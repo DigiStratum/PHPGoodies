@@ -30,8 +30,8 @@ abstract class Csv {
 	 * @return array An array representing the supplied CSV fields
 	 */
 	static public function tokenize($csvline, $delimiter = '"', $separator = ',') {
-		$final_data = Array();
-		$this_data = $ch = '';
+		$finalData = Array();
+		$thisData = $ch = '';
 		$infield = $escaped = $delimited = false;
 		for ($pos = 0; $pos < strlen($csvline); $pos++) {
 
@@ -51,11 +51,11 @@ abstract class Csv {
 					if (($ch == $delimiter) || ($ch == "\\")) {
 
 						// Add the char to the output and move on
-						$this_data .= $ch;
+						$thisData .= $ch;
 						continue;
 					}
 					// Otherwise it was an invalid escapement; pass on the original escape char and keep looking
-					$this_data .= "\\";
+					$thisData .= "\\";
 				}
 
 				// If this is the escape char, we'll expect to see a delimiter next...
@@ -75,13 +75,13 @@ abstract class Csv {
 
 					// The data gets this character then; the next char will
 					// be separator (or EOL) which will trigger the completion
-					$this_data .= $ch;
+					$thisData .= $ch;
 					continue;
 				}
 
 				// Non-delimited means that any character other than separator gets added to the field
 				if ($ch != $separator) {
-					$this_data .= $ch;
+					$thisData .= $ch;
 					continue;
 				}
 
@@ -92,27 +92,27 @@ abstract class Csv {
 			// Look for a separator or quoting delimiter to start the field, etc.
 			if ($ch == $separator) {
 
-				// The field separator - whatever is in this_data now goes to the final
-				$final_data[] = $this_data;
-				$this_data = '';
+				// The field separator - whatever is in thisData now goes to the final
+				$finalData[] = $thisData;
+				$thisData = '';
 				continue;
 			}
 
 			// Opening delimeter only valid at beginning of a field
-			if ((! strlen($this_data)) && ($ch == $delimiter)) {
+			if ((! strlen($thisData)) && ($ch == $delimiter)) {
 				$delimiter = $ch;
 				$infield = $delimited = true;
 				continue;
 			}
 
 			// Anything else must be initial data!
-			$this_data .= $ch;
+			$thisData .= $ch;
 		}
 
-		// If there is still data lingering in this_data then it was the last field or if
+		// If there is still data lingering in thisData then it was the last field or if
 		// the last char was separator then there is an empty field hanging off the end
-		if (strlen($this_data) || ($ch == $separator)) $final_data[] = $this_data;
+		if (strlen($thisData) || ($ch == $separator)) $finalData[] = $thisData;
 
-		return($final_data);
+		return($finalData);
 	}
 }

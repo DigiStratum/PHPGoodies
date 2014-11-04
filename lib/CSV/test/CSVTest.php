@@ -5,9 +5,11 @@
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
-use PHPGoodies\CSV as CSV;
+namespace PHPGoodies;
 
-class CSVTest extends PHPUnit_Framework_TestCase {
+require(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
+
+class CSVTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * An instance of the class under test
@@ -20,8 +22,7 @@ class CSVTest extends PHPUnit_Framework_TestCase {
 	public function __construct() {
 
 		// Where is the source dir? (independent of CWD)
-		$srcdir = realpath(dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'src');
-		require_once($srcdir . DIRECTORY_SEPARATOR . 'CSV.php');
+		PHPGoodies::import('lib.CSV.CSV');
 	}
 
 	/**

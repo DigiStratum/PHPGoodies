@@ -457,5 +457,45 @@ class Mysql {
 	public function error() {
 		return mysql_error($this->link);
 	}
+
+	/**
+	 * Get schema info for the specified table
+	 *
+	 * Initial implementation is just formatting the DESCRIBE details for the table, however it
+	 * will be possible to add further details in the future without disrupting these details
+	 * as they are currently provided when needed.
+	 *
+	 * @param string $table Name of the table we want schema info for
+	 * @param string $database Name of the database that the table is in (optional)
+	 *
+	 * @return array Associtive array with schema info for the table or null on error
+	 */
+	public function schemaInfo($table, $database = null) {
+		$tableIdent = $this->identifier($database, $table);
+		$tableInfo = $this->query("DESCRIBE {$tableIdent};");
+                if (false === $tableInfo) return null;
+                $schema = array();
+                foreach ($tableInfo as $fieldInfo) {
+			if (preg_match('/(.*?)\((.*?)\)/', $fieldInfo['Type'], $matches)) {
+				$type = $matches[1];
+				$size = $matches[2];
+			}
+			else {
+				$type = $fieldInfo['Type'];
+				$size = 0;
+			}
+
+			$nullable = ($fieldInfo['Null'] == 'YES') ? true : false;
+
+			$schema[$fieldInfo['Field']] = array(
+				'type' => $type,
+				'size' => $size,
+				'nullable' => $nullable,
+				'default' => $fieldInfo['Default']
+			);
+                }
+
+		return $schema;
+	}
 }
 

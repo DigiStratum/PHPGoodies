@@ -132,12 +132,8 @@ END;
 
 		// Turn the table fields into a header row
 		$tableIdent = $this->db->identifier($database, $table);
-		$tableInfo = $this->db->query("DESCRIBE {$tableIdent};");
-		if (! $this->db->QC($tableInfo)) return false;
-		$fields = array();
-		foreach ($tableInfo as $fieldInfo) {
-			$fields[] = $fieldInfo['Field'];
-		}
+		$tableSchema = $this->db->schemaInfo($table, $database);
+		$fields = array_keys($tableSchema);
 
 		// Open the CSV file or fail
 		if (! ($fout = fopen($path, 'w'))) return false;
@@ -151,7 +147,6 @@ END;
 			// write out the header line
 			$res = fputs($fout, Csv::csvize($fields) . "\n");
 			if (false === $res) break;
-
 			$batchNum = 0;
 
 			// Keep reading batches until one with a lower record count than requested

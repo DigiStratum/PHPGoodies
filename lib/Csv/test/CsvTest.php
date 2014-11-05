@@ -109,4 +109,32 @@ class CsvTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals("shouldn't fail", $data[0]);
 		$this->assertEquals('c,z', $data[1]);
 	}
+
+	/**
+	 * Test that passing an empty array to csvize() results in an empty string
+	 */
+	public function testThatAnEmptyArrayResultsInAnEmptyString() {
+		$csv = Csv::csvize(array());
+		$this->assertEquals('string', gettype($csv));
+		$this->assertEquals(0, strlen($csv));
+	}
+
+	/**
+	 * Test that passing a simple array to csvize() results in a properly encoded string
+	 */
+	public function testThatASimpleArrayIsEncodedProperly() {
+		$csv = Csv::csvize(array(1,'2',3,'a,b,c'));
+		$this->assertEquals('"1","2","3","a,b,c"', $csv);
+	}
+
+	/**
+	 * Test that escaping of delimiter and escape characters is handled correctly
+	 */
+	public function testThatEscapingIsHandledCorrectly() {
+		$str = "\"\\hello\\\"";
+		$csv = Csv::csvize(array($str));
+		// Crazy slashes: one escaped slash in the origrinal become DOUBLE escaped slashes!
+		$this->assertEquals('"\"\\\\hello\\\\\""', $csv);
+	}
 }
+

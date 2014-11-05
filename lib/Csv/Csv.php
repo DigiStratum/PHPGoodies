@@ -115,4 +115,36 @@ abstract class Csv {
 
 		return($finalData);
 	}
+
+	/**
+	 * Convert an array of numeric/string values into a CSV string
+	 *
+	 * We will wrap all values, numeric or string, with delimiters since it is safe and easy.
+	 *
+	 * @param array $data An array with simple numeric and string values
+	 * @param string $delimiter Single-character value delimiter; optional, defaults to double-quote
+	 * @param string $separator Single-character value separator; optional, defaults to comma
+	 *
+	 * @return string A CSV string representing the supplied data array
+	 */
+	static public function csvize($data, $delimiter = '"', $separator = ',') {
+		$csvline = '';
+
+		foreach ($data as $value) {
+
+			// \n and \r characters are not acceptable; convert to spaces
+			$value = str_replace(Array("\n", "\r"), ' ', $value);
+
+			// Escape the escape if any exist
+			$value = str_replace("\\", "\\\\", $value);
+
+			// Escape the delimiter if any exist
+			$value = str_replace($delimiter, "\\{$delimiter}", $value);
+
+			// Tack this value onto the end of the line
+			$csvline .= (strlen($csvline) ? $separator : '') . "{$delimiter}{$value}{$delimiter}";
+		}
+
+		return $csvline;
+	}
 }

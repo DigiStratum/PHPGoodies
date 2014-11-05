@@ -351,6 +351,25 @@ class Mysql {
 	}
 
 	/**
+	 * Helper function to set a field equal to the supplied value
+	 *
+	 * This expects the supplied value to be a single number/string, not an array; current
+	 * implementation is a simple wrapper of the makeCondition() method which is intended for
+	 * checking rather than setting, but they are syntactically identical.
+	 *
+	 * @param string $field The name of the field to set
+	 * @param mixed $value A single numeric/string value
+	 * @param string $table Name of table to set the field on (optional)
+	 * @param string $database Name of database to set the field on (optional, requires table)
+	 *
+	 * @return string Setter statement for inclusion in a query, or null on some problem
+	 */
+	public function makeSetter($field, $value, $table = null, $database = null) {
+		if (is_array($value)) return null;
+		return $this->makeCondition($field, $value, '=', $table, $database);
+	}
+
+	/**
 	 * Get the number of affected rows by the previous query
 	 *
 	 * Typically, queries that don't return data, but affect stored data such as delete, update,
@@ -404,10 +423,10 @@ class Mysql {
 	 */
 	public function identifier($database = null, $table = null, $field = null) {
 		$parts = array();
-		if (! is_null($database)) $parts .= $database;
-		if (! is_null($table)) $parts .= $table;
-		if (! is_null($field)) $parts .= $field;
-		return '`' . join('`.`', $parts) . '`';
+		if (! is_null($database)) $parts[] = $database;
+		if (! is_null($table)) $parts[] = $table;
+		if (! is_null($field)) $parts[] = $field;
+		return (count($parts) > 0) ? '`' . join('`.`', $parts) . '`' : '';
 	}
 
 	/**

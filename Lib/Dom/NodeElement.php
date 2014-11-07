@@ -24,15 +24,22 @@ class NodeElement extends Node implements NodeInterface {
 	protected $elementType;
 
 	/**
+	 * The HTML specification version we want to support (4/5)
+	 */
+	protected $compatability;
+
+	/**
 	 * Constructor
 	 *
 	 * @param string $name The kind of Html element (i.e. 'a', 'table', etc.)
 	 * @param string $elementType The type of element (either 'inline' or 'block')
+	 * @param integer $compatability The HTML specification version we want to support (4/5)
 	 */
-	public function __construct($name, $elementType) {
+	public function __construct($name, $elementType, $compatability = 5) {
 		parent::__construct('element');
 		$this->name = $name;
 		$this->elementType = $elementType;
+		$this->compatability = $compatability;
 	}
 
 	/**
@@ -105,6 +112,39 @@ class NodeElement extends Node implements NodeInterface {
 	}
 
 	/**
+	 * Set the lang attribute value
+	 *
+	 * @param string $value The value to set for this attribute
+	 *
+	 * @return object This object for chaining...
+	 */
+	public function setLang($value = null) {
+		$this->setAttribute('lang', $value);
+
+		return $this;
+	}
+
+	/**
+	 * Set the hidden attribute value
+	 *
+	 * HTML 5+ compatability only
+	 *
+	 * @param string $value The value to set for this attribute
+	 *
+	 * @return object This object for chaining...
+	 */
+	public function setHidden($value = null) {
+		if ($this->compatability >= 5) {
+			$this->setAttribute('hidden', $value);
+		}
+		return $this;
+	}
+
+	// TODO also add... (ref: http://www.w3schools.com/tags/ref_standardattributes.asp)
+	// version 4:  accesskey, class, dir, id, lang, style, tabindex, title
+	// version 5: contenteditable, contextmenu, data-*, draggable, dropzone, hidden, spellcheck, translate
+
+	/**
 	 * Turn this element node into a string
 	 *
 	 * @return string HTML with the rendered element
@@ -128,3 +168,4 @@ class NodeElement extends Node implements NodeInterface {
 		}
 	}
 }
+

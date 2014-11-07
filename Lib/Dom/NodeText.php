@@ -7,10 +7,10 @@
 
 namespace PHPGoodies;
 
-require_once(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
+require_once(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
 
-PHPGoodies::import('lib.Dom.Node');
-PHPGoodies::import('lib.Dom.NodeInterface');
+PHPGoodies::import('Lib.Dom.Node');
+PHPGoodies::import('Lib.Dom.NodeInterface');
 
 /**
  * NodeText - General HTML Text Generation support

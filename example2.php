@@ -12,12 +12,14 @@ use PHPGoodies\Mysql as Mysql;
 
 // 2) Load up our goodies
 require('PHPGoodies.php');
-PHPGoodies::import('lib.Mysql.Mysql');
-PHPGoodies::import('util.db.CsvDb.CsvDb');
+PHPGoodies::import('Lib.Db.Mysql.Mysql');
+PHPGoodies::import('Util.Db.CsvDb.CsvDb');
 
 // 3) Make a database connection
 $db = new Mysql();
-$db->connect('hostname', 'username', 'password', 'databasename');
+if (! $db->connect('hostname', 'username', 'password', 'databasename')) {
+	die("error connecting to database\n");
+}
 
 // 4) Make a new CsvDb utility; dependency inject the Mysql database instance
 $csvDb = new CsvDb($db);

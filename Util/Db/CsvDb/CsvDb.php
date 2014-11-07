@@ -40,7 +40,7 @@ class CsvDb {
 		$this->db =& $mysql;
 
 		// We don't need to dependency inject CSV since it is stateless
-		PHPGoodies::import('lib.Csv.Csv');
+		PHPGoodies::import('Lib.File.Csv.Csv');
 	}
 
 	/**

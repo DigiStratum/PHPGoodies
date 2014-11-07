@@ -7,7 +7,7 @@
 
 namespace PHPGoodies;
 
-require(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
+require(realpath(dirname(__FILE__) . '/../../../../PHPGoodies.php'));
 
 class CsvTest extends \PHPUnit_Framework_TestCase {
 
@@ -15,7 +15,7 @@ class CsvTest extends \PHPUnit_Framework_TestCase {
 	 * Constructor
 	 */
 	public function __construct() {
-		PHPGoodies::import('lib.Csv.Csv');
+		PHPGoodies::import('Lib.File.Csv.Csv');
 	}
 
 	/**

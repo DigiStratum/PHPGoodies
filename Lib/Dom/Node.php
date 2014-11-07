@@ -54,6 +54,33 @@ abstract class Node {
 	}
 
 	/**
+	 * Getter for our type
+	 *
+	 * @return string The type of this node
+	 */
+	public function getType() {
+		return $this->type;
+	}
+
+	/**
+	 * Getter for our name
+	 *
+	 * @return string The name of this node
+	 */
+	public function getName() {
+		return $this->name;
+	}
+
+	/**
+	 * Getter for our value
+	 *
+	 * @return string The value of this node
+	 */
+	public function getValue() {
+		return $this->value;
+	}
+
+	/**
 	 * Append a child node to the end of the set of nodeList for this node
 	 *
 	 * @param object $node A Node opject to append to our set of nodeList

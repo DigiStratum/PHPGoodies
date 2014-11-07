@@ -36,18 +36,71 @@ class NodeElement extends Node implements NodeInterface {
 	}
 
 	/**
-	 * Add an attribute to this element with the specified name/value
-	 *
-	 * Note that no effort is made to prevent the addition of the same attribute twice.
+	 * Set the named attribute on this element to the specified value
 	 *
 	 * @param string $name The name of the attribute to add
 	 * @param string $value The value to assign to the attribute
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function addAttribute($name, $value = null) {
-		$attrNode = new NodeAttribute($name, $value);
-		$this->appendNode($attrNode); 
+	public function setAttribute($name, $value = null) {
+
+		// If this attribute is already set...
+		$attrNode =& $this->getAttribute($name);
+		if (isset($attrNode)) {
+
+			// Update the value
+			$attrNode->setValue($value);
+		}
+		else {
+
+			// Make a new attribute!
+			$attrNode = new NodeAttribute($name, $value);
+			$this->appendNode($attrNode); 
+		}
+		return $this;
+	}
+
+	/**
+	 * Get the named attribute if it is set
+	 *
+	 * @param string $name The name of the attribute we are after
+	 *
+	 * @return object NodeAttribute instance for the named attribute, or null if there isn't one
+	 */
+	public function &getAttribute($name) {
+		foreach ($this->nodeList as $node) {
+			if ($node->getType() != 'attribute') continue;
+			if ($node->getName() == $name) return $node;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Remove the named attribute if it is set
+	 *
+	 * @param string $name The name of the attribute we are after
+	 *
+	 * @return object $this for chaining...
+	 */
+	public function removeAttribute($name) {
+
+		// My professors urged me never to use single-letter variable names, so...
+		for ($xx = 0; $xx < count($this->nodeList); $xx++) {
+			if ($this->nodeList[$xx]->getType() != 'attribute') continue;
+			if ($this->nodeList[$xx]->getName() == $name) {
+
+				// Get rid of this one...
+				unset($this->nodeList[$xx]);
+
+				// And reindex the array
+				$this->nodeList = array_values($this->nodeList);
+
+				break;
+			}
+		}
+
 		return $this;
 	}
 

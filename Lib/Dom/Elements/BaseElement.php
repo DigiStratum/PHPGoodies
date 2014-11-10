@@ -12,8 +12,8 @@ require_once(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
 PHPGoodies::import('Lib.Dom.NodeElement');
 
 // Attributes
-PHPGoodies::import('Lib.Dom.HrefAttribute');
-PHPGoodies::import('Lib.Dom.TargetAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.HrefAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.TargetAttribute');
 
 /**
  * BaseElement - BASE Element

@@ -12,8 +12,8 @@ require_once(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
 PHPGoodies::import('Lib.Dom.NodeElement');
 
 // Attributes
-PHPGoodies::import('Lib.Dom.CompactAttribute');
-PHPGoodies::import('Lib.Dom.TypeAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.CompactAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.TypeAttribute');
 
 /**
  * UlElement - UL Element

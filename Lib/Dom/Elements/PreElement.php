@@ -12,9 +12,9 @@ require_once(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
 PHPGoodies::import('Lib.Dom.NodeElement');
 
 // Attributes
-PHPGoodies::import('Lib.Dom.ColsAttribute');
-PHPGoodies::import('Lib.Dom.WidthAttribute');
-PHPGoodies::import('Lib.Dom.WrapAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.ColsAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.WidthAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.WrapAttribute');
 
 /**
  * PreElement - PRE Element

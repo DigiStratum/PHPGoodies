@@ -1,6 +1,6 @@
 <?php
 /**
-  * PHPGoodies:TemplateElement - TEMPLATE Element
+  * PHPGoodies:DivElement - DIV Element
   *
   * @author Sean M. Kelly <smk@smkelly.com>
   */
@@ -12,19 +12,20 @@ require_once(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
 PHPGoodies::import('Lib.Dom.NodeElement');
 
 // Attributes
-PHPGoodies::import('Lib.Dom.ContentAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.AlignAttribute');
+
 
 /**
- * TemplateElement - TEMPLATE Element
+ * DivElement - DIV Element
  */
-class TemplateElement extends NodeElement {
-	use ContentAttribute;
+class DivElement extends NodeElement {
+	use AlignAttribute;
 
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
-		parent::__construct('template', 'block');
+		parent::__construct('div', 'block');
 	}
 }
 

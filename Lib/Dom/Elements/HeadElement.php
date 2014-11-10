@@ -1,6 +1,6 @@
 <?php
 /**
-  * PHPGoodies:LiElement - LI Element
+  * PHPGoodies:HeadElement - HEAD Element
   *
   * @author Sean M. Kelly <smk@smkelly.com>
   */
@@ -12,20 +12,20 @@ require_once(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
 PHPGoodies::import('Lib.Dom.NodeElement');
 
 // Attributes
-PHPGoodies::import('Lib.Dom.ValueAttribute');
-PHPGoodies::import('Lib.Dom.TypeAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.ProfileAttribute');
+
 
 /**
- * LiElement - LI Element
+ * HeadElement - HEAD Element
  */
-class LiElement extends NodeElement {
-	use ValueAttribute, TypeAttribute;
+class HeadElement extends NodeElement {
+	use ProfileAttribute;
 
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
-		parent::__construct('li', 'block');
+		parent::__construct('head', 'block');
 	}
 }
 

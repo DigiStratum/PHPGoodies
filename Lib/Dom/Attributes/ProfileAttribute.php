@@ -1,28 +1,14 @@
 <?php
 /**
-  * PHPGoodies:HeadElement - HEAD Element
-  *
-  * @author Sean M. Kelly <smk@smkelly.com>
-  */
-
-namespace PHPGoodies;
-
-require_once(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
-
-PHPGoodies::import('Lib.Dom.NodeElement');
+ * PHPGoodies:ProfileAttribute - PROFILE element attribute trait for NodeElements to easily use
+ *
+ * @author Sean M. Kelly <smk@smkelly.com>
+ */
 
 /**
- * HeadElement - HEAD Element
+ * ProfileAttribute - PROFILE element attribute trait for NodeElements to easily use
  */
-class HeadElement extends NodeElement {
-
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-		parent::__construct('head', 'block');
-	}
-
+trait ProfileAttribute {
 	/**
 	 * Set the profile attribute value
 	 *

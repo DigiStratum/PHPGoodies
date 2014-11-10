@@ -10,24 +10,24 @@ namespace PHPGoodies;
 require_once(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
 
 // HTML4 Attributes
-PHPGoodies::import('Lib.Dom.AccessKeyAttribute');
-PHPGoodies::import('Lib.Dom.ClassAttribute');
-PHPGoodies::import('Lib.Dom.DirAttribute');
-PHPGoodies::import('Lib.Dom.IdAttribute');
-PHPGoodies::import('Lib.Dom.LangAttribute');
-PHPGoodies::import('Lib.Dom.NodeAttribute');
-PHPGoodies::import('Lib.Dom.StyleAttribute');
-PHPGoodies::import('Lib.Dom.TabIndexAttribute');
-PHPGoodies::import('Lib.Dom.TitleAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.AccessKeyAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.ClassAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.DirAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.IdAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.LangAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.NodeAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.StyleAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.TabIndexAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.TitleAttribute');
 
 // HTML5 Attributes
-PHPGoodies::import('Lib.Dom.ContentEditable');
-PHPGoodies::import('Lib.Dom.ContextMenu');
-PHPGoodies::import('Lib.Dom.Draggable');
-PHPGoodies::import('Lib.Dom.DropZone');
-PHPGoodies::import('Lib.Dom.Hidden');
-PHPGoodies::import('Lib.Dom.SpellCheck');
-PHPGoodies::import('Lib.Dom.Translate');
+PHPGoodies::import('Lib.Dom.Attributes.ContentEditable');
+PHPGoodies::import('Lib.Dom.Attributes.ContextMenu');
+PHPGoodies::import('Lib.Dom.Attributes.Draggable');
+PHPGoodies::import('Lib.Dom.Attributes.DropZone');
+PHPGoodies::import('Lib.Dom.Attributes.Hidden');
+PHPGoodies::import('Lib.Dom.Attributes.SpellCheck');
+PHPGoodies::import('Lib.Dom.Attributes.Translate');
 
 /**
  * GlobalAttributes - A collection of attribute traits global to all HTML elements

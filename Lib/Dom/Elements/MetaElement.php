@@ -12,11 +12,11 @@ require_once(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
 PHPGoodies::import('Lib.Dom.NodeElement');
 
 // Attributes
-PHPGoodies::import('Lib.Dom.CharSetAttribute');
-PHPGoodies::import('Lib.Dom.ContentAttribute');
-PHPGoodies::import('Lib.Dom.HttpEquivAttribute');
-PHPGoodies::import('Lib.Dom.NameAttribute');
-PHPGoodies::import('Lib.Dom.SchemeAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.CharSetAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.ContentAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.HttpEquivAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.NameAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.SchemeAttribute');
 
 /**
  * MetaElement - META Element

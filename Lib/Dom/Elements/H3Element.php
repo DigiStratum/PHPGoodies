@@ -1,6 +1,6 @@
 <?php
 /**
-  * PHPGoodies:DdElement - DD Element
+  * PHPGoodies:H3Element - H3 Element
   *
   * @author Sean M. Kelly <smk@smkelly.com>
   */
@@ -12,20 +12,20 @@ require_once(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
 PHPGoodies::import('Lib.Dom.NodeElement');
 
 // Attributes
-PHPGoodies::import('Lib.Dom.NoWrapAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.AlignAttribute');
 
 
 /**
- * DdElement - DD Element
+ * H3Element - H3 Element
  */
-class DdElement extends NodeElement {
-	use NoWrapAttribute;
+class H3Element extends NodeElement {
+	use AlignAttribute;
 
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
-		parent::__construct('dd', 'block');
+		parent::__construct('h3', 'block');
 	}
 }
 

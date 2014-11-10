@@ -1,6 +1,6 @@
 <?php
 /**
-  * PHPGoodies:BlockQuoteElement - BLOCKQUOTE Element
+  * PHPGoodies:LiElement - LI Element
   *
   * @author Sean M. Kelly <smk@smkelly.com>
   */
@@ -12,19 +12,20 @@ require_once(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
 PHPGoodies::import('Lib.Dom.NodeElement');
 
 // Attributes
-PHPGoodies::import('Lib.Dom.CiteAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.ValueAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.TypeAttribute');
 
 /**
- * BlockQuoteElement - BLOCKQUOTE Element
+ * LiElement - LI Element
  */
-class BlockQuoteElement extends NodeElement {
-	use CiteAttribute;
+class LiElement extends NodeElement {
+	use ValueAttribute, TypeAttribute;
 
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
-		parent::__construct('blockquote', 'block');
+		parent::__construct('li', 'block');
 	}
 }
 

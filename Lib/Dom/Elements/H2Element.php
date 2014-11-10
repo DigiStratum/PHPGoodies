@@ -1,6 +1,6 @@
 <?php
 /**
-  * PHPGoodies:PElement - P Element
+  * PHPGoodies:H2Element - H2 Element
   *
   * @author Sean M. Kelly <smk@smkelly.com>
   */
@@ -12,20 +12,20 @@ require_once(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
 PHPGoodies::import('Lib.Dom.NodeElement');
 
 // Attributes
-PHPGoodies::import('Lib.Dom.AlignAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.AlignAttribute');
 
 
 /**
- * PElement - P Element
+ * H2Element - H2 Element
  */
-class PElement extends NodeElement {
+class H2Element extends NodeElement {
 	use AlignAttribute;
 
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
-		parent::__construct('p', 'block');
+		parent::__construct('h2', 'block');
 	}
 }
 

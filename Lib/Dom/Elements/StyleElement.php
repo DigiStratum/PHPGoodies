@@ -12,11 +12,11 @@ require_once(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
 PHPGoodies::import('Lib.Dom.NodeElement');
 
 // Attributes
-PHPGoodies::import('Lib.Dom.TypeAttribute');
-PHPGoodies::import('Lib.Dom.MediaAttribute');
-PHPGoodies::import('Lib.Dom.ScopedAttribute');
-PHPGoodies::import('Lib.Dom.TitleAttribute');
-PHPGoodies::import('Lib.Dom.DisabledAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.TypeAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.MediaAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.ScopedAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.TitleAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.DisabledAttribute');
 
 
 /**

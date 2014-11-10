@@ -12,11 +12,11 @@ require_once(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
 PHPGoodies::import('Lib.Dom.NodeElement');
 
 // Attributes
-PHPGoodies::import('Lib.Dom.AlignAttribute');
-PHPGoodies::import('Lib.Dom.ColorAttribute');
-PHPGoodies::import('Lib.Dom.NoShadeAttribute');
-PHPGoodies::import('Lib.Dom.SizeAttribute');
-PHPGoodies::import('Lib.Dom.WidthAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.AlignAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.ColorAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.NoShadeAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.SizeAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.WidthAttribute');
 
 /**
  * HrElement - HR Element

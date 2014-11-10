@@ -27,7 +27,7 @@ abstract class PHPGoodies {
 	}
 
 	/**
-	 * Import the specified class/interface resource definition with dotted notation
+	 * Import the specified class/interface/trait resource definition with dotted notation
 	 *
 	 * This import implementation mimics Java's implementation by relativizing the path where classes
 	 * can be loaded from, and enforcing the class name matching the filename.
@@ -73,17 +73,17 @@ abstract class PHPGoodies {
 	}
 
 	/**
-	 * Determine whether a class or interface with the specified name has already been imported
+	 * Determine whether a class, interface, or trait with the specified name is already imported
 	 *
 	 * @todo Use newer NAMESPACE::CLASSNAME supported in PHP5.5+
 	 *
 	 * @param string $name PHP native string name to look for
 	 *
-	 * @return boolean true if the name is defined as a class or interface, else false
+	 * @return boolean true if the name is defined as a class, interface, or trace, else false
 	 */
 	public static function isImported($name) {
 		$nsName = __NAMESPACE__ . '\\' . $name;
-		return (class_exists($nsName) || interface_exists($nsName));
+		return (class_exists($nsName) || interface_exists($nsName || trait_exists($nsName)));
 	}
 }
 

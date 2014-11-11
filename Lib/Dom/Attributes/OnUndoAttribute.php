@@ -5,6 +5,8 @@
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
+namespace PHPGoodies;
+
 /**
  * OnUndoAttribute - ONUNDO element attribute trait for NodeElements to easily use
  */

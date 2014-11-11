@@ -5,6 +5,8 @@
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
+namespace PHPGoodies;
+
 /**
  * HeadersAttribute - HEADERS element attribute trait for NodeElements to easily use
  */

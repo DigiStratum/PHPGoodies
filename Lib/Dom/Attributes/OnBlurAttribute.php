@@ -5,6 +5,8 @@
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
+namespace PHPGoodies;
+
 /**
  * OnBlurAttribute - ONBLUR element attribute trait for NodeElements to easily use
  */

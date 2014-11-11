@@ -5,6 +5,8 @@
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
+namespace PHPGoodies;
+
 /**
  * NoWrapAttribute - NOWRAP element attribute trait for NodeElements to easily use
  */

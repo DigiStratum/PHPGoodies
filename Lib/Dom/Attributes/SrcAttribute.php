@@ -5,6 +5,8 @@
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
+namespace PHPGoodies;
+
 /**
  * SrcAttribute - SRC element attribute trait for NodeElements to easily use
  */

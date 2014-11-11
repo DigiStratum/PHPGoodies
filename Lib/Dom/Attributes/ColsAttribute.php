@@ -5,6 +5,8 @@
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
+namespace PHPGoodies;
+
 /**
  * ColsAttribute - COLS element attribute trait for NodeElements to easily use
  */

@@ -1,14 +1,16 @@
 <?php
 /**
- * PHPGoodies:HhiddendenAttribute - HIDDEN element attribute trait for NodeElements to easily use
+ * PHPGoodies:HiddenAttribute - HIDDEN element attribute trait for NodeElements to easily use
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
+namespace PHPGoodies;
+
 /**
- * HhiddendenAttribute - HIDDEN element attribute trait for NodeElements to easily use
+ * HiddenAttribute - HIDDEN element attribute trait for NodeElements to easily use
  */
-trait HhiddendenAttribute {
+trait HiddenAttribute {
 	/**
 	 * Set the hidden attribute value
 	 *
@@ -16,7 +18,7 @@ trait HhiddendenAttribute {
 	 *
 	 * @return object This object for chaining...
 	 */
-	public function setHhiddenden($value) {
+	public function setHidden($value) {
 		$this->setAttribute('hidden', $value);
 
 		return $this;
@@ -27,7 +29,7 @@ trait HhiddendenAttribute {
 	 *
 	 * @return string The attribute's current value or null if not set
 	 */
-	public function getHhiddenden() {
+	public function getHidden() {
 		return $this->getAttribute('hidden');
 	}
 }

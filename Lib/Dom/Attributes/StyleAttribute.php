@@ -5,6 +5,8 @@
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
+namespace PHPGoodies;
+
 /**
  * StyleAttribute - STYLE element attribute trait for NodeElements to easily use
  */

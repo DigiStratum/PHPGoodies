@@ -5,6 +5,8 @@
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
+namespace PHPGoodies;
+
 /**
  * AutoBufferAttribute - AUTOBUFFER element attribute trait for NodeElements to easily use
  */

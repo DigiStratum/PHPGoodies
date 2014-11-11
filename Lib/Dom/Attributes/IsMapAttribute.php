@@ -5,6 +5,8 @@
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
+namespace PHPGoodies;
+
 /**
  * IsMapAttribute - ISMAP element attribute trait for NodeElements to easily use
  */

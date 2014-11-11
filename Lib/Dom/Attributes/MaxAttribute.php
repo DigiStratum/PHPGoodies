@@ -5,6 +5,8 @@
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
+namespace PHPGoodies;
+
 /**
  * MaxAttribute - MAX element attribute trait for NodeElements to easily use
  */

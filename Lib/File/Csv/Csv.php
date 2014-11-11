@@ -56,6 +56,7 @@ abstract class Csv {
 					}
 					// Otherwise it was an invalid escapement; pass on the original escape char and keep looking
 					$thisData .= "\\";
+					continue;
 				}
 
 				// If this is the escape char, we'll expect to see a delimiter next...

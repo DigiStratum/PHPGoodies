@@ -4,13 +4,14 @@
  *
  * Many of the PHPGoodies class implementations stand alone, however some of the more complex
  * implementations have external dependencies within the PHPGoodies family of code. The supporting
- * functions and constants found here provide a streamlined mechanism for accessing those
- * dependencies.
+ * code found here provide a streamlined mechanism for accessing those dependencies.
  *
-- * @author Sean M. Kelly <smk@smkelly.com>
+ * @author Sean M. Kelly <smk@smkelly.com>
  */
 
 namespace PHPGoodies;
+
+use ReflectionClass;
 
 /**
  * PHPGoodies support code
@@ -84,6 +85,38 @@ abstract class PHPGoodies {
 	public static function isImported($name) {
 		$nsName = __NAMESPACE__ . '\\' . $name;
 		return (class_exists($nsName) || interface_exists($nsName) || trait_exists($nsName));
+	}
+
+	/**
+	 * Factory method to get an instance of the named resource (class)
+	 *
+	 * Automatically imports the resource if it hasn't been already. This method is useful to
+	 * make a single line of code out of your typical import/new() two-line operations.
+	 *
+	 * @param string $resource The dotted notation resource identifier to import
+	 * @param ... Variable arguments follow to be passed to the resource class' constructor
+	 *
+	 * @return object Instance of the requested resource if all went well
+	 */
+	public static function &instantiate($resource) {
+
+		// Always try to import first
+		static::import($resource);
+
+		// Figure out the classname
+		$resourceParts = explode('.', $resource);
+		$className = $resourceParts[count($resourceParts) - 1];
+		$nsClassName = __NAMESPACE__ . "\\{$className}";
+
+		// Get the variable argument list ...
+		$args = func_get_args();
+		// ... less the first which is the resource identifier
+		array_shift($args);
+
+		// Reflect so that we can pass args
+		// ref: http://stackoverflow.com/questions/2640208/call-a-constructor-from-variable-arguments-with-php
+		$reflectedClass = new ReflectionClass($nsClassName);
+		return $reflectedClass->newInstanceArgs($args);
 	}
 }
 

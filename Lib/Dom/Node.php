@@ -84,24 +84,32 @@ abstract class Node {
 	 * Append a child node to the end of the set of nodeList for this node
 	 *
 	 * @param object $node A Node opject to append to our set of nodeList
+	 *
+	 * @return object Reference to the newly appended node
 	 */
-	public function appendNode($node) {
+	public function &appendNode($node) {
 
 		// Only other Nodes need apply...
 		if (! ($node instanceof Node)) return;
 		$this->nodeList[] = $node;
+
+		return $this->nodeList[count($this->nodeList) - 1];
 	}
 
 	/**
 	 * Prepend a child node to the beginning of the set of nodeList for this node
 	 *
 	 * @param object $node A Node opject to prepend to our set of nodeList
+	 *
+	 * @return object Reference to the newly appended node
 	 */
-	public function prependNode($node) {
+	public function &prependNode($node) {
 
 		// Only other Nodes need apply...
 		if (! ($node instanceof Node)) return;
 		array_unshift($this->nodeList, $node);
+
+		return $this->nodeList[0];
 	}
 
 	/**

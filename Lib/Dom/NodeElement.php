@@ -51,7 +51,7 @@ class NodeElement extends Node implements NodeInterface {
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function setAttribute($name, $value = null) {
+	public function &setAttribute($name, $value = null) {
 
 		// If this attribute is already set...
 		$attrNode =& $this->getAttribute($name);
@@ -92,7 +92,7 @@ class NodeElement extends Node implements NodeInterface {
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function removeAttribute($name) {
+	public function &removeAttribute($name) {
 
 		// My professors urged me never to use single-letter variable names, so...
 		for ($xx = 0; $xx < count($this->nodeList); $xx++) {
@@ -110,6 +110,24 @@ class NodeElement extends Node implements NodeInterface {
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Add a child element to this one
+	 *
+	 * @param string $type The element type such as 'a', 'body', etc.
+	 *
+	 * @return object instance of the child class
+	 */
+	public function &addChild($type) {
+
+		// Figure out the classname and import it as needed
+		$className = ucfirst(strtolower($type)) . 'Element';
+		if (! class_exists($className)) {
+			PHPGoodies::import("Lib.Dom.Elements.{$className}");
+		}
+		$nsClassName = __NAMESPACE__ . "\\{$className}";
+		return $this->appendNode(new $nsClassName());
 	}
 
 	/**

@@ -58,6 +58,6 @@ class NodeAttribute extends Node implements NodeInterface {
 	 * @return string HTML with the rendered attribute
 	 */
 	public function toString() {
-		return " {$this->name}" . (is_null($this->value) ? '' : "\"{$this->value}\"");
+		return " {$this->name}" . (is_null($this->value) ? '' : "=\"{$this->value}\"");
 	}
 }

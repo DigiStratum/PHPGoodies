@@ -9,13 +9,14 @@ namespace PHPGoodies;
 
 require_once(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
 
+PHPGoodies::import('Lib.Dom.NodeAttribute');
+
 // HTML4 Attributes
 PHPGoodies::import('Lib.Dom.Attributes.AccessKeyAttribute');
 PHPGoodies::import('Lib.Dom.Attributes.ClassAttribute');
 PHPGoodies::import('Lib.Dom.Attributes.DirAttribute');
 PHPGoodies::import('Lib.Dom.Attributes.IdAttribute');
 PHPGoodies::import('Lib.Dom.Attributes.LangAttribute');
-PHPGoodies::import('Lib.Dom.Attributes.NodeAttribute');
 PHPGoodies::import('Lib.Dom.Attributes.StyleAttribute');
 PHPGoodies::import('Lib.Dom.Attributes.TabIndexAttribute');
 PHPGoodies::import('Lib.Dom.Attributes.TitleAttribute');
@@ -36,7 +37,7 @@ trait GlobalAttributes {
 
 	// HTML4
 	use AccessKeyAttribute, ClassAttribute, DirAttribute, IdAttribute, LangAttribute;
-       	use NodeAttribute, StyleAttribute, TabIndexAttribute, TitleAttribute;
+       	use StyleAttribute, TabIndexAttribute, TitleAttribute;
 
 	// HTML5
 	use ContentEditableAttribute, ContextMenuAttribute, DraggableAttribute, DropZoneAttribute;

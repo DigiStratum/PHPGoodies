@@ -61,7 +61,7 @@ abstract class PHPGoodies {
 
 		// If resultant path invalid, class missing
 		if (! @file_exists($path)) {
-			throw new \Exception("Could not import implementation for '{$resource}'");
+			throw new \Exception("Could not import implementation for '{$resource}'; not found at [{$path}]");
 		}
 
 		@require_once($path);
@@ -83,7 +83,7 @@ abstract class PHPGoodies {
 	 */
 	public static function isImported($name) {
 		$nsName = __NAMESPACE__ . '\\' . $name;
-		return (class_exists($nsName) || interface_exists($nsName || trait_exists($nsName)));
+		return (class_exists($nsName) || interface_exists($nsName) || trait_exists($nsName));
 	}
 }
 

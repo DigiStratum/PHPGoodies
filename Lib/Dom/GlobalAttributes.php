@@ -21,13 +21,13 @@ PHPGoodies::import('Lib.Dom.Attributes.TabIndexAttribute');
 PHPGoodies::import('Lib.Dom.Attributes.TitleAttribute');
 
 // HTML5 Attributes
-PHPGoodies::import('Lib.Dom.Attributes.ContentEditable');
-PHPGoodies::import('Lib.Dom.Attributes.ContextMenu');
-PHPGoodies::import('Lib.Dom.Attributes.Draggable');
-PHPGoodies::import('Lib.Dom.Attributes.DropZone');
-PHPGoodies::import('Lib.Dom.Attributes.Hidden');
-PHPGoodies::import('Lib.Dom.Attributes.SpellCheck');
-PHPGoodies::import('Lib.Dom.Attributes.Translate');
+PHPGoodies::import('Lib.Dom.Attributes.ContentEditableAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.ContextMenuAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.DraggableAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.DropZoneAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.HiddenAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.SpellCheckAttribute');
+PHPGoodies::import('Lib.Dom.Attributes.TranslateAttribute');
 
 /**
  * GlobalAttributes - A collection of attribute traits global to all HTML elements
@@ -35,9 +35,11 @@ PHPGoodies::import('Lib.Dom.Attributes.Translate');
 trait GlobalAttributes {
 
 	// HTML4
-	use AccessKeyAttribute, ClassAttribute, DirAttribute, IdAttribute, LangAttribute, NodeAttribute, StyleAttribute, TabIndexAttribute, TitleAttribute;
+	use AccessKeyAttribute, ClassAttribute, DirAttribute, IdAttribute, LangAttribute;
+       	use NodeAttribute, StyleAttribute, TabIndexAttribute, TitleAttribute;
 
 	// HTML5
-	use ContentEditable, ContextMenu, Draggable, DropZone, Hidden, SpellCheck, Translate;
+	use ContentEditableAttribute, ContextMenuAttribute, DraggableAttribute, DropZoneAttribute;
+       	use HiddenAttribute, SpellCheckAttribute, TranslateAttribute;
 }
 

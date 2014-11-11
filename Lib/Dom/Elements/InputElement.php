@@ -73,7 +73,7 @@ class InputElement extends NodeElement {
 	 * Constructor
 	 */
 	public function __construct() {
-		parent::__construct('input', 'block');
+		parent::__construct('input', 'inline');
 	}
 }
 

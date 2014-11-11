@@ -2,12 +2,14 @@
 /**
   * PHPGoodies:MathElement - MATH Element
   *
+  * @todo Add support for MathML child elements
+  *
   * @author Sean M. Kelly <smk@smkelly.com>
   */
 
 namespace PHPGoodies;
 
-require_once(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
+require_once(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
 
 PHPGoodies::import('Lib.Dom.NodeElement');
 

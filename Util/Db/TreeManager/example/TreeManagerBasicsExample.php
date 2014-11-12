@@ -13,7 +13,7 @@ require(realpath(dirname(__FILE__) . '/../../../../PHPGoodies.php'));
 
 // 3) Make a database connection
 $db = PHPGoodies::instantiate('Lib.Db.Mysql.Mysql');
-if (! $db->connect('localhost', 'root', '*rid0nKulous1', 'taxonomy')) {
+if (! $db->connect('localhost', 'root', '', 'taxonomy')) {
 	die("error connecting to database\n");
 }
 

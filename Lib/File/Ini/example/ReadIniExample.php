@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies CsvTokenizeExample.php
+ * PHPGoodies ReadIniExample.php
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */

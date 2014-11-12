@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies example3.php
+ * PHPGoodies TableSchemaInfoExample.php
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */

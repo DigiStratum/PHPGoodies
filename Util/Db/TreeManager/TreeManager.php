@@ -3,8 +3,8 @@
  * PHPGoodies:TreeManager - A class for managing "tree" type database tables
  *
  * For purposes of this utility, we will consider a "tree" type database table to be one which is
- * self-referential via an "fk_node" field which links to its parent node in the tree where any
- * root nodes have null for fk_node.
+ * self-referential via an "fk_parent" field which links to its parent node in the tree where any
+ * root nodes have null for fk_parent.
  *
  * @todo Rework to support specification of a database name instead of requiring that the correct
  * database has already been selected.
@@ -61,7 +61,7 @@ class TreeManager {
 	 * @param string $table Name of the table we want to manage
 	 * @param array $fields Collection of fields, name=type (optional)
 	 *
-	 * return array Of strings with valid field names for this table excluding id and fk_node
+	 * return array Of strings with valid field names for this table excluding id and fk_parent
 	 */
 	public function setup($table, $fields = array()) {
 
@@ -77,8 +77,8 @@ class TreeManager {
 			$this->fields = array();
 			foreach ($tableSchema as $field => $info) {
 
-				// ID and fk_node fields are managed automatically
-				if (('id' == $field) || ('fk_node' == $field)) continue;
+				// ID and fk_parent fields are managed automatically
+				if (('id' == $field) || ('fk_parent' == $field)) continue;
 
 				// All else will be user-managed, and thus must be in the fields;
 				// The type will determine the UI input form type
@@ -97,11 +97,11 @@ class TreeManager {
 	 */
 	public function getRootNodes() {
 		$table = $this->db->identifier(null, $this->table);
-		return $this->db->query("SELECT * FROM {$table} WHERE `fk_node` IS NULL;");
+		return $this->db->query("SELECT * FROM {$table} WHERE `fk_parent` IS NULL;");
 	}
 
 	/**
-	 * Get all child nodes for the specified parent node ID
+	 * Get all child records for the specified parent node ID
 	 *
 	 * @param integer $nodeId ID of the parent node of interest
 	 *
@@ -109,21 +109,103 @@ class TreeManager {
 	 */
 	public function getChildNodes($nodeId) {
 		$table = $this->db->identifier(null, $this->table);
-		$cond = $this->db->makeCondition('fk_node', $nodeId, '=', $this->table);
+		$cond = $this->db->makeCondition('fk_parent', $nodeId, '=', $this->table);
 		return $this->db->query("SELECT * FROM {$table} WHERE {$cond};");
 	}
 
 	/**
-	 * Get the full node record for the specified node ID
+	 * Get the full record for the specified node ID
 	 *
 	 * @param integer $nodeId ID of the node of interest
 	 *
 	 * @return array Full node record of the specified node ID
 	 */
-	public function getNode($nodeId) {
+	public function getNodeById($nodeId) {
 		$table = $this->db->identifier(null, $this->table);
 		$cond = $this->db->makeCondition('id', $nodeId, '=', $this->table);
-		return $this->db->query("SELECT * FROM {$table} WHERE {$cond};");
+		$res = $this->db->query("SELECT * FROM {$table} WHERE {$cond};");
+		return $this->db->QC($res) ? $res[0] : null;
+	}
+
+	/**
+	 * Get the full record for the specified node and parent ID
+	 *
+	 * @param string $node The value stored for this node's string identifier
+	 * @param integer $parentNodeId The ID of the parent node, or null if this is a root node
+	 *
+	 * @return array Full node record, or null on error 
+	 */
+	public function getNode($node, $parentNodeId = null) {
+		$table = $this->db->identifier(null, $this->table);
+		$nodeCond = $this->db->makeCondition('node', $node, '=', $this->table);
+		$parentCond = is_null($parentNodeId) ? '`fk_parent` IS NULL' : $this->db->makeCondition('fk_parent', $parentNodeId, '=', $this->table);
+		$res = $this->db->query("SELECT * FROM {$table} WHERE {$nodeCond} AND {$parentCond};");
+		return $this->db->QC($res) ? $res[0] : null;
+	}
+
+	/**
+	 * Get the node whose hierarchical tree matches that of the supplied identifier
+	 *
+	 * Note: nodeIdentifier is dotted notation like 'root.parent.child' list of 'node' property
+	 * values in order of hierarchy, starting with a root node. Any node in the chain that is
+	 * not located will cause the request to fail. If there are two nodes with the same name
+	 * and under the same parent (a violation of the "contract" for this form of tree which
+	 * means our database integrity is broken), then the first in the list of results returned
+	 * by the query, in whatever arbitrary ordering scheme the database uses, will win. And thus
+	 * if those two nodes have different children beneath them, we may or may not be able to get
+	 * at the originally desired node branch - "luck".
+	 *
+	 * @param string $nodeIdentifier Dotted notation hierarchical node identifier
+	 *
+	 * @return array Full node record of the node which was found or null if not
+	 */
+	public function findNode($nodeIdentifier) {
+
+		// Get all the node parts lined up in sequence
+		$parts = explode('.', $nodeIdentifier);
+		if (count($parts) == 0) return null;
+
+		// Get the starting node...
+		$node = $this->getNode($parts[0]);
+
+		// Treat each node as the parent of the next one until we find the last
+		for ($part = 1; $part < count($parts); $part++) {
+
+			// Find the next node in the chain...
+			$node = $this->getNode($parts[$part], $node['id']);
+
+			// And if any is null then the chain is broken
+			if (null == $node) return null;
+		}
+
+		// The last one should be what we're after
+		return $node;
+	}
+
+	/**
+	 * Get the unique node identifier for the specified nodeId
+	 *
+	 * @param integer $nodeId ID of the node of interest
+	 *
+	 * @return string Unique hierarchical node identifier in dotted notation, or null on error
+	 */
+	public function getNodeIdentifier($nodeId) {
+
+		// Pull the starting node and make sure it's good
+		$node = $this->getNodeById($nodeId);
+		if (null == $node) return null;
+		$nodeIdentifier = $node['node'];
+
+		// Now for each non-null parent, keep fetching parental nodes up the hierarchy
+		while (null != $node['fk_parent']) {
+
+			// Get this node's parent as the new node
+			$node = $this->getNodeById($node['fk_parent']);
+			if (null == $node) return null;
+			$nodeIdentifier = "{$node['node']}.{$nodeIdentifier}";
+		}
+
+		return $nodeIdentifier;
 	}
 
 	/**
@@ -135,26 +217,18 @@ class TreeManager {
 	 * @return boolean true on success, else false
 	 */
 	public function addNode($parentNodeId, &$data) {
-print_r($data);		
-print "1\n";
+
 		// Get the setters; require at least one; and add one for the parent nodeId
 		$setters = $this->getDataSetters($data);
-print "2\n";
 		if (! count($setters)) return false;
-print "3\n";
 		if (! is_null($parentNodeId)) {
-print "4\n";
-			$setters[] = $this->db->makeSetter('fk_node', $parentNodeId, $this->table);
+			$setters[] = $this->db->makeSetter('fk_parent', $parentNodeId, $this->table);
 		}
-print "5\n";
 
 		// Make a query out of it
 		$qSetters = join(",\n", $setters);
-print "6\n";
 		$table = $this->db->identifier(null, $this->table);
-print "7\n";
-		$query = "INSERT INTO {$table} SET {$qSetters}";
-print "Q=[{$query}]\n";
+		$query = "INSERT INTO {$table} SET {$qSetters};";
 		return $this->db->query($query);
 	}
 
@@ -207,7 +281,7 @@ print "Q=[{$query}]\n";
 	protected function getDataSetters(&$data) {
 		// Only accept data for fields we recognize
 		$setters = array();
-		foreach ($this->fields as $field) {
+		foreach ($this->fields as $field => $type) {
 			if (! isset($data[$field])) continue;
 			$setters[] = $this->db->makeSetter($field, $data[$field], $this->table);
 		}

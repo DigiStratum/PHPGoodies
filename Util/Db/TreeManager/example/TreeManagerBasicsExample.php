@@ -13,18 +13,18 @@ require(realpath(dirname(__FILE__) . '/../../../../PHPGoodies.php'));
 
 // 3) Make a database connection
 $db = PHPGoodies::instantiate('Lib.Db.Mysql.Mysql');
-if (! $db->connect('localhost', 'root', '', 'taxonomy')) {
+if (! $db->connect('localhost', 'test', 'test123', 'test')) {
 	die("error connecting to database\n");
 }
 
 $tm = PHPGoodies::instantiate('Util.Db.TreeManager.TreeManager', $db);
-$tm->setup('node');
+$tm->setup('type');
 
 $roots = $tm->getRootNodes();
 print_r($roots);
 
 $data = array(
-	'name' => 'testname',
+	'node' => 'testnode',
 	'description' => 'test description'
 );
 $tm->addNode(null, $data);

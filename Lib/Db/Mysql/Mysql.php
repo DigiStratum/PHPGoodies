@@ -338,13 +338,13 @@ class Mysql {
 			// Assemble the comparator and quoted values
 			$values = '';
 			foreach ($value as $val) {
-				$values .= (strlen($values) ? ', ' : '') . $this->quoteString($val);
+				$values .= (strlen($values) ? ', ' : '') . $this->quoteValue($val);
 			}
 			$res .= "{$comparator} ({$values})";
 		}
 		else {
 			// Otherwise single values are pretty straightforward...
-			$res . "{$comparator} " . $this->quoteString($value);
+			$res .= "{$comparator} " . $this->quoteValue($value);
 		}
 
 		return $res;

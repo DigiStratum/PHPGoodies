@@ -17,7 +17,7 @@ abstract class RestEndpoint {
 	 *
 	 * @param object $requestInfo RequestInfo instance
 	 *
-	 * @return object RestResponse instance or null if not implemented
+	 * @return object HttpResponse instance or null if not implemented
 	 */
 	public function GET($requestInfo) {
 		return null;
@@ -27,6 +27,8 @@ abstract class RestEndpoint {
 	 * POST method handler for this endpoint
 	 *
 	 * @param object $requestInfo RequestInfo instance
+	 *
+	 * @return object HttpResponse instance or null if not implemented
 	 */
 	public function POST($requestInfo) {
 		return null;
@@ -37,7 +39,7 @@ abstract class RestEndpoint {
 	 *
 	 * @param object $requestInfo RequestInfo instance
 	 *
-	 * @return object RestResponse instance or null if not implemented
+	 * @return object HttpResponse instance or null if not implemented
 	 */
 	public function PUT($requestInfo) {
 		return null;
@@ -48,7 +50,7 @@ abstract class RestEndpoint {
 	 *
 	 * @param object $requestInfo RequestInfo instance
 	 *
-	 * @return object RestResponse instance or null if not implemented
+	 * @return object HttpResponse instance or null if not implemented
 	 */
 	public function DELETE($requestInfo) {
 		return null;
@@ -59,7 +61,7 @@ abstract class RestEndpoint {
 	 *
 	 * @param object $requestInfo RequestInfo instance
 	 *
-	 * @return object RestResponse instance or null if not implemented
+	 * @return object HttpResponse instance or null if not implemented
 	 */
 	public function OPTIONS($requestInfo) {
 		return null;

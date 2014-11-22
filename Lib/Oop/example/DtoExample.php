@@ -53,13 +53,6 @@ class MessageDto extends Dto {
 	public function setMessage($message) {
 		$this->_set('message', $message);
 	}
-
-	/**
-	 * Expose the toJson method publicly
-	 */
-	public function toJson() {
-		return $this->_toJson();
-	}
 }
 
 $response = new MessageDto(200, 'OK');

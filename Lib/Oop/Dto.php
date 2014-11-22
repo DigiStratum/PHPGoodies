@@ -52,10 +52,48 @@ abstract class Dto {
 	}
 
 	/**
+	 * Convert the properties of this Dto into JSON
+	 *
+	 * @return string with JSON representation of our properties
+	 */
+	public function toJson() {
+		return json_encode((object) $this->properties);
+	}
+
+	/**
+	 * Fill the properties of this Dto from the supplied JSON
+	 *
+	 * @param string $json The JSON text string to use as our data source
+	 */
+	public function fromJson($json) {
+
+		// Clear out the existing properties, if any
+		$this->reset();
+
+		// Turn the JSON into a PHP data structure
+		$obj = json_decode($json);
+		if (! is_object($obj)) return;
+
+		// Capture the properties of the object
+		foreach ($obj as $name => $value) {
+			$this->_set($name, $value);
+		}
+	}
+
+	/**
 	 * Empty out all the properties to start fresh
 	 */
-	public function _reset() {
+	protected function _reset() {
 		$this->properties = array();
+	}
+
+	/**
+	 * Get the names of all the currently defined properties
+	 *
+	 * @return array of strings for all the currently defined properties; may be empty
+	 */
+	protected function  _definedProperties() {
+		return array_keys($this->properties);
 	}
 
 	/**
@@ -65,7 +103,7 @@ abstract class Dto {
 	 *
 	 * @param $propertyNames Array of strings that define valid property names for this DTO
 	 */
-	public function _setPropertyNames($propertyNames = array()) {
+	protected function _setPropertyNames($propertyNames = array()) {
 
 		if (! is_array($propertyNames)) {
 			throw new Exception("Property Names must be supplied as an array of strings; " . gettype($propertyNames) . " was supplied instead.");
@@ -86,40 +124,11 @@ abstract class Dto {
 	 *
 	 * @return boolean true on success, else false
 	 */
-	public function _addProperty($name) {
+	protected function _addProperty($name) {
 		$propertyName = $this->_clean($name);
 		if (! strlen($propertyName)) return false;
 		$this->propertyNames[] = $propertyName;
 		return true;
-	}
-
-	/**
-	 * Convert the properties of this Dto into JSON
-	 *
-	 * @return string with JSON representation of our properties
-	 */
-	public function _toJson() {
-		return json_encode((object) $this->properties);
-	}
-
-	/**
-	 * Fill the properties of this Dto from the supplied JSON
-	 *
-	 * @param string $json The JSON text string to use as our data source
-	 */
-	public function _fromJson($json) {
-
-		// Clear out the existing properties, if any
-		$this->reset();
-
-		// Turn the JSON into a PHP data structure
-		$obj = json_decode($json);
-		if (! is_object($obj)) return;
-
-		// Capture the properties of the object
-		foreach ($obj as $name => $value) {
-			$this->_set($name, $value);
-		}
 	}
 
 	/**
@@ -141,7 +150,7 @@ abstract class Dto {
 	 *
 	 * @throws Exception for empty names
 	 */
-	public function  _set($name, $value) {
+	protected function  _set($name, $value) {
 		$propertyName = $this->_clean($name);
 		if (! strlen($propertyName)) {
 			throw new Exception("Attempted to set a property with no name to value: [{$value}]");
@@ -165,7 +174,7 @@ abstract class Dto {
 	 *
 	 * @throws Exception for undefined properties
 	 */
-	public function  _get($name) {
+	protected function  _get($name) {
 		if (! $this->_chk($name)) {
 			throw new Exception("Requested property ({$name}) is undefined");
 		}
@@ -175,12 +184,31 @@ abstract class Dto {
 	/**
 	 * Check whether the named property is defined
 	 *
-	 * @param string $name The name of the property to be returned
+	 * @param string $name The name of the property to be checked
 	 *
 	 * @return boolean true if the named property is set, else false
 	 */
-	public function  _chk($name) {
+	protected function  _chk($name) {
 		return isset($this->properties[$name]);
+	}
+
+	/**
+	 * Delete the named property
+	 *
+	 * Note that the property will no longer be defined after deletion. Any objects derived from
+	 * the properties of this response which are held externally to this class as a result of
+	 * prior calls to obj() will not be affected - if they had the named property defined,
+	 * deleting it here will NOT cause the property to be deleted from them as well.
+	 *
+	 * @param string $name The name of the property to be returned
+	 *
+	 * @throws Exception for undefined properties
+	 */
+	protected function  _del($name) {
+		if (! $this->_chk($name)) {
+			throw new Exception("Requested property ({$name}) is undefined");
+		}
+		unset($this->properties[$name]);
 	}
 
 	/**
@@ -195,7 +223,7 @@ abstract class Dto {
 	 *
 	 * @return boolean true if the name is valid for properties, else false
 	 */
-	public function  _valid($name) {
+	protected function  _valid($name) {
 		$propertyName = $this->_clean($name);
 		if (! strlen($propertyName)) return false;
 
@@ -217,36 +245,8 @@ abstract class Dto {
 	 *
 	 * @return string Cleaned name, may be empty, not guaranteed to be valid()
 	 */
-	public function  _clean($name) {
+	protected function  _clean($name) {
 		return trim((string) $name);
-	}
-
-	/**
-	 * Delete the named property
-	 *
-	 * Note that the property will no longer be defined after deletion. Any objects derived from
-	 * the properties of this response which are held externally to this class as a result of
-	 * prior calls to obj() will not be affected - if they had the named property defined,
-	 * deleting it here will NOT cause the property to be deleted from them as well.
-	 *
-	 * @param string $name The name of the property to be returned
-	 *
-	 * @throws Exception for undefined properties
-	 */
-	public function  _del($name) {
-		if (! $this->_chk($name)) {
-			throw new Exception("Requested property ({$name}) is undefined");
-		}
-		unset($this->properties[$name]);
-	}
-
-	/**
-	 * Get the names of all the currently defined properties
-	 *
-	 * @return array of strings for all the currently defined properties; may be empty
-	 */
-	public function  _definedProperties() {
-		return array_keys($this->properties);
 	}
 }
 

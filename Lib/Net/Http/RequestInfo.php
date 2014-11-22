@@ -39,9 +39,9 @@ class RequestInfo {
 			'protocol' => null,	// HTTP/S
 			'hostname' => null,	// www.yoursite.com
 			'port' => null,		// service port (80|443)
-			'uri' => null,		// entire uri to map/satisfy the request
+			'uri' => null,		// entire uri up to the '?' for mapping
 			'script' => null,	// leading portion of uri, possibly all of it
-			'queryString' => null,	// everything after the ? up to a fragment or EOL
+			'queryString' => null,	// everything after the '?' up to a fragment or EOL
 			'data' => null,		// All the name=value pair data for GET|POST, etc.
 			'fragment' => null,	// everything after the '#'
 			'preFragment' => null	// true|false to preFragment a request being forumed
@@ -73,7 +73,7 @@ class RequestInfo {
 						$this->setIsTunnelled(true);
 						break;
 					default:
-						throw new Exception("Unexpected value for KTTP_X_HTTP_METHOD Header: '{$_SERVER['HTTP_X_HTTP_METHOD']}'");
+						throw new Exception("Unexpected value for HTTP_X_HTTP_METHOD Header: '{$_SERVER['HTTP_X_HTTP_METHOD']}'");
 				}
 			}
 			else $this->setIsTunnelled(false);

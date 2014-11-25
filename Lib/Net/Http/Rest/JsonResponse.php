@@ -40,7 +40,7 @@ class JsonResponse extends HttpResponse {
 	/**
 	 * Override the response body by forcing it to be the JSON output of the DTO
 	 *
-	 * @return string JSON formatted dext of the body
+	 * @return string JSON formatted text of the body
 	 */
 	public function getResponseBody() {
 		$this->body = $this->dto->toJson();

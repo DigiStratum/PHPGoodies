@@ -13,13 +13,29 @@ namespace PHPGoodies;
 abstract class RestEndpoint {
 
 	/**
+	 * Check whether the specified method is implemented for this endpoint
+	 *
+	 * Note that we are just going off public scope status since all these methods are protected
+	 * by default, if one of them turns up public, it's because it is "implemented" and should 
+	 * be accessible to the outside world.
+	 *
+	 * @param string $method One of GET|POST|PUT|DELETE|OPTIONS
+	 *
+	 * @return boolean true if the method is implemented for this endpoint, else false
+	 */
+	public function isImplemented($method) {
+		$ref = new ReflectionProperty($this, $method);
+		return $ref->isPublic();
+	}
+
+	/**
 	 * GET method handler for this endpoint
 	 *
 	 * @param object $requestInfo RequestInfo instance
 	 *
 	 * @return object HttpResponse instance or null if not implemented
 	 */
-	public function GET($requestInfo) {
+	protected function get($requestInfo) {
 		return null;
 	}
 
@@ -30,7 +46,7 @@ abstract class RestEndpoint {
 	 *
 	 * @return object HttpResponse instance or null if not implemented
 	 */
-	public function POST($requestInfo) {
+	protected function post($requestInfo) {
 		return null;
 	}
 
@@ -41,7 +57,7 @@ abstract class RestEndpoint {
 	 *
 	 * @return object HttpResponse instance or null if not implemented
 	 */
-	public function PUT($requestInfo) {
+	protected function put($requestInfo) {
 		return null;
 	}
 
@@ -52,7 +68,7 @@ abstract class RestEndpoint {
 	 *
 	 * @return object HttpResponse instance or null if not implemented
 	 */
-	public function DELETE($requestInfo) {
+	protected function delete($requestInfo) {
 		return null;
 	}
 
@@ -63,7 +79,7 @@ abstract class RestEndpoint {
 	 *
 	 * @return object HttpResponse instance or null if not implemented
 	 */
-	public function OPTIONS($requestInfo) {
+	protected function options($requestInfo) {
 		return null;
 	}
 }

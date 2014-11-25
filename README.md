@@ -6,6 +6,15 @@ Now I make these implementations available to the general public in the hopes th
 
 Happy coding!
 
+## Advantage Considerations
+
+As I mentioned in opening, there are a great number of third party libraries available to accomplish your PHP goals, however there are two aspects to PHPGoodies which, over time, will distinguish it from the rest:
+
+1) Cohesion across all the classes in the library which may be arbitrarily imported/instantiated into any application and used without fuss, and with confidence that the goodies with cross-dependencies will all be satisfied without the need to custom integration of third part code to get any of them working; and...
+
+2) Steadfast dedication to the production of consistent, high quality code that is documented, tested, has usage examples ready to roll for pretty much everything, and leverages the best of the latest PHP object oriented capabilities while complying with common coding practicies.
+
+
 ## Design Conventions
 
 There are some design conventions at play here that it may be helpful for the developer to understand. Perhaps this section of the document will end up with enough convention explanations that they warrant some grouping or organization, but for now here they are in no particular order other than as they occur to me while I am getting things together...

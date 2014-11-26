@@ -31,6 +31,7 @@ class RequestInfo {
 	 */
 	public function reset() {
 
+		// TODO - consider refactoring this associative array into an object...
 		// preFragment=false -> protocol://hostname[:port]/uri[?queryString][#fragment]
 		// preFragment=true  -> protocol://hostname[:port]/uri[#fragment][?queryString]
 		$this->requestInfo = Array(

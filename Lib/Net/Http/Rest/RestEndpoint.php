@@ -24,7 +24,7 @@ abstract class RestEndpoint {
 	 * @return boolean true if the method is implemented for this endpoint, else false
 	 */
 	public function isImplemented($method) {
-		$ref = new ReflectionProperty($this, $method);
+		$ref = new \ReflectionMethod($this, $method);
 		return $ref->isPublic();
 	}
 

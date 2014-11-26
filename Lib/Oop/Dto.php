@@ -106,7 +106,7 @@ abstract class Dto {
 	protected function _setPropertyNames($propertyNames = array()) {
 
 		if (! is_array($propertyNames)) {
-			throw new Exception("Property Names must be supplied as an array of strings; " . gettype($propertyNames) . " was supplied instead.");
+			throw new \Exception("Property Names must be supplied as an array of strings; " . gettype($propertyNames) . " was supplied instead.");
 		}
 
 		// Reset everything and then fill up the property names...
@@ -153,11 +153,11 @@ abstract class Dto {
 	protected function  _set($name, $value) {
 		$propertyName = $this->_clean($name);
 		if (! strlen($propertyName)) {
-			throw new Exception("Attempted to set a property with no name to value: [{$value}]");
+			throw new \Exception("Attempted to set a property with no name to value: [{$value}]");
 		}
 
 		if (! $this->_valid($propertyName)) {
-			throw new Exception("Attempted to set a property with an invalid name ('{$propertyName}') to value: [{$value}]");
+			throw new \Exception("Attempted to set a property with an invalid name ('{$propertyName}') to value: [{$value}]");
 		}
 
 		$this->properties[$propertyName] = $value;
@@ -176,7 +176,7 @@ abstract class Dto {
 	 */
 	protected function  _get($name) {
 		if (! $this->_chk($name)) {
-			throw new Exception("Requested property ({$name}) is undefined");
+			throw new \Exception("Requested property ({$name}) is undefined");
 		}
 		return $this->properties[$name];
 	}
@@ -206,7 +206,7 @@ abstract class Dto {
 	 */
 	protected function  _del($name) {
 		if (! $this->_chk($name)) {
-			throw new Exception("Requested property ({$name}) is undefined");
+			throw new \Exception("Requested property ({$name}) is undefined");
 		}
 		unset($this->properties[$name]);
 	}

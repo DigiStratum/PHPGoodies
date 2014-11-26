@@ -41,12 +41,17 @@ class RestApi {
 	protected $baseUri;
 
 	/**
+	 * The protocol used to make the request
+	 */
+	protected $requestProtocol;
+
+	/**
 	 * Constructor
 	 *
 	 * @param string $baseUri The base URI for this API all others are relative to
 	 * @param string $signature API signature string which will be in the default response
 	 */
-	public function __construct($baseUri, $signature = 'REST API', $version = '1') {
+	public function __construct($baseUri, $signature = 'REST API', $version = 1) {
 		$this->baseUri = $baseUri;
 		$this->signature = $signature;
 		$this->version = $version;
@@ -57,12 +62,15 @@ class RestApi {
 	 *
 	 * @param string $uri The URI that will invoke this RestEndpoint's handlers
 	 * @param object RestEndpoint handler for this URI
+	 *
+	 * @return object $this for chaining support...
 	 */
-	public function addEndpoint($uri, &$restEndpiont) {
+	public function addEndpoint($uri, &$restEndpoint) {
 		if (! $restEndpoint instanceof RestEndpoint) {
-			throw new exception('Something other than a RestEndpoint was supplied');
+			throw new \Exception('Something other than a RestEndpoint was supplied');
 		}
 		$this->endpoints[$uri] =& $restEndpoint;
+		return $this;
 	}
 
 	/**
@@ -72,7 +80,10 @@ class RestApi {
 	 */
 	public function getResponse() {
 		$requestInfo = PHPGoodies::instantiate('Lib.Net.Http.RequestInfo');
+		$requestInfo->initCurrentRequest();
 		$request = $requestInfo->getInfo();
+
+		$this->requestProtocol = $request['protocol'];
 
 		if ($request['uri'] == $this->baseUri) {
 			return $this->signatureResponse();
@@ -89,6 +100,19 @@ class RestApi {
 		}
 
 		return $restEndpoint->$restMethod($requestInfo);
+	}
+
+	/**
+	 * Actually send the response out to the client, headers, code, body, and all
+	 */
+	public function respond($httpResponse) {
+		if (! $httpResponse instanceof HttpResponse) {
+			throw new \Exception('Something other than an HttpResponse was supplied');
+		}
+		// Add a header for the HTTP/S response
+		$httpResponse->headers->set($this->requestProtocol, $httpResponse->code);
+		$httpResponse->headers->send();
+		print $httpResponse->getResponseBody();
 	}
 
 	/**
@@ -116,19 +140,11 @@ class RestApi {
 	protected function errorResponse($message, $code) {
 		$jsonResponse = PHPGoodies::instantiate('Lib.Net.Http.Rest.JsonResponse');
 		$jsonResponse->code = $code;
-		$jsonResponse->dto->setProperties(Array('message', 'code'));
-		$jsonResponse->dto->set('message', $message);
-		$jsonResponse->dto->set('code', $code);
+		$jsonResponse->dto->setProperties(Array(
+			'message' => $message,
+			'code' => $code
+		));
 		return $jsonResponse;
-	}
-
-	/**
-	 * Actually send the response out to the client, headers, code, body, and all
-	 */
-	public function respond($httpResponse) {
-		if (! $httpResponse instanceof HttpResponse) {
-			throw new exception('Something other than an HttpResponse was supplied');
-		}
 	}
 }
 

@@ -31,6 +31,7 @@ class JsonResponse extends HttpResponse {
 	 * Constructor
 	 */
 	public function __construct() {
+		parent::__construct();
 
 		// Initially the DTO will be generic so it's usable but caller can over-write
 		$this->dto = PHPGoodies::instantiate('Lib.Oop.GenericDto');

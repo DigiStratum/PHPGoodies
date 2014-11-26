@@ -25,7 +25,7 @@ class GenericDto extends Dto {
 	 * @param $propertyNames Array of strings that define valid property names for this DTO
 	 */
 	public function __construct($properties = array()) {
-		parent::_construct();
+		parent::__construct();
 	}
 
 	/**

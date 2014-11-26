@@ -34,7 +34,15 @@ class Headers extends Hash {
 		// If headers have already been sent, there's nothing we can do now
 		if ($this->headersSent) return;
 
-		// Otherwise send all the headers; order is unimportant
+		// See if we have an HTTP/S header which must be sent first
+		foreach ($this->hash as $name => $value) {
+			if (('HTTP' == $name) || ('HTTPS' == $name)) {
+				header("{$name} {$value}", true, $value);
+				$this->del($name);
+			}
+		}
+
+		// All other headers; order is unimportant
 		foreach ($this->hash as $name => $value) {
 			header("{$name}: {$value}");
 		}

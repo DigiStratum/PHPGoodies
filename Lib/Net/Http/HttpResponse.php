@@ -2,7 +2,7 @@
 /**
  * PHPGoodies:HttpResponse - An HTTP response container
  *
- * @uses Headers
+ * @uses HttpHeaders
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -112,7 +112,7 @@ class HttpResponse {
 	 * Constructor
 	 */
 	public function __construct() {
-		$this->headers = PHPGoodies::instantiate('Lib.Net.Http.Headers');
+		$this->headers = PHPGoodies::instantiate('Lib.Net.Http.HttpHeaders');
 	}
 
 	/**

@@ -75,7 +75,6 @@ class CorsPolicy {
 	 * @return object $this for chaining support...
 	 */
 	public function addMethodOrigin($method, $origin) {
-
 		$this->requireSupportedMethod($method);
 
 		// If the requested method doesn't already have any origins
@@ -84,7 +83,7 @@ class CorsPolicy {
 		}
 
 		// No effort is made to de-duplicate
-		$this->methodOrigins[] = $origin;
+		$this->methodOrigins[$method][] = $origin;
 
 		return $this;
 	}
@@ -120,8 +119,8 @@ class CorsPolicy {
 	 */
 	public function getMatchingMethodOrigin($method, $origin) {
 		$this->requireSupportedMethod($method);
-		if (! is_array($this->methodOrigins)) return null;
-		foreach ($this->methodOrigins as $methodOrigin) {
+		if (! is_array($this->methodOrigins[$method])) return null;
+		foreach ($this->methodOrigins[$method] as $methodOrigin) {
 			$pattern = str_replace('*', '(.*?)', $methodOrigin);
 			if (preg_match("/{$pattern}/", $origin)) return $methodOrigin;
 		}

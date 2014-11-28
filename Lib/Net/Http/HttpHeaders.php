@@ -38,10 +38,10 @@ class HttpHeaders extends Hash {
 		foreach ($this->hash as $name => $value) {
 
 			// If it is the HTTP/S headers...
-			if ($this->isHttp($name)) {
+			if (self::isHttp($name)) {
 
 				// Send it only for now...
-				header("{$this->properName($name)} {$value}", true, $value);
+				header(self::properName($name) . ": {$value}", true, $value);
 				break;
 			}
 		}
@@ -50,10 +50,10 @@ class HttpHeaders extends Hash {
 		foreach ($this->hash as $name => $value) {
 
 			// If it is the HTTP/S header, it's already been sent
-			if ($this->isHttp($name)) continue;
+			if (self::isHttp($name)) continue;
 
 			// Send this one proper-like
-			header("{$this->properName($name)}: {$value}");
+			header(self::properName($name) . ": {$value}");
 		}
 
 		$this->headersSent = true;
@@ -79,7 +79,7 @@ class HttpHeaders extends Hash {
 		else $headers = array();
 
 		foreach ($headers as $name => $value) {
-			$this->set($this->properName($name), $value);
+			$this->set(self::properName($name), $value);
 		}
 	}
 
@@ -91,7 +91,7 @@ class HttpHeaders extends Hash {
 	 * @return string Whatever is currently stored in the named header
 	 */
 	public function get($name) {
-		return parent::get($this->properName($name));
+		return parent::get(self::properName($name));
 	}
 
 	/**
@@ -103,7 +103,7 @@ class HttpHeaders extends Hash {
 	 * @return object $this for chaining support...
 	 */
 	public function set($name, $value) {
-		parent::set($this->properName($name), $value);
+		parent::set(self::properName($name), $value);
 		return $this;
 	}
 
@@ -115,7 +115,7 @@ class HttpHeaders extends Hash {
 	 * @return object $this for chaining support...
 	 */
 	public function del($name) {
-		parent::del($this->properName($name));
+		parent::del(self::properName($name));
 		return $this;
 	}
 
@@ -127,7 +127,7 @@ class HttpHeaders extends Hash {
 	 * @return boolean true if we have this header set, else false
 	 */
 	public function has($name) {
-		return parent::has($this->properName($name));
+		return parent::has(self::properName($name));
 	}
 
 	/**
@@ -137,7 +137,7 @@ class HttpHeaders extends Hash {
 	 *
 	 * @return boolean true if it is an HTTP header, else false
 	 */
-	protected function isHttp($name) {
+	static public function isHttp($name) {
 		return preg_match('/^http/i', $name);
 	}
 
@@ -148,8 +148,8 @@ class HttpHeaders extends Hash {
 	 *
 	 * @return string The proper representation of the supplied name
 	 */
-	protected function properName($name) {
-		if ($this->isHttp($name)) return strtoupper($name);
+	static public function properName($name) {
+		if (self::isHttp($name)) return strtoupper($name);
 		$parts = explode('-', $name);
 		foreach ($parts as $pos => $part) $parts[$pos] = ucfirst(strtolower($part));
 		return implode('-', $parts);

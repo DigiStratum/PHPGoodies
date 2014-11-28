@@ -61,11 +61,17 @@ class HttpHeaders extends Hash {
 
 	/**
 	 * Receive all the headers in the current request being serviced
+	 *
+	 * @todo supply some alternative to emmulate this for testing outside httpd context?
 	 */
 	public function receive() {
-		$headers = getallheaders();
-		foreach ($headers as $name => $value) {
-			$this->set($this->properName($name), $value);
+
+		// This function only exists under an Apache/httpd context...
+		if (function_exists('getallheaders')) {
+			$headers = getallheaders();
+			foreach ($headers as $name => $value) {
+				$this->set($this->properName($name), $value);
+			}
 		}
 	}
 

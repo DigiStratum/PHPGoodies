@@ -98,7 +98,7 @@ abstract class PHPGoodies {
 	 *
 	 * @return object Instance of the requested resource if all went well
 	 */
-	public static function &instantiate($resource) {
+	public static function instantiate($resource) {
 
 		// Always try to import first
 		static::import($resource);

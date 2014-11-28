@@ -38,10 +38,10 @@ class HttpHeaders extends Hash {
 		foreach ($this->hash as $name => $value) {
 
 			// If it is the HTTP/S headers...
-			if (strpos($name, 'HTTP')  === 0) {
+			if ($this->isHttp($name)) {
 
 				// Send it only for now...
-				header("{$name} {$value}", true, $value);
+				header("{$this->properName($name)} {$value}", true, $value);
 				break;
 			}
 		}
@@ -50,7 +50,7 @@ class HttpHeaders extends Hash {
 		foreach ($this->hash as $name => $value) {
 
 			// If it is the HTTP/S header, it's already been sent
-			if (strpos($name, 'HTTP')  === 0) continue;
+			if ($this->isHttp($name)) continue;
 
 			// Send this one proper-like
 			header("{$this->properName($name)}: {$value}");
@@ -62,16 +62,24 @@ class HttpHeaders extends Hash {
 	/**
 	 * Receive all the headers in the current request being serviced
 	 *
-	 * @todo supply some alternative to emmulate this for testing outside httpd context?
+	 * Note: an alternative mechanism is provided to simulate request headers (for testing, or
+	 * some other non-httpd-context operation) by supplying the array of headers just as httpd
+	 * would supply it, but into the _SERVER['REQUEST_HEADERS'] super global instead. This is
+	 * only permitted if we are not in a legitimate http context.
 	 */
 	public function receive() {
 
 		// This function only exists under an Apache/httpd context...
 		if (function_exists('getallheaders')) {
 			$headers = getallheaders();
-			foreach ($headers as $name => $value) {
-				$this->set($this->properName($name), $value);
-			}
+		}
+		else if (isset($_SERVER['REQUEST_HEADERS'])) {
+			$headers = $_SERVER['REQUEST_HEADERS'];
+		}
+		else $headers = array();
+
+		foreach ($headers as $name => $value) {
+			$this->set($this->properName($name), $value);
 		}
 	}
 
@@ -123,6 +131,17 @@ class HttpHeaders extends Hash {
 	}
 
 	/**
+	 * Is the supplied header name the special 'HTTP*' one?
+	 *
+	 * @param string $name The header name to check
+	 *
+	 * @return boolean true if it is an HTTP header, else false
+	 */
+	protected function isHttp($name) {
+		return preg_match('/^http/i', $name);
+	}
+
+	/**
 	 * Make the supplied name "proper" with respect to capitalization
 	 *
 	 * @param string $name The header name that we want to make proper
@@ -130,6 +149,7 @@ class HttpHeaders extends Hash {
 	 * @return string The proper representation of the supplied name
 	 */
 	protected function properName($name) {
+		if ($this->isHttp($name)) return strtoupper($name);
 		$parts = explode('-', $name);
 		foreach ($parts as $pos => $part) $parts[$pos] = ucfirst(strtolower($part));
 		return implode('-', $parts);

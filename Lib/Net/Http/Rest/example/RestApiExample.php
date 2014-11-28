@@ -16,10 +16,18 @@ require(realpath(dirname(__FILE__) . '/../../../../../PHPGoodies.php'));
 PHPGoodies::import('Lib.Net.Http.HttpRequest');
 PHPGoodies::import('Lib.Net.Http.HttpResponse');
 PHPGoodies::import('Lib.Net.Http.Rest.RestEndpoint');
-$api = PHPGoodies::instantiate('Lib.Net.Http.Rest.RestApi', '/api/2', 'General Api', 2);
 
 // 3) Make a custom API endpoint
 class ChronometricsEndpoint extends RestEndpoint {
+	public function __construct() {
+
+		// Set up an optional CORS policy for this endpoint
+		$corsPolicy = PHPGoodies::instantiate('Lib.Net.Http.CorsPolicy');
+		$corsPolicy->addMethodOrigin(HttpRequest::HTTP_GET, '*');
+		$this->setCorsPolicy($corsPolicy);
+	}
+
+	// GET request handler
 	public function get($httpRequest) {
 		$response = PHPGoodies::instantiate('Lib.Net.Http.Rest.JsonResponse');
 		$response->dto->setProperties(array(
@@ -29,6 +37,7 @@ class ChronometricsEndpoint extends RestEndpoint {
 		return $response;
 	}
 }
+$api = PHPGoodies::instantiate('Lib.Net.Http.Rest.RestApi', '/api/2', 'General Api', 2);
 $api->addEndpoint('/api/2/chronometrics', new ChronometricsEndpoint());
 
 // 4) Now mock up an HTTP request to see how the endpoint responds
@@ -37,7 +46,11 @@ $_SERVER['HTTP_HOST'] = 'localhost';
 $_SERVER['SERVER_PORT'] = 80;
 $_SERVER['REQUEST_METHOD'] = HttpRequest::HTTP_GET;
 $_SERVER['REQUEST_URI'] = '/api/2/chronometrics';
+$_SERVER['REQUEST_HEADERS'] = array(
+	'Origin' => 'http://www.phpgoodies.org/'
+);
 
 $httpResponse = $api->getResponse();
 $api->respond($httpResponse);
+print "\n\n" . $httpResponse->headers->see('Response Headers');
 

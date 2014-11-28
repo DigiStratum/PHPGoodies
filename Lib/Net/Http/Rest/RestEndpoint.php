@@ -2,15 +2,57 @@
 /**
  * PHPGoodies:RestEndpoint - Non-instantiable RESTful API endpoint base class
  *
+ * @uses CorsPolicy
+ *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
 namespace PHPGoodies;
 
+PHPGoodies::import('Lib.Net.Http.CorsPolicy');
+
 /**
  * Non-instantiable RESTful API endpoint base class
  */
 abstract class RestEndpoint {
+
+	/**
+	 * The CorsPolicy for this endpoint
+	 */
+	protected $corsPolicy = null;
+
+	/**
+	 * Get the currently set CorsPolicy
+	 *
+	 * @return object Our current CorsPolicy, or null if there isn't one
+	 */
+	public function &getCorsPolicy() {
+		return $this->corsPolicy;
+	}
+
+	/**
+	 * Set a CorsPolicy for this REST endpoint
+	 *
+	 * @param object $corsPolicy an instance of CorsPolicy
+	 *
+	 * @return object $this for chaining aupport...
+	 */
+	public function setCorsPolicy($corsPolicy) {
+		if (! $corsPolicy instanceof CorsPolicy) {
+			throw new \Exception("Attempted to set something other than a CorsPolicy as the CORS Policy for a RESTful endpoint.");
+		}
+		$this->corsPolicy = $corsPolicy;
+		return $this;
+	}
+
+	/**
+	 * Check whether this endpoint has a CORS Policy set
+	 *
+	 * @return boolean true if there is a CorsPolicy, else false
+	 */
+	public function hasCorsPolicy() {
+		return ($this->corsPolicy instanceof CorsPolicy);
+	}
 
 	/**
 	 * Check whether the specified method is implemented for this endpoint

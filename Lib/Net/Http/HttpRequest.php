@@ -2,6 +2,8 @@
 /**
  * PHPGoodies:HttpRequest - Objectify a pile of information about a request
  *
+ * @uses HttpHeaders
+ *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
@@ -131,6 +133,10 @@ class HttpRequest {
 				PHPGoodies::import('Lib.Net.Http.QueryString');
 				$this->requestInfo->data = QueryString::getQueryStringAsData($_SERVER['QUERY_STRING']);
 			}
+
+			// Headers
+			$this->requestInfo->headers = PHPGoodies::instantiate('Lib.Net.Http.HttpHeaders');
+			$this->requestInfo->headers->receive();
 		}
 	}
 
@@ -155,6 +161,7 @@ class HttpRequest {
 		$this->requestInfo->data = null;	// All the name=value pair data for GET|POST, etc.
 		$this->requestInfo->fragment = null;	// everything after the '#'
 		$this->requestInfo->preFragment = null;	// true|false to preFragment a request being forumed
+		$this->requestInfo->headers = null;	// HttpHeaders instance with the complete set
 
 		return $this;
 	}

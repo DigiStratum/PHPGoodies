@@ -79,11 +79,13 @@ class RestApi {
 	 * @return object An instance of HttpResponse (or a subclass) with all the details inside
 	 */
 	public function getResponse() {
+
+		// Get some details about this request
 		$httpRequest = PHPGoodies::instantiate('Lib.Net.Http.HttpRequest');
 		$request = $httpRequest->getInfo();
-
 		$this->requestProtocol = $request->protocol;
 
+		// Expect either baseUri or another validly defined endpoint URI
 		if ($request->uri == $this->baseUri) {
 			return $this->signatureResponse();
 		}
@@ -91,14 +93,36 @@ class RestApi {
 			return $this->errorResponse('Not Found', HttpResponse::HTTP_NOT_FOUND);
 		}
 
-		$restMethod = strtolower($request->method);
+		// Verify this RestEndpoint supports the request method
 		$restEndpoint =& $this->endpoints[$request->uri];
-
+		$restMethod = strtolower($request->method);
 		if (! $restEndpoint->isImplemented($restMethod)) {
 			return $this->errorResponse('Method Not Allowed', HttpResponse::HTTP_METHOD_NOT_ALLOWED);
 		}
 
-		return $restEndpoint->$restMethod($httpRequest);
+		// Get the natural response from the RestEndpoint
+		$response = $restEndpoint->$restMethod($httpRequest);
+
+		// Add CORS headers if necessary
+		if ($restEndpoint->hasCorsPolicy()) {
+
+			// CORS headers may only be matched to requests that supply an origin
+			if ($request->headers->has('Origin')) {
+
+				// Got a match for origin in the CorsPolicy for this request method?
+				$origin = $request->headers->get('Origin');
+				$method = $request->method;
+				$corsPolicy =& $restEndpoint->getCorsPolicy();
+				$match = $corsPolicy->getMatchingMethodOrigin($method, $origin);
+				if (! is_null($match)) {
+
+					// Add a CORS header to the response with the policy that matched
+					$response->headers->set('Access-Control-Allow-Origin', $match);
+				}
+			}
+		}
+
+		return $response;
 	}
 
 	/**

@@ -106,7 +106,7 @@ class HttpResponse {
 	/**
 	 * HTTP code for this response
 	 */
-	public $code = 200;
+	public $code = self::HTTP_OK;
 
 	/**
 	 * Constructor

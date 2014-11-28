@@ -2,9 +2,9 @@
 /**
  * PHPGoodies:RestApi - RESTful API shell
  *
- * @uses RestEndpoint
- * @uses RequestInfo
  * @uses HttpResponse
+ * @uses HttpRequest
+ * @uses RestEndpoint
  * @uses JsonResponse
  *
  * @author Sean M. Kelly <smk@smkelly.com>
@@ -79,27 +79,26 @@ class RestApi {
 	 * @return object An instance of HttpResponse (or a subclass) with all the details inside
 	 */
 	public function getResponse() {
-		$requestInfo = PHPGoodies::instantiate('Lib.Net.Http.RequestInfo');
-		$requestInfo->initCurrentRequest();
-		$request = $requestInfo->getInfo();
+		$httpRequest = PHPGoodies::instantiate('Lib.Net.Http.HttpRequest');
+		$request = $httpRequest->getInfo();
 
-		$this->requestProtocol = $request['protocol'];
+		$this->requestProtocol = $request->protocol;
 
-		if ($request['uri'] == $this->baseUri) {
+		if ($request->uri == $this->baseUri) {
 			return $this->signatureResponse();
 		}
-		else if (! isset($this->endpoints[$request['uri']])) {
+		else if (! isset($this->endpoints[$request->uri])) {
 			return $this->errorResponse('Not Found', HttpResponse::HTTP_NOT_FOUND);
 		}
 
-		$restMethod = strtolower($request['method']);
-		$restEndpoint =& $this->endpoints[$request['uri']];
+		$restMethod = strtolower($request->method);
+		$restEndpoint =& $this->endpoints[$request->uri];
 
 		if (! $restEndpoint->isImplemented($restMethod)) {
 			return $this->errorResponse('Method Not Allowed', HttpResponse::HTTP_METHOD_NOT_ALLOWED);
 		}
 
-		return $restEndpoint->$restMethod($requestInfo);
+		return $restEndpoint->$restMethod($httpRequest);
 	}
 
 	/**

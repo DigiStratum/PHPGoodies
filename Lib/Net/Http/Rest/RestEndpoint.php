@@ -31,55 +31,55 @@ abstract class RestEndpoint {
 	/**
 	 * GET method handler for this endpoint
 	 *
-	 * @param object $requestInfo RequestInfo instance
+	 * @param object $httpRequest HttpRequest instance
 	 *
 	 * @return object HttpResponse instance or null if not implemented
 	 */
-	protected function get($requestInfo) {
+	protected function get($httpRequest) {
 		return null;
 	}
 
 	/**
 	 * POST method handler for this endpoint
 	 *
-	 * @param object $requestInfo RequestInfo instance
+	 * @param object $httpRequest HttpRequest instance
 	 *
 	 * @return object HttpResponse instance or null if not implemented
 	 */
-	protected function post($requestInfo) {
+	protected function post($httpRequest) {
 		return null;
 	}
 
 	/**
 	 * PUT method handler for this endpoint
 	 *
-	 * @param object $requestInfo RequestInfo instance
+	 * @param object $httpRequest HttpRequest instance
 	 *
 	 * @return object HttpResponse instance or null if not implemented
 	 */
-	protected function put($requestInfo) {
+	protected function put($httpRequest) {
 		return null;
 	}
 
 	/**
 	 * DELETE method handler for this endpoint
 	 *
-	 * @param object $requestInfo RequestInfo instance
+	 * @param object $httpRequest HttpRequest instance
 	 *
 	 * @return object HttpResponse instance or null if not implemented
 	 */
-	protected function delete($requestInfo) {
+	protected function delete($httpRequest) {
 		return null;
 	}
 
 	/**
 	 * OPTIONS method handler for this endpoint
 	 *
-	 * @param object $requestInfo RequestInfo instance
+	 * @param object $httpRequest HttpRequest instance
 	 *
 	 * @return object HttpResponse instance or null if not implemented
 	 */
-	protected function options($requestInfo) {
+	protected function options($httpRequest) {
 		return null;
 	}
 }

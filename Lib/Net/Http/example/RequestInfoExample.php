@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies RequestInfoExample.php
+ * PHPGoodies HttpRequestExample.php
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -10,10 +10,8 @@ use PHPGoodies\PHPGoodies as PHPGoodies;
 
 // 2) Load up our goodies
 require(realpath(dirname(__FILE__) . '/../../../../PHPGoodies.php'));
-$reqInfo = PHPGoodies::instantiate('Lib.Net.Http.RequestInfo');
+$reqInfo = PHPGoodies::instantiate('Lib.Net.Http.HttpRequest');
 
 // 3) Take a look at the current request
-$reqInfo->initCurrentRequest();
-
 print_r($reqInfo->getInfo());
 

@@ -55,13 +55,13 @@ class Hash {
 	}
 
 	/**
-	 * Checks whether the element with the specified key exists already
+	 * Checks whether the hash has an element with the specified key
 	 *
 	 * @param string $key The hash key for the element that we want to check
 	 *
 	 * @return boolean true if the element is already set, else false
 	 */
-	public function chk($key) {
+	public function has($key) {
 		return isset($this->hash[$key]) ? true : false;
 	}
 

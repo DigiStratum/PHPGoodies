@@ -44,15 +44,7 @@ class HttpRequest {
 	 */
 	public function __construct($initCurrentRequest = true) {
 
-		$this->requestMethods = array(
-			self::HTTP_DELETE,
-			self::HTTP_GET,
-			self::HTTP_HEAD,
-			self::HTTP_OPTIONS,
-			self::HTTP_POST,
-			self::HTTP_PUT,
-			self::HTTP_TRACE
-		);
+		$this->requestMethods = self::getRequestMethods();
 
 		$this->reset();
 
@@ -164,6 +156,23 @@ class HttpRequest {
 		$this->requestInfo->headers = null;	// HttpHeaders instance with the complete set
 
 		return $this;
+	}
+
+	/**
+	 * Get a complete set of supported request methods
+	 *
+	 * @return array filled with the string name of each supported request method
+	 */
+	static public function getRequestMethods() {
+		return  array(
+			self::HTTP_DELETE,
+			self::HTTP_GET,
+			self::HTTP_HEAD,
+			self::HTTP_OPTIONS,
+			self::HTTP_POST,
+			self::HTTP_PUT,
+			self::HTTP_TRACE
+		);
 	}
 
 	/**

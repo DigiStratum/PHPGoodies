@@ -25,7 +25,7 @@ class Hash {
 	 * @return mixed Whatever is stored in the hash with this key
 	 */
 	public function get($key) {
-		if (! $this->chk($key)) return null;
+		if (! $this->has($key)) return null;
 		return $this->hash[$key];
 	}
 
@@ -50,7 +50,7 @@ class Hash {
 	 * return object $this for chainable support...
 	 */
 	public function del($key) {
-		if ($this->chk($key)) unset($this->hash[$key]);
+		if ($this->has($key)) unset($this->hash[$key]);
 		return $this;
 	}
 

@@ -114,7 +114,7 @@ class Hash {
 	 */
 	public function see($name = '') {
 		$output = (strlen($name) ? "HASH {$name} : " : '') . "\{\n";
-		if (! $this->len()) return $output;
+		if (! count($this->hash)) return $output;
 		foreach ($this->hash as $key => $value) {
 			$output .= "\t[{$key}] => [{$value}]\n";
 		}

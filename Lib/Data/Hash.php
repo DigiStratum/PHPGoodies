@@ -113,11 +113,12 @@ class Hash {
 	 * @return string The formatted output of the hash contents
 	 */
 	public function see($name = '') {
-		$output = (strlen($name) ? "HASH {$name} : " : '') . "\{\n";
+		$output = (strlen($name) ? "HASH {$name} : " : '') . "{\n";
 		if (! count($this->hash)) return $output;
 		foreach ($this->hash as $key => $value) {
 			$output .= "\t[{$key}] => [{$value}]\n";
 		}
+		$output .= "}\n";
 		return $output;
 	}
 }

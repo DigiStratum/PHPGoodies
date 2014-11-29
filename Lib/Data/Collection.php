@@ -25,13 +25,24 @@ class Collection {
 	/**
 	 * Constructor, locks in the class type for the collection
 	 *
+	 * Note that we want Collections to work with classes that may or may not be PHPGoodies, so
+	 * we need to check for a class that exists either in the global namespace or the PHPGoodies
+	 * one and capture accordingly. It seems strange, but even with "use" in the calling code to
+	 * bring a PHPGoodies namespace scoped Classname into the global namespace, class_exists()
+	 * method cannot see it.
+	 *
 	 * @param string $className the name of the class that this collection will hold
 	 */
 	public function __construct($className) {
-		if (! class_exists($className)) {
+		if (class_exists($className)) {
+			$this->className = $className;
+		}
+		else if (class_exists(PHPGoodies::namespaced($className))) {
+			$this->className = PHPGoodies::namespaced($className);
+		}
+		else {
 			throw new \Exception("Attempted to create a collection of a non-existent class ('{$className}')");
 		}
-		$this->className = $className;
 	}
 
 	/**
@@ -130,6 +141,20 @@ class Collection {
 			throw new \Exception("Attempted to pluck a non-existent property/method ('{$name}') from collection of '{$this->className}' objects");
 		}
 		return $values;
+	}
+
+	/**
+	 * Iterate over the collection passing each object to the callback function
+	 *
+	 * @param function $callback Callback function with a single argument to receive the object
+	 */
+	public function iterate($callback) {
+		if (! is_callable($callback)) {
+			throw new Exception("Attempted to iterate with a non-callable callback; it must be a function!");
+		}
+		foreach ($this->collection as $object) {
+			call_user_func($callback, $object);
+		}
 	}
 
 	/**

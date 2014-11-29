@@ -83,8 +83,19 @@ abstract class PHPGoodies {
 	 * @return boolean true if the name is defined as a class, interface, or trace, else false
 	 */
 	public static function isImported($name) {
-		$nsName = __NAMESPACE__ . '\\' . $name;
+		$nsName = static::namespaced($name);
 		return (class_exists($nsName) || interface_exists($nsName) || trait_exists($nsName));
+	}
+
+	/**
+	 * Get the namespaced version of the specified name
+	 *
+	 * @param string $name PHP native string name to look for
+	 *
+	 * @return string The PHPGoodies namespaced name
+	 */
+	public static function namespaced($name) {
+		return __NAMESPACE__ . '\\' . $name;
 	}
 
 	/**
@@ -106,7 +117,7 @@ abstract class PHPGoodies {
 		// Figure out the classname
 		$resourceParts = explode('.', $resource);
 		$className = $resourceParts[count($resourceParts) - 1];
-		$nsClassName = __NAMESPACE__ . "\\{$className}";
+		$nsClassName = static::namespaced($className);
 
 		// Get the variable argument list ...
 		$args = func_get_args();

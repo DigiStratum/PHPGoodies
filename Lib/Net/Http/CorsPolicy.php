@@ -29,9 +29,9 @@ PHPGoodies::import('Lib.Net.Http.HttpHeaders');
  */
 class CorsPolicy {
 
-	const CREDENTIAL_DISABLED		= 0;
-	const CREDENTIAL_ALLOWED		= 1;
-	const CREDENTIAL_REQUIRED		= 2;
+	const CREDENTIALS_DISABLED		= 0;
+	const CREDENTIALS_ALLOWED		= 1;
+	const CREDENTIALS_REQUIRED		= 2;
 
 	/**
 	 * The set of policy data for each request method of this endpoint
@@ -51,26 +51,6 @@ class CorsPolicy {
 		foreach (HttpRequest::getRequestMethods() as $method) {
 			$this->methodPolicies[$method] = null;
 		}
-	}
-
-	/**
-	 * Factory method to produce a policy object for a given request method of this URI
-	 *
-	 * @return object stdClass instance with all properties needed for a method's CORS Policy
-	 */
-	protected function methodPolicyFactory() {
-		$methodPolicy = new \stdClass();
-
-		// The set of origins for each method for which CORS header(s) should be provided
-		$methodPolicy->origins = array();
-
-		// The set of atypical headers that each method is prepared to receive
-		$methodPolicy->headers = array();
-
-		// Credentialed requests may be disabled (ignored), allowed, or required
-		$methodPolicy->credentials = self::CREDENTIAL_DISABLED;
-
-		return $methodPolicy;
 	}
 
 	/**
@@ -214,6 +194,57 @@ class CorsPolicy {
 	}
 
 	/**
+	 * Get the credentials policy for the specified method
+	 *
+	 * @param string $method The method we want to check the credentials policy for
+	 *
+	 * @return integer One of the CREDENTIALS_* constants representing the policy state
+	 */
+	public function getMethodCredentialsPolicy($method) {
+		$this->requireSupportedMethod($method);
+		return $this->methodPolicies[strtoupper($method)]->credentials;
+	}
+
+	/**
+	 * Disable credentials from being passed to the specified method
+	 *
+	 * @param string $method The method we want to disable credentials for
+	 *
+	 * @return object $this for chaining support...
+	 */
+	public function disableMethodCredentials($method) {
+		$this->requireSupportedMethod($method);
+		$this->methodPolicies[strtoupper($method)]->credentials = self::CREDENTIALS_DISABLED;
+		return $this;
+	}
+
+	/**
+	 * Allow credentials to be passed to the specified method
+	 *
+	 * @param string $method The method we want to allow credentials for
+	 *
+	 * @return object $this for chaining support...
+	 */
+	public function allowMethodCredentials($method) {
+		$this->requireSupportedMethod($method);
+		$this->methodPolicies[strtoupper($method)]->credentials = self::CREDENTIALS_ALLOWED;
+		return $this;
+	}
+
+	/**
+	 * Require credentials to be passed to the specified method
+	 *
+	 * @param string $method The method we want to require credentials for
+	 *
+	 * @return object $this for chaining support...
+	 */
+	public function requireMethodCredentials($method) {
+		$this->requireSupportedMethod($method);
+		$this->methodPolicies[strtoupper($method)]->credentials = self::CREDENTIALS_REQUIRED;
+		return $this;
+	}
+
+	/**
 	 * Caller forces specified method to be supported or throw exception (boilerplate reduction)
 	 *
 	 * @param string $method The method we want to check
@@ -224,6 +255,26 @@ class CorsPolicy {
 		if (! $this->isMethodSupported($method)) {
 			throw new \Exception("Attempt to set CORS Policy on an unsupported method ({$method})");
 		}
+	}
+
+	/**
+	 * Factory method to produce a policy object for a given request method of this URI
+	 *
+	 * @return object stdClass instance with all properties needed for a method's CORS Policy
+	 */
+	protected function methodPolicyFactory() {
+		$methodPolicy = new \stdClass();
+
+		// The set of origins for each method for which CORS header(s) should be provided
+		$methodPolicy->origins = array();
+
+		// The set of atypical headers that each method is prepared to receive
+		$methodPolicy->headers = array();
+
+		// Credentialed requests may be disabled (ignored), allowed, or required
+		$methodPolicy->credentials = self::CREDENTIALS_DISABLED;
+
+		return $methodPolicy;
 	}
 }
 

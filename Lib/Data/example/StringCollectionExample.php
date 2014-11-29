@@ -25,3 +25,5 @@ $collection->iterate(function ($str) {
 	print $str->get();
 });
 
+print "Found the World in the collection at index {$collection->find('get', 'World')}\n";
+

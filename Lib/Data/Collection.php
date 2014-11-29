@@ -128,13 +128,13 @@ class Collection {
 	public function pluck($name) {
 		$values = array();
 		if (property_exists($this->className, $name)) {
-			$this->iterate(function ($object) use (&$values) {
+			$this->iterate(function ($object) use (&$values, $name) {
 				$values[] = $object->$name;
 			});
 		}
 		else if (method_exists($this->className, $name)) {
-			$this->iterate(function ($object) use (&$values) {
-				$values[] = $object->$name();
+			$this->iterate(function ($object) use (&$values, $name) {
+				$values[] = call_user_func(array($object, $name));
 			});
 		}
 		else {
@@ -146,14 +146,43 @@ class Collection {
 	/**
 	 * Iterate over the collection passing each object to the callback function
 	 *
+	 * If the callback function returns false, then iteration will stop there and return the
+	 * collection index of the stopping point.
+	 *
 	 * @param function $callback Callback function with a single argument to receive the object
+	 *
+	 * @return integer collection index where we stopped, or null if entire collection iterated
 	 */
 	public function iterate($callback) {
 		if (! is_callable($callback)) {
 			throw new Exception("Attempted to iterate with a non-callable callback; it must be a function!");
 		}
-		foreach ($this->collection as $object) {
-			call_user_func($callback, $object);
+		foreach ($this->collection as $index => $object) {
+			$res = call_user_func($callback, $object);
+			if ($res === false) return $index;
+		}
+	}
+
+	/**
+	 * Find the object in the collection with the named property == value
+	 *
+	 * @param string $name Name of the public property/method that we want to pluck out
+	 *
+	 * @return integer collection index where we found a match, or null if no match found
+	 */
+	public function find($name, $value) {
+		if (property_exists($this->className, $name)) {
+			return $this->iterate(function ($object) use ($value, $name) {
+				if ($value == $object->$name) return false;
+			});
+		}
+		else if (method_exists($this->className, $name)) {
+			return $this->iterate(function ($object) use ($value, $name) {
+				if ($value == call_user_func(array($object, $name))) return false;
+			});
+		}
+		else {
+			throw new \Exception("Attempted to find a a value for a non-existent property/method ('{$name}') from collection of '{$this->className}' objects");
 		}
 	}
 

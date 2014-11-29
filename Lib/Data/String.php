@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:String - OOP String
+ * PHPGoodies:String - Extends PHP's native/primitive string with OOP capabilities
  *
  * @todo Bring in code from the JavaPHP project (but dispense with the Java interface in favor of
  * something more sensible/streamlined.
@@ -23,14 +23,14 @@ class String {
 	/**
 	 * Constructor
 	 *
-	 * @param mixed $str Primitive string value OR another String object to initialize with
+	 * @param mixed $str Native/primitive string value OR another String object to initialize with
 	 */
 	public function __construct($str) {
 		$this->str = $this->mixedVal($str);
 	}
 
 	/**
-	 * Get the primitive string value back out easily
+	 * Get the native/primitive string value back out easily
 	 *
 	 * @return string The value of our string
 	 */
@@ -52,7 +52,7 @@ class String {
 	/**
 	 * Is the supplied string equal to us?
 	 *
-	 * @param mixed $str Primitive string value OR another String object to use
+	 * @param mixed $str Native/primitive string value OR another String object to use
 	 *
 	 * @return boolean true if the string is equl to us, else false
 	 */
@@ -61,11 +61,11 @@ class String {
 	}
 
 	/**
-	 * Get the value of either a primitive or OOP String
+	 * Get the value of either a native/primitive or OOP String
 	 *
 	 * With enforcement!
 	 *
-	 * @param mixed $str Primitive string value OR another String object to use
+	 * @param mixed $str Native/primitive string value OR another String object to use
 	 *
 	 * @return string The value of the string either way
 	 */
@@ -74,9 +74,9 @@ class String {
 	}
 
 	/**
-	 * Is the argument a string (primitive) or String (object)?
+	 * Is the argument a string (native/primitive) or String (object)?
 	 *
-	 * @param mixed $str Primitive string value OR another String object to use
+	 * @param mixed $str Native/primitive string value OR another String object to use
 	 *
 	 * @return string Either 'string' or 'String', depending
 	 */

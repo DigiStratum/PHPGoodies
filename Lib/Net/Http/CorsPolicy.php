@@ -10,12 +10,19 @@
  * All methods supported by HTTP1.1, RFC2616, http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html,
  * are supported (not just those commonly used by REST interfaces).
  *
+ * Note that all method names are indexed in all CAPS as array indexes regardless of what is passed
+ * to the method calls to ensure that they will always be found.
+ *
+ * @uses HttpRequest
+ * @uses HttpHeaders
+ *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
 namespace PHPGoodies;
 
 PHPGoodies::import('Lib.Net.Http.HttpRequest');
+PHPGoodies::import('Lib.Net.Http.HttpHeaders');
 
 /**
  * CorsPolicy
@@ -28,20 +35,21 @@ class CorsPolicy {
 	protected $methodOrigins;
 
 	/**
+	 * The set of atypical headers that each method is prepared to receive
+	 */
+	protected $methodHeaders;
+
+	/**
 	 * Constructor
 	 *
 	 * Prepares the set of method origins with all the methods and no origins
 	 */
 	public function __construct() {
-		$this->methodOrigins = array(
-			HttpRequest::HTTP_DELETE => null,
-			HttpRequest::HTTP_GET => null,
-			HttpRequest::HTTP_HEAD => null,
-			HttpRequest::HTTP_OPTIONS => null,
-			HttpRequest::HTTP_POST => null,
-			HttpRequest::HTTP_PUT => null,
-			HttpRequest::HTTP_TRACE => null
-		);
+		$this->methodOrigins = $this->methodHeaders = array();
+		foreach (HttpRequest::getRequestMethods() as $method) {
+			$this->methodOrigins[$method] = null;
+			$this->methodHeaders[$method] = null;
+		}
 	}
 
 	/**
@@ -83,7 +91,29 @@ class CorsPolicy {
 		}
 
 		// No effort is made to de-duplicate
-		$this->methodOrigins[$method][] = $origin;
+		$this->methodOrigins[strtoupper($method)][] = $origin;
+
+		return $this;
+	}
+
+	/**
+	 * Adds an atypical request header to a method so that the CORS response may reflect it
+	 *
+	 * @param string $method The method we want to associate the header with
+	 * @param string $header The name of a header we want requesters to be able to send here
+	 *
+	 * @return object $this for chaining support...
+	 */
+	public function addMethodHeader($method, $header) {
+		$this->requireSupportedMethod($method);
+
+		// If the requested method doesn't already have any headers...
+		if (! is_array($this->methodHeader[strtoupper($method)])) {
+			$this->methodHeader[strtoupper($method)] = array();
+		}
+
+		// No effort is made to de-duplicate
+		$this->methodHeader[strtoupper($method)][] = HttpHeaders::properName($header);
 
 		return $this;
 	}
@@ -119,12 +149,38 @@ class CorsPolicy {
 	 */
 	public function getMatchingMethodOrigin($method, $origin) {
 		$this->requireSupportedMethod($method);
-		if (! is_array($this->methodOrigins[$method])) return null;
+		if (! is_array($this->methodOrigins[strtoupper($method)])) return null;
 		foreach ($this->methodOrigins[$method] as $methodOrigin) {
 			$pattern = str_replace('*', '(.*?)', $methodOrigin);
 			if (preg_match("/{$pattern}/", $origin)) return $methodOrigin;
 		}
 		return null;
+	}
+
+	/**
+	 * Simple check for whether the method supports this specific header
+	 *
+	 * @param string $method The method we want to check
+	 * @param string $header The name of a header we want to check
+	 *
+	 * @return boolean true if the method supports this header, else false
+	 */
+	public function doesMethodHaveHeader($method, $header) {
+		$this->requireSupportedMethod($method);
+		if (! is_array($this->methodHeaders[strtoupper($method)])) return false;
+		return in_array(HttpHeaders::properName($header), $this->methodHeaders[strtoupper($method)]);
+	}
+
+	/**
+	 * Get the whole set of headers supported by this method
+	 *
+	 * @param string $method The method we want to check
+	 *
+	 * @return array Of strings where each is the name of an atypical header supported
+	 */
+	public function getMethodHeaders($method) {
+		$this->requireSupportedMethod($method);
+		return is_array($this->methodHeaders[strtoupper($method)]) ? $this->methodHeaders[strtoupper($method)] : array();
 	}
 
 	/**

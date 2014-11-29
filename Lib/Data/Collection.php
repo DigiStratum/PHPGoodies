@@ -128,14 +128,14 @@ class Collection {
 	public function pluck($name) {
 		$values = array();
 		if (property_exists($this->className, $name)) {
-			foreach ($this->collection as $object) {
+			$this->iterate(function ($object) use (&$values) {
 				$values[] = $object->$name;
-			}
+			});
 		}
 		else if (method_exists($this->className, $name)) {
-			foreach ($this->collection as $object) {
+			$this->iterate(function ($object) use (&$values) {
 				$values[] = $object->$name();
-			}
+			});
 		}
 		else {
 			throw new \Exception("Attempted to pluck a non-existent property/method ('{$name}') from collection of '{$this->className}' objects");

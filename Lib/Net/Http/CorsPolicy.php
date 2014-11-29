@@ -29,15 +29,14 @@ PHPGoodies::import('Lib.Net.Http.HttpHeaders');
  */
 class CorsPolicy {
 
-	/**
-	 * The set of origins for each method for which CORS header(s) should be provided
-	 */
-	protected $methodOrigins;
+	const CREDENTIAL_DISABLED		= 0;
+	const CREDENTIAL_ALLOWED		= 1;
+	const CREDENTIAL_REQUIRED		= 2;
 
 	/**
-	 * The set of atypical headers that each method is prepared to receive
+	 * The set of policy data for each request method of this endpoint
 	 */
-	protected $methodHeaders;
+	protected $methodPolicies;
 
 	/**
 	 * Constructor
@@ -45,11 +44,33 @@ class CorsPolicy {
 	 * Prepares the set of method origins with all the methods and no origins
 	 */
 	public function __construct() {
-		$this->methodOrigins = $this->methodHeaders = array();
+
+		$this->methodPolicies = array();
+
+		// For every valid HTTP request method...
 		foreach (HttpRequest::getRequestMethods() as $method) {
-			$this->methodOrigins[$method] = null;
-			$this->methodHeaders[$method] = null;
+			$this->methodPolicies[$method] = null;
 		}
+	}
+
+	/**
+	 * Factory method to produce a policy object for a given request method of this URI
+	 *
+	 * @return object stdClass instance with all properties needed for a method's CORS Policy
+	 */
+	protected function methodPolicyFactory() {
+		$methodPolicy = new \stdClass();
+
+		// The set of origins for each method for which CORS header(s) should be provided
+		$methodPolicy->origins = array();
+
+		// The set of atypical headers that each method is prepared to receive
+		$methodPolicy->headers = array();
+
+		// Credentialed requests may be disabled (ignored), allowed, or required
+		$methodPolicy->credentials = self::CREDENTIAL_DISABLED;
+
+		return $methodPolicy;
 	}
 
 	/**
@@ -64,11 +85,11 @@ class CorsPolicy {
 		if (! (is_array($methodList) && count($methodList))) return $this;
 		foreach ($methodList as $method) {
 
-			// If the requested method isn't even a supported one, skip it
+			// If the requested method isn't even a supported one, skip it quietly
 			if (! $this->isMethodSupported($method)) continue;
 
 			// Add the origin to this method
-			$this->addMethodOrigin($origin, $method);
+			$this->addMethodOrigin($method, $origin);
 		}
 
 		return $this;
@@ -77,6 +98,8 @@ class CorsPolicy {
 	/**
 	 * Add an origin to the specified method
 	 *
+	 * No effort is made to de-duplicate
+	 *
 	 * @param string $method The method we want to associate the origin with
 	 * @param string $origin protocol://hostname:port
 	 *
@@ -84,20 +107,14 @@ class CorsPolicy {
 	 */
 	public function addMethodOrigin($method, $origin) {
 		$this->requireSupportedMethod($method);
-
-		// If the requested method doesn't already have any origins
-		if (! is_array($this->methodOrigins[strtoupper($method)])) {
-			$this->methodOrigins[strtoupper($method)] = array();
-		}
-
-		// No effort is made to de-duplicate
-		$this->methodOrigins[strtoupper($method)][] = $origin;
-
+		$this->methodPolicies[strtoupper($method)]->origins[] = $origin;
 		return $this;
 	}
 
 	/**
 	 * Adds an atypical request header to a method so that the CORS response may reflect it
+	 *
+	 * No effort is made to de-duplicate
 	 *
 	 * @param string $method The method we want to associate the header with
 	 * @param string $header The name of a header we want requesters to be able to send here
@@ -106,15 +123,7 @@ class CorsPolicy {
 	 */
 	public function addMethodHeader($method, $header) {
 		$this->requireSupportedMethod($method);
-
-		// If the requested method doesn't already have any headers...
-		if (! is_array($this->methodHeader[strtoupper($method)])) {
-			$this->methodHeader[strtoupper($method)] = array();
-		}
-
-		// No effort is made to de-duplicate
-		$this->methodHeader[strtoupper($method)][] = HttpHeaders::properName($header);
-
+		$this->methodPolicies[$method]->headers[] = HttpHeaders::properName($header);
 		return $this;
 	}
 
@@ -149,8 +158,7 @@ class CorsPolicy {
 	 */
 	public function getMatchingMethodOrigin($method, $origin) {
 		$this->requireSupportedMethod($method);
-		if (! is_array($this->methodOrigins[strtoupper($method)])) return null;
-		foreach ($this->methodOrigins[$method] as $methodOrigin) {
+		foreach ($this->methodPolicies[strtoupper($method)]->origins as $methodOrigin) {
 			$pattern = str_replace('*', '(.*?)', $methodOrigin);
 			if (preg_match("/{$pattern}/", $origin)) return $methodOrigin;
 		}
@@ -167,8 +175,7 @@ class CorsPolicy {
 	 */
 	public function doesMethodHaveHeader($method, $header) {
 		$this->requireSupportedMethod($method);
-		if (! is_array($this->methodHeaders[strtoupper($method)])) return false;
-		return in_array(HttpHeaders::properName($header), $this->methodHeaders[strtoupper($method)]);
+		return in_array(HttpHeaders::properName($header), $this->methodPolicies[strtoupper($method)]->headers);
 	}
 
 	/**
@@ -180,7 +187,19 @@ class CorsPolicy {
 	 */
 	public function getMethodHeaders($method) {
 		$this->requireSupportedMethod($method);
-		return is_array($this->methodHeaders[strtoupper($method)]) ? $this->methodHeaders[strtoupper($method)] : array();
+		return $this->methodPolicies[strtoupper($method)]->headers;
+	}
+
+	/**
+	 * Get the whole set of origins supported by this method
+	 *
+	 * @param string $method The method we want to check
+	 *
+	 * @return array Of strings where each is one of the origins supported by the method
+	 */
+	public function getMethodOrigins($method) {
+		$this->requireSupportedMethod($method);
+		return $this->methodPolicies[strtoupper($method)]->origins;
 	}
 
 	/**
@@ -191,7 +210,7 @@ class CorsPolicy {
 	 * @return boolean true if the method is supported, else false
 	 */
 	public function isMethodSupported($method) {
-		return (in_array(strtoupper($method), array_keys($this->methodOrigins)));
+		return (in_array(strtoupper($method), array_keys($this->methodPolicies)));
 	}
 
 	/**

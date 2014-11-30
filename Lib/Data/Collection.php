@@ -197,7 +197,10 @@ class Collection {
 	 */
 	public function &find($name, $value) {
 		$index = $this->findIndex($name, $value);
-		if (is_null($index)) return null;
+		if (is_null($index)) {
+			$null = null;
+			return $null;
+		}
 		$obj =& $this->get($index);
 		return $obj;
 	}

@@ -167,6 +167,7 @@ class Collection {
 	 * Find the object in the collection with the named property == value
 	 *
 	 * @param string $name Name of the public property/method that we want to pluck out
+	 * @param mixed $value String/number or other directly comparable data type value
 	 *
 	 * @return integer collection index where we found a match, or null if no match found
 	 */
@@ -184,6 +185,20 @@ class Collection {
 		else {
 			throw new \Exception("Attempted to find a a value for a non-existent property/method ('{$name}') from collection of '{$this->className}' objects");
 		}
+	}
+
+	/**
+	 * Does the collection have an object with named property == value?
+	 *
+	 * Implemented as a simple wrapper of find()
+	 *
+	 * @param string $name Name of the public property/method that we want to pluck out
+	 * @param mixed $value String/number or other directly comparable data type value
+	 *
+	 * @return boolean true if there is an object with property/method with that value, else false
+	 */
+	public function hasWith($name, $value) {
+		return is_null($this->find($name, $value)) ? false : true;
 	}
 
 	/**

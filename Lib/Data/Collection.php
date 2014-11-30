@@ -164,14 +164,14 @@ class Collection {
 	}
 
 	/**
-	 * Find the object in the collection with the named property == value
+	 * Find the index of object in the collection with the named property == value
 	 *
 	 * @param string $name Name of the public property/method that we want to pluck out
 	 * @param mixed $value String/number or other directly comparable data type value
 	 *
 	 * @return integer collection index where we found a match, or null if no match found
 	 */
-	public function find($name, $value) {
+	public function findIndex($name, $value) {
 		if (property_exists($this->className, $name)) {
 			return $this->iterate(function ($object) use ($value, $name) {
 				if ($value == $object->$name) return false;
@@ -188,6 +188,21 @@ class Collection {
 	}
 
 	/**
+	 * Find the object in the collection with the named property == value
+	 *
+	 * @param string $name Name of the public property/method that we want to pluck out
+	 * @param mixed $value String/number or other directly comparable data type value
+	 *
+	 * @return object Reference to the object in the collection or null
+	 */
+	public function &find($name, $value) {
+		$index = $this->findIndex($name, $value);
+		if (is_null($index)) return null;
+		$obj =& $this->get($index);
+		return $obj;
+	}
+
+	/**
 	 * Does the collection have an object with named property == value?
 	 *
 	 * Implemented as a simple wrapper of find()
@@ -198,7 +213,7 @@ class Collection {
 	 * @return boolean true if there is an object with property/method with that value, else false
 	 */
 	public function hasWith($name, $value) {
-		return is_null($this->find($name, $value)) ? false : true;
+		return is_null($this->findIndex($name, $value)) ? false : true;
 	}
 
 	/**

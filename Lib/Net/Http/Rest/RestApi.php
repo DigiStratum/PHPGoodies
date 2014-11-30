@@ -113,7 +113,7 @@ class RestApi {
 				$origin = $request->headers->get('Origin');
 				$method = $request->method;
 				$corsPolicy =& $restEndpoint->getCorsPolicy();
-				$match = $corsPolicy->getMatchingMethodOrigin($method, $origin);
+				$match = $corsPolicy->getMatchingOrigin($method, $origin);
 				if (! is_null($match)) {
 
 					// Add a CORS header to the response with the policy that matched

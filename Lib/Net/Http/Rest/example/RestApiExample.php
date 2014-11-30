@@ -22,8 +22,8 @@ class ChronometricsEndpoint extends RestEndpoint {
 	public function __construct() {
 
 		// Set up an optional CORS policy for this endpoint
-		$corsPolicy = PHPGoodies::instantiate('Lib.Net.Http.CorsPolicy');
-		$corsPolicy->addMethodOrigin(HttpRequest::HTTP_GET, '*');
+		$corsPolicy = PHPGoodies::instantiate('Lib.Net.Http.CorsPolicy', array(HttpRequest::HTTP_GET));
+		$corsPolicy->addOrigin(HttpRequest::HTTP_GET, '*');
 		$this->setCorsPolicy($corsPolicy);
 	}
 

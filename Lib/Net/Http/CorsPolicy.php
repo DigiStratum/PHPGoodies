@@ -44,15 +44,22 @@ class CorsPolicy {
 	/**
 	 * Constructor
 	 *
-	 * Prepares the set of method origins with all the methods and no origins
+	 * Prepares the set of method policies for all methods
 	 */
-	public function __construct() {
+	public function __construct($methods = array()) {
 
 		$this->methodPolicies = array();
 
+		foreach ($methods as $index => $value) {
+			$methods[$index] = strtoupper($value);
+		}
+
 		// For every valid HTTP request method...
 		foreach (HttpRequest::getRequestMethods() as $method) {
-			$this->methodPolicies[$method] = null;
+			if (in_array($method, $methods)) {
+				$this->methodPolicies[$method] = $this->methodPolicyFactory();
+			}
+			else $this->methodPolicies[$method] = null;
 		}
 	}
 
@@ -90,7 +97,7 @@ class CorsPolicy {
 	 */
 	public function addOrigin($method, $origin) {
 		$this->requireSupportedMethod($method);
-		$this->methodPolicies[strtoupper($method)]->origins->add(new String($origin));
+		$this->methodPolicies[strtoupper($method)]->allowedOrigins->add(new String($origin));
 		return $this;
 	}
 
@@ -109,14 +116,8 @@ class CorsPolicy {
 	/**
 	 * Get the matching methodOrigin for the requested method/origin (if any)
 	 *
-	 * The catch here is that we are suposed to support wildcards; so we will convert all the
-	 * origins that we have stored for this method into regex matching patterns, and try to
-	 * match them each in turn with the origin supplied.
-	 *
-	 * What we will return is the methodOrigin that we have who matches the requested origin
-	 * (the first one that we hit in the even that there are multiple potential matches) so
-	 * if, for example, we have a methodOrigin of '*' in the policy and the requested origin
-	 * is like 'yoursite.com', '*' will be returned because that is what matched.
+	 * If we have a methodOrigin of '*' in the policy and the requested origin is like
+	 * 'yoursite.com', '*' will be returned because that is what matched.
 	 *
 	 * @param string $method The method we want to check
 	 * @param string $origin protocol://hostname:port
@@ -125,7 +126,10 @@ class CorsPolicy {
 	 */
 	public function getMatchingOrigin($method, $origin) {
 		$this->requireSupportedMethod($method);
-		$match =& $this->methodPolicies[strtoupper($method)]->origins->find('get', $origin);
+		// Special support for wildcard
+		$any =& $this->methodPolicies[strtoupper($method)]->allowedOrigins->find('get', '*');
+		if (! is_null($any)) return '*';
+		$match =& $this->methodPolicies[strtoupper($method)]->allowedOrigins->find('get', $origin);
 		return is_null($match) ? null : $match->get();
 	}
 
@@ -138,7 +142,7 @@ class CorsPolicy {
 	 */
 	public function getOrigins($method) {
 		$this->requireSupportedMethod($method);
-		return $this->methodPolicies[strtoupper($method)]->origins->pluck('get');
+		return $this->methodPolicies[strtoupper($method)]->allowedOrigins->pluck('get');
 	}
 
 	// HEADERS
@@ -155,7 +159,7 @@ class CorsPolicy {
 	 */
 	public function addHeader($method, $header) {
 		$this->requireSupportedMethod($method);
-		$this->methodPolicies[strtoupper($method)]->headers->add(new String(HttpHeaders::properName($header)));
+		$this->methodPolicies[strtoupper($method)]->allowedHeaders->add(new String(HttpHeaders::properName($header)));
 		return $this;
 	}
 
@@ -169,7 +173,7 @@ class CorsPolicy {
 	 */
 	public function hasHeader($method, $header) {
 		$this->requireSupportedMethod($method);
-		return $this->methodPolicies[strtoupper($method)]->headers->hasWith('get', HttpHeaders::properName($header));
+		return $this->methodPolicies[strtoupper($method)]->allowedHeaders->hasWith('get', HttpHeaders::properName($header));
 	}
 
 	/**
@@ -181,7 +185,7 @@ class CorsPolicy {
 	 */
 	public function getHeaders($method) {
 		$this->requireSupportedMethod($method);
-		return $this->methodPolicies[strtoupper($method)]->headers->pluck('get');
+		return $this->methodPolicies[strtoupper($method)]->allowedHeaders->pluck('get');
 	}
 
 	// CREDENTIALS

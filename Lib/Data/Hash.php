@@ -76,9 +76,12 @@ class Hash {
 
 	/**
 	 * Resets the hash to empty (nil)
+	 *
+	 * return object $this for chainable support...
 	 */
 	public function nil() {
 		$this->hash = Array();
+		return $this;
 	}
 
 	/**

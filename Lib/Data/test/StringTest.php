@@ -79,5 +79,20 @@ class StringTest extends \PHPUnit_Framework_TestCase {
 		// It should equal the other string
 		$this->assertTrue($str1->equals($str2));
 	}
+
+	/**
+	 * Test that unequal strings come back as unequal...
+	 */
+	public function testThatUnequalStringsAreUnequal() {
+		$value1 = 'apples';
+		$str1 = PHPGoodies::instantiate('Lib.Data.String', $value1);
+		$value2 = 'oranges';
+		$str2 = PHPGoodies::instantiate('Lib.Data.String', $value2);
+
+		// It should not equal the other raw value
+		$this->assertFalse($str1->equals($value2));
+		// It should not equal the other string
+		$this->assertFalse($str1->equals($str2));
+	}
 }
 

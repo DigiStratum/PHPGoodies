@@ -1,0 +1,8 @@
+<phpunit>
+	<testsuites>
+		<testsuite name="phpgoodies">
+			<directory>Lib/Data/test</directory>
+			<directory>Lib/File/Csv/test</directory>
+		</testsuite>
+	</testsuites>
+</phpunit>

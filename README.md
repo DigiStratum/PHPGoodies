@@ -6,6 +6,11 @@ Now I make these implementations available to the general public in the hopes th
 
 Happy coding!
 
+## Testing
+
+PHPUnit is used for unit test coverage. The code base is woefully shy of 100% test coverage right now, but it will improve in time. Get phpunit installed (`yum install phpunit`, `apt-get install phpunit`, or similar should do the trick depending on your *nix platform), then just run `phpunit` from the same directory that this README.md lives; phpunit will read the phpunit.xml configuration file to identify all the subdirectories throughout the code base where tests live and run the entire set of tests. For more isolated testing, you can also run `phpunit filenameTest.php` for any of the **/test/*Test.php files in the PHPGoodies code base to run just the tests for the named class. As the code base expands, I will be making a more concerted effort to ensure that test coverage is provided, especially for the most foundational classes upon which other classes are dependent - the more sophisticated a class becomes, the more difficult the testing becomes...
+
+
 ## Advantage Considerations
 
 As I mentioned in opening, there are a great number of third party libraries available to accomplish your PHP goals, however there are two aspects to PHPGoodies which, over time, will distinguish it from the rest:

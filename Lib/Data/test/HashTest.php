@@ -7,7 +7,7 @@
 
 namespace PHPGoodies;
 
-require(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
+require_once(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
 
 class HashTest extends \PHPUnit_Framework_TestCase {
 

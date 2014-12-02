@@ -155,7 +155,7 @@ class Collection {
 	 */
 	public function iterate($callback) {
 		if (! is_callable($callback)) {
-			throw new Exception("Attempted to iterate with a non-callable callback; it must be a function!");
+			throw new \Exception("Attempted to iterate with a non-callable callback; it must be a function!");
 		}
 		foreach ($this->collection as $index => $object) {
 			$res = call_user_func($callback, $object);

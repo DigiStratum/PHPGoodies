@@ -36,7 +36,7 @@ abstract class PHPGoodies {
 	 * @todo - add support for an equivalent to CLASSPATH where import will attempt to do so from any
 	 * directory specified in CLASSPATH and in the order provided.
 	 *
-	 * @param string $resource The dotted notation resource identifier to import
+	 * @param string $resource The dotted notation resource specifier to import
 	 *
 	 * @throws Exception
 	 */
@@ -79,12 +79,17 @@ abstract class PHPGoodies {
 	 * @todo Use newer NAMESPACE::CLASSNAME supported in PHP5.5+
 	 *
 	 * @param string $name PHP native string name to look for
+	 * @param boolean $requireClass set to true to require the name to be a class (and not an
+	 * interface or trait)
 	 *
 	 * @return boolean true if the name is defined as a class, interface, or trace, else false
 	 */
-	public static function isImported($name) {
+	public static function isImported($name, $requireClass = false) {
 		$nsName = static::namespaced($name);
-		return (class_exists($nsName) || interface_exists($nsName) || trait_exists($nsName));
+		return (
+			class_exists($nsName) ||
+			(! $requireClass && (interface_exists($nsName) || trait_exists($nsName)))
+		);
 	}
 
 	/**
@@ -99,12 +104,26 @@ abstract class PHPGoodies {
 	}
 
 	/**
+	 * Simple helper to snag just the class name off the end of a resource specifier
+	 *
+	 * @param string $resource The dotted notation resource specifier to import
+	 *
+	 * @return string Just the last segment, or null if it ends up being nothing
+	 */
+	public static function specifierClassName($resource) {
+		$resourceParts = explode('.', $resource);
+		if (count($resourceParts) == 0) return null;
+		$lastPart = trim($resourceParts[count($resourceParts) - 1]);
+		return strlen($lastPart) > 0 ? $lastPart : null;
+	}
+
+	/**
 	 * Factory method to get an instance of the named resource (class)
 	 *
 	 * Automatically imports the resource if it hasn't been already. This method is useful to
 	 * make a single line of code out of your typical import/new() two-line operations.
 	 *
-	 * @param string $resource The dotted notation resource identifier to import
+	 * @param string $resource The dotted notation resource specifier to import
 	 * @param ... Variable arguments follow to be passed to the resource class' constructor
 	 *
 	 * @return object Instance of the requested resource if all went well
@@ -115,18 +134,24 @@ abstract class PHPGoodies {
 		static::import($resource);
 
 		// Figure out the classname
-		$resourceParts = explode('.', $resource);
-		$className = $resourceParts[count($resourceParts) - 1];
+		$className = static::specifierClassName($resource);
+		if (! static::isImported($className, true)) {
+			throw new \Exception('Attempted to instantiate something other than an instantiable class');
+		}
 		$nsClassName = static::namespaced($className);
-
-		// Get the variable argument list ...
-		$args = func_get_args();
-		// ... less the first which is the resource identifier
-		array_shift($args);
 
 		// Reflect so that we can pass args
 		// ref: http://stackoverflow.com/questions/2640208/call-a-constructor-from-variable-arguments-with-php
 		$reflectedClass = new ReflectionClass($nsClassName);
+		if ($reflectedClass->isAbstract()) {
+			throw new \Exception('Attempted to instantiate an abstract (non-instantiable) class');
+		}
+
+		// Get the variable argument list ...
+		$args = func_get_args();
+		// ... less the first which is the resource specifier
+		array_shift($args);
+
 		return $reflectedClass->newInstanceArgs($args);
 	}
 }

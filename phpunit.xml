@@ -1,6 +1,7 @@
 <phpunit>
 	<testsuites>
 		<testsuite name="phpgoodies">
+			<directory>test</directory>
 			<directory>Lib/Data/test</directory>
 			<directory>Lib/File/Csv/test</directory>
 		</testsuite>

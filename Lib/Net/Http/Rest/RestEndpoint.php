@@ -78,10 +78,10 @@ abstract class RestEndpoint {
 	 *
 	 * @param object $httpRequest HttpRequest instance
 	 *
-	 * @return object HttpResponse instance or null if not implemented
+	 * @return object HttpResponse instance
 	 */
 	protected function get($httpRequest) {
-		return null;
+		return $this->defaultResponse($httpRequest);
 	}
 
 	/**
@@ -89,10 +89,10 @@ abstract class RestEndpoint {
 	 *
 	 * @param object $httpRequest HttpRequest instance
 	 *
-	 * @return object HttpResponse instance or null if not implemented
+	 * @return object HttpResponse instance
 	 */
 	protected function post($httpRequest) {
-		return null;
+		return $this->defaultResponse($httpRequest);
 	}
 
 	/**
@@ -100,10 +100,10 @@ abstract class RestEndpoint {
 	 *
 	 * @param object $httpRequest HttpRequest instance
 	 *
-	 * @return object HttpResponse instance or null if not implemented
+	 * @return object HttpResponse instance
 	 */
 	protected function put($httpRequest) {
-		return null;
+		return $this->defaultResponse($httpRequest);
 	}
 
 	/**
@@ -111,118 +111,73 @@ abstract class RestEndpoint {
 	 *
 	 * @param object $httpRequest HttpRequest instance
 	 *
-	 * @return object HttpResponse instance or null if not implemented
+	 * @return object HttpResponse instance
 	 */
 	protected function delete($httpRequest) {
-		return null;
+		return $this->defaultResponse($httpRequest);
 	}
 
 	/**
 	 * OPTIONS method handler for this endpoint
+	 *
+	 * This one is public because it is likely to not need a custom implementation per API, just
+	 * relying on a properly configured CorsPolicy to drive it. So this default implementation
+	 * will what responds to most-to-all OPTIONS "pre-flight" requests.
+	 *
+	 * @todo What should we return for OPTIONS requests with no CORS policy?
+	 *
+	 * @param object $httpRequest HttpRequest instance (read only)
+	 *
+	 * @return object HttpResponse instance
+	 */
+	public function options(&$httpRequest) {
+		return $this->defaultResponse($httpRequest);
+	}
+
+	/**
+	 * Default baseline response for all methods for this endpoint
 	 *
 	 * Default implementation will handle CORS headers according to policy, but subclass may
 	 * override with a custom implementation as needed.
 	 *
 	 * ref: https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS
 	 *
-	 * @param object $httpRequest HttpRequest instance
+	 * @todo Any other default headers we want to add into the response set?
+	 *
+	 * @param object $httpRequest HttpRequest instance (read only)
 	 *
 	 * @return object HttpResponse instance or null if not implemented
 	 */
-	public function options($httpRequest) {
-
+	protected function defaultResponse(&$httpRequest) {
+		$httpResponse = PHPGoodies::instantiate('Lib.Net.Http.HttpResponse');
 		$requestInfo = $httpRequest->getInfo();
 
-		$httpResponse = PHPGoodies::instantiate('Lib.Net.Http.HttpResponse');
+		// If we have a CORS policy...
+		if (! is_null($this->corsPolicy)) {
 
-		// Is there a CorsPolicy for this request method?
-		if ($this->hasCorsPolicy()) {
+			// For OPTIONS requests...
+			if ($requestInfo->method == 'OPTIONS') {
 
-			// Since there is a CorsPolicy in place, we will require that it explicitly
-			// permit requests to whatever is being inquired about...
-
-			// Did the requester ask about a specific method?
-			if ($requestInfo->headers->has('Access-Control-Request-Method')) {
-				$method = $requestInfo->headers->get('Access-Control-Request-Method');
-
-				// Did the requester ask about any custom headers?
-				if ($requestInfo->headers->has('Access-Control-Request-Headers')) {
-					$requestHeaders = explode(',', $requestInfo->headers->get('Access-Control-Request-Headers'));
-					$allowedHeaders = array();
-					// For each requested custom header...
-					foreach ($requestHeaders as $header) {
-
-						// header gets trimmed because there may be whitespace in the supplied string
-						if ($this->corsPolicy->doesMethodHaveHeader($method, trim($header))) {
-							$allowedHeaders[] = trim($header);
-						}
-					}
-					if (count($allowedHeaders)) {
-						$httpResponse->headers->set('Access-Control-Allow-Headers', implode(', ', $allowedHeaders));
-					}
-				}
-			}
-			else $method = null;
-
-			// Did the requester supply an origin?
-			if ($requestInfo->headers->has('Origin')) {
-				$origin = $requestInfo->headers->get('Origin');
-
-				// Did the requester ask about a specific method?
-				if (isset($method)) {
-					if ($this->corsPolicy->doesMethodHaveOrigin($method, $origin)) {
-						$allowedOrigin = $this->corsPolicy->getMatchingMethodOrigin($method, $origin);
-						$httpResponse->headers->set('Access-Control-Allow-Origin', $allowedOrigin);
-						$httpResponse->headers->set('Access-Control-Allow-Methods', strtoupper($method));
-					}
-				}
-				else {
-					// With no request method, all we can really do is give
-					// the set of methods that are possible for this origin
-					$allowedMethods = array();
-
-					// For every possible request method...
-					foreach (HttpRequest::getRequestMethods() as $method) {
-
-						// If we have a handler implementation for it here...
-						if ($this->isImplemented($method)) {
-
-							// And the CorsPolicy allows it for this origin
-							if ($this->corsPolicy->doesMethodHaveOrigin($method, $origin)) {
-								$allowedMethods[] = $method;
-							}
-						}
-					}
-					$httpResponse->headers->set('Access-Control-Allow-Methods', implode(', ', $allowedMethods));
-				}
-			}
-			else {
-				// With no origin specified, all we can do is response with the set
-				// of methods that are implemented...
-				$implementedMethods = array();
-
-				// For every possible request method...
+				// We want to look at ALL implemented methods for this endpoint
+				$methods = array();
 				foreach (HttpRequest::getRequestMethods() as $method) {
 
 					// If we have a handler implementation for it here...
 					if ($this->isImplemented($method)) {
-						$implementedMethods[] = $method;
+						$methods[] = $method;
 					}
 				}
-				$httpResponse->headers->set('Access-Control-Allow-Methods', implode(', ', $implementedMethods));
+			}
+			else {
+				// Otherwise we just want a response for the one method requested
+				$methods = array($requestInfo->method);
 			}
 
-			// 30 mintues expiry on preflight info so we can change things without a long wait
-			$httpResponse->headers->set('Access-Control-Max-Age', 1800);
+			// Merge the CORS response headers in with our own
+			$httpResponse->headers->merge(
+				$this->corsPolicy->getResponseHeaders($httpRequest, $methods)
+			);
 		}
-		else {
-			// TODO: What should we return for OPTIONS requests with no CORS policy?
-		}
-
-
-		// TODO Any other default headers we want to add into the response set?
-
-		// TODO support for authenticated requests
 
 		return $httpResponse;
 	}

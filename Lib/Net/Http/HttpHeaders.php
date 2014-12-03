@@ -131,6 +131,29 @@ class HttpHeaders extends Hash {
 	}
 
 	/**
+	 * Merge in another set of headers to our set
+	 *
+	 * @param object $httpHeaders Another instance of HttpHeaders whose records we'll merge in
+	 * @param boolean $replace Replaces any existing headers with supplied ones if true (default)
+	 *
+	 * @return object $this for chaining support...
+	 */
+	public function merge($httpHeaders, $replace = true) {
+
+		// Protected members of $httpHeaders are accessible because we are the same class
+		foreach ($httpHeaders->hash as $name => $value) {
+
+			// If we are not replacing and we already have this one, skip it!
+			if ((! $replace) && ($this->has($name))) continue;
+
+			// Otherwise, set this one normally
+			$this->set($name, $value);
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Is the supplied header name the special 'HTTP*' one?
 	 *
 	 * @param string $name The header name to check

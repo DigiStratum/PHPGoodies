@@ -29,7 +29,9 @@ class ChronometricsEndpoint extends RestEndpoint {
 
 	// GET request handler
 	public function get($httpRequest) {
+		$defaultResponse = parent::get($httpRequest);
 		$response = PHPGoodies::instantiate('Lib.Net.Http.Rest.JsonResponse');
+		$response->headers->merge($defaultResponse->headers);
 		$response->dto->setProperties(array(
 			'currentTime' => date('Y-m-d h:m:s')
 		));

@@ -90,3 +90,14 @@ $httpResponse = $api->getResponse();
 $api->respond($httpResponse);
 print "\n\n" . $httpResponse->headers->see('Response Headers');
 
+// Then a GET ... with Authorization
+$_SERVER['REQUEST_HEADERS'] = array(
+	'Origin' => 'http://www.phpgoodies.org/',
+	'Authorization' => 'Basic qf3c9m849m84m94c8jf4cq9cmfwqj'
+);
+
+print "{$_SERVER['REQUEST_METHOD']}:\n";
+$httpResponse = $api->getResponse();
+$api->respond($httpResponse);
+print "\n\n" . $httpResponse->headers->see('Response Headers');
+

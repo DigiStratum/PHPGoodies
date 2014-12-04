@@ -413,14 +413,11 @@ class CorsPolicy {
 			// Did the requester send credentials/cookie?
 			$allowWildcard = true;
 			$isCredentialed = false;
-			if ($requestInfo->headers->has('Cookie')) {
+			if ($requestInfo->headers->has('Cookie') || $requestInfo->headers->has('Authorization')) {
 
 				// Credentialed request: require exact match on origin
 				$allowWildcard = false;
 				$isCredentialed = true;
-			}
-			else {
-				// TODO support for authenticated requests
 			}
 
 			$allowedOrigin = $this->getMatchingOrigin($method, $origin, $allowWildcard);

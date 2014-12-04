@@ -124,5 +124,41 @@ class Hash {
 		$output .= "}\n";
 		return $output;
 	}
+
+	/**
+	 * Get the current keys defined for this hash
+	 *
+	 * @return array Set of key strings valid for get/has/del operations
+	 */
+	public function keys() {
+		return array_keys($this->hash);
+	}
+
+	/**
+	 * Merge in another Hash
+	 *
+	 * @param object $hash Another instance of Hash whose records we'll merge in
+	 * @param boolean $replace Replaces any existing entries with supplied ones if true (default)
+	 *
+	 * @return object $this for chaining support...
+	 */
+	public function merge($hash, $replace = true) {
+
+		if (! $hash instanceof Hash) {
+			throw new \Exception('Attempted to merge with something other than another Hash');
+		}
+
+		// Protected members of $httpHeaders are accessible because we are the same class
+		foreach ($hash->hash as $name => $value) {
+
+			// If we are not replacing and we already have this one, skip it!
+			if ((! $replace) && ($this->has($name))) continue;
+
+			// Otherwise, set this one normally
+			$this->set($name, $value);
+		}
+
+		return $this;
+	}
 }
 

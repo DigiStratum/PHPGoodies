@@ -36,6 +36,7 @@ class HashTest extends \PHPUnit_Framework_TestCase {
 	public function testThatNewHashIsEmpty() {
 		$hash = PHPGoodies::instantiate('Lib.Data.Hash');
 		$this->assertEquals(0, $hash->num());
+		$this->assertEquals(0, count($hash->keys()));
 	}
 
 	/**
@@ -45,6 +46,7 @@ class HashTest extends \PHPUnit_Framework_TestCase {
 		$hash = PHPGoodies::instantiate('Lib.Data.Hash');
 		$hash->set('name', 'value');
 		$this->assertEquals(1, $hash->num());
+		$this->assertEquals(1, count($hash->keys()));
 	}
 
 	/**
@@ -71,6 +73,7 @@ class HashTest extends \PHPUnit_Framework_TestCase {
 		$hash = PHPGoodies::instantiate('Lib.Data.Hash');
 		$value = $hash->set('name', 'value')->get('name');
 		$this->assertEquals('value', $value);
+		$this->assertTrue(in_array('name', $hash->keys()));
 	}
 
 	/**
@@ -86,6 +89,7 @@ class HashTest extends \PHPUnit_Framework_TestCase {
 		// Empty/check
 		$num = $hash->nil()->num();
 		$this->assertEquals(0, $num);
+		$this->assertEquals(0, count($hash->keys()));
 	}
 
 	/**
@@ -119,11 +123,49 @@ class HashTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals(10, $num);
 
 		foreach ($all as $name => $expected) {
-			$hasIt = $hash->has($name);
-			$this->assertTrue($hasIt);
-			$actual = $hash->get($name);
-			$this->assertEquals($expected, $actual);
+			$this->assertTrue($hash->has($name));
+			$this->assertEquals($expected, $hash->get($name));
 		}
+	}
+
+	/**
+	 * Test that merging in another hash does so by replacing duplicate keys by default
+	 */
+	public function testThatMergeReplacesDuplicatKeys() {
+		$hash1 = PHPGoodies::instantiate('Lib.Data.Hash');
+		$hash2 = PHPGoodies::instantiate('Lib.Data.Hash');
+		$hash1->set('key1', 'value1');
+		$hash1->set('key2', 'original');
+		$hash2->set('key2', 'replaced');
+		$hash2->set('key3', 'value3');
+		$hash1->merge($hash2);
+		$this->assertEquals(3, $hash1->num());
+		$this->assertTrue($hash1->has('key1'));
+		$this->assertEquals('value1', $hash1->get('key1'));
+		$this->assertTrue($hash1->has('key2'));
+		$this->assertEquals('replaced', $hash1->get('key2'));
+		$this->assertTrue($hash1->has('key3'));
+		$this->assertEquals('value3', $hash1->get('key3'));
+	}
+
+	/**
+	 * Test that merging in another hash does so by skipping duplicate keys by request
+	 */
+	public function testThatMergeSkipsDuplicatKeys() {
+		$hash1 = PHPGoodies::instantiate('Lib.Data.Hash');
+		$hash2 = PHPGoodies::instantiate('Lib.Data.Hash');
+		$hash1->set('key1', 'value1');
+		$hash1->set('key2', 'original');
+		$hash2->set('key2', 'replaced');
+		$hash2->set('key3', 'value3');
+		$hash1->merge($hash2, false);
+		$this->assertEquals(3, $hash1->num());
+		$this->assertTrue($hash1->has('key1'));
+		$this->assertEquals('value1', $hash1->get('key1'));
+		$this->assertTrue($hash1->has('key2'));
+		$this->assertEquals('original', $hash1->get('key2'));
+		$this->assertTrue($hash1->has('key3'));
+		$this->assertEquals('value3', $hash1->get('key3'));
 	}
 }
 

@@ -101,28 +101,7 @@ class RestApi {
 		}
 
 		// Get the natural response from the RestEndpoint
-		$response = $restEndpoint->$restMethod($httpRequest);
-
-		// Add CORS headers if necessary
-		if ($restEndpoint->hasCorsPolicy()) {
-
-			// CORS headers may only be matched to requests that supply an origin
-			if ($request->headers->has('Origin')) {
-
-				// Got a match for origin in the CorsPolicy for this request method?
-				$origin = $request->headers->get('Origin');
-				$method = $request->method;
-				$corsPolicy =& $restEndpoint->getCorsPolicy();
-				$match = $corsPolicy->getMatchingOrigin($method, $origin);
-				if (! is_null($match)) {
-
-					// Add a CORS header to the response with the policy that matched
-					$response->headers->set('Access-Control-Allow-Origin', $match);
-				}
-			}
-		}
-
-		return $response;
+		return $restEndpoint->$restMethod($httpRequest);
 	}
 
 	/**

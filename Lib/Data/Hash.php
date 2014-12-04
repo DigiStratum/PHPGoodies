@@ -119,7 +119,7 @@ class Hash {
 		$output = (strlen($name) ? "HASH {$name} : " : '') . "{\n";
 		if (! count($this->hash)) return $output;
 		foreach ($this->hash as $key => $value) {
-			$output .= "\t[{$key}] => [{$value}]\n";
+			$output .= "\t\"{$key}\": \"{$value}\"\n";
 		}
 		$output .= "}\n";
 		return $output;

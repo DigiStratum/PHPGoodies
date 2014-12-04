@@ -23,7 +23,9 @@ class ChronometricsEndpoint extends RestEndpoint {
 
 		// Set up an optional CORS policy for this endpoint
 		$corsPolicy = PHPGoodies::instantiate('Lib.Net.Http.CorsPolicy', array(HttpRequest::HTTP_GET));
-		$corsPolicy->addOrigin(HttpRequest::HTTP_GET, '*');
+		$corsPolicy->addOrigin(HttpRequest::HTTP_GET, 'http://www.phpgoodies.org/');
+		$corsPolicy->addOrigin(HttpRequest::HTTP_GET, 'http://www.kellydiversified.com/');
+		$corsPolicy->addHeader(HttpRequest::HTTP_GET, 'CUSTOMHEADER');
 		$this->setCorsPolicy($corsPolicy);
 	}
 
@@ -42,16 +44,33 @@ class ChronometricsEndpoint extends RestEndpoint {
 $api = PHPGoodies::instantiate('Lib.Net.Http.Rest.RestApi', '/api/2', 'General Api', 2);
 $api->addEndpoint('/api/2/chronometrics', new ChronometricsEndpoint());
 
-// 4) Now mock up an HTTP request to see how the endpoint responds
+// 4) Now mock up some HTTP requests to see how the endpoint responds
+
+// First the preflight (OPTIONS)
 $_SERVER['REQUEST_SCHEME'] = 'http';
 $_SERVER['HTTP_HOST'] = 'localhost';
 $_SERVER['SERVER_PORT'] = 80;
-$_SERVER['REQUEST_METHOD'] = HttpRequest::HTTP_GET;
+$_SERVER['REQUEST_METHOD'] = HttpRequest::HTTP_OPTIONS;
 $_SERVER['REQUEST_URI'] = '/api/2/chronometrics';
 $_SERVER['REQUEST_HEADERS'] = array(
+	'Access-Control-Request-Method' => 'GET',
+	'Access-Control-Request-Headers' => 'CUSTOMHEADER',
 	'Origin' => 'http://www.phpgoodies.org/'
 );
 
+print "{$_SERVER['REQUEST_METHOD']}:\n";
+$httpResponse = $api->getResponse();
+$api->respond($httpResponse);
+print "\n\n" . $httpResponse->headers->see('Response Headers');
+
+// Then a GET
+$_SERVER['REQUEST_METHOD'] = HttpRequest::HTTP_GET;
+$_SERVER['REQUEST_HEADERS'] = array(
+	'CUSTOMHEADER' => 'CUSTOMVALUE',
+	'Origin' => 'http://www.phpgoodies.org/'
+);
+
+print "{$_SERVER['REQUEST_METHOD']}:\n";
 $httpResponse = $api->getResponse();
 $api->respond($httpResponse);
 print "\n\n" . $httpResponse->headers->see('Response Headers');

@@ -61,6 +61,12 @@ class CorsPolicy {
 			}
 			else $this->methodPolicies[$method] = null;
 		}
+
+		// And ALL origins are allowed for OPTIONS method
+		if (! isset($this->methodPolicies['OPTIONS'])) {
+			$this->methodPolicies['OPTIONS'] = $this->methodPolicyFactory();
+		}
+		$this->addOrigin('OPTIONS', '*');
 	}
 
 	// ORIGINS
@@ -279,78 +285,72 @@ class CorsPolicy {
 
 		$requestInfo = $httpRequest->getInfo();
 
-		// Since there is a CorsPolicy in place, we will require that it explicitly
-		// permit requests to whatever is being inquired about...
+		$origin = $requestInfo->headers->has('Origin') ? $requestInfo->headers->get('Origin') : null;
 
-		// Did the requester ask about a specific method?
-		if ($requestInfo->headers->has('Access-Control-Request-Method')) {
-			$method = $requestInfo->headers->get('Access-Control-Request-Method');
-
-			// Did the requester ask about any custom headers?
-			if ($requestInfo->headers->has('Access-Control-Request-Headers')) {
-				$requestHeaders = explode(',', $requestInfo->headers->get('Access-Control-Request-Headers'));
-				$allowedHeaders = array();
-				// For each requested custom header...
-				foreach ($requestHeaders as $header) {
-
-					// header gets trimmed because there may be whitespace in the supplied string
-					if ($this->hasHeader($method, trim($header))) {
-						$allowedHeaders[] = trim($header);
-					}
-				}
-				if (count($allowedHeaders)) {
-					$responseHeaders->set('Access-Control-Allow-Headers', implode(', ', $allowedHeaders));
-				}
-			}
-		}
-		else $method = null;
-
-		// Did the requester supply an origin?
-		if ($requestInfo->headers->has('Origin')) {
-			$origin = $requestInfo->headers->get('Origin');
+		// OPTIONS requests are checked for preflight/CORS headers...
+		if (strtoupper($requestInfo->method) == 'OPTIONS') {
 
 			// Did the requester ask about a specific method?
-			if (isset($method)) {
-				if ($this->hasOrigin($method, $origin)) {
-					$allowedOrigin = $this->getMatchingOrigin($method, $origin);
-					$responseHeaders->set('Access-Control-Allow-Origin', $allowedOrigin);
-					$responseHeaders->set('Access-Control-Allow-Methods', strtoupper($method));
-				}
-			}
-			else {
-				// With no request method, all we can really do is give
-				// the set of methods that are possible for this origin
-				$allowedMethods = array();
+			if ($requestInfo->headers->has('Access-Control-Request-Method')) {
 
-				// For every possible request method...
-				foreach (HttpRequest::getRequestMethods() as $method) {
+				// This indicates the requester is running a preflight check
+				$method = strtoupper($requestInfo->headers->get('Access-Control-Request-Method'));
 
-					// If we have a handler implementation for it here...
-					if (in_array($method, $methods)) {
+				// Did the requester ask about any custom headers?
+				if ($requestInfo->headers->has('Access-Control-Request-Headers')) {
+					$requestHeaders = explode(',', $requestInfo->headers->get('Access-Control-Request-Headers'));
+					$allowedHeaders = array();
+					// For each requested custom header...
+					foreach ($requestHeaders as $header) {
 
-						// And the CorsPolicy allows it for this origin
-						if ($this->hasOrigin($method, $origin)) {
-							$allowedMethods[] = $method;
+						// header gets trimmed because there may be whitespace in the supplied string
+						if ($this->hasHeader($method, trim($header))) {
+							$allowedHeaders[] = trim($header);
 						}
 					}
+					if (count($allowedHeaders)) {
+						$responseHeaders->set('Access-Control-Allow-Headers', implode(', ', $allowedHeaders));
+					}
 				}
-				$responseHeaders->set('Access-Control-Allow-Methods', implode(', ', $allowedMethods));
+
+				// Which methods are allowed for this origin
+				if (! is_null($origin)) {
+					$allowedMethods = array();
+
+					// For every possible request method...
+					foreach ($methods as $possibleMethod) {
+
+						// ... and the CorsPolicy allows it for this origin...
+						if ($this->hasOrigin($possibleMethod, $origin)) {
+							$allowedMethods[] = $possibleMethod;
+						}
+					}
+					$responseHeaders->set('Access-Control-Allow-Methods', implode(', ', $allowedMethods));
+				}
+
+				// 30 mintues expiry on preflight info so we can change things without a long wait
+				$responseHeaders->set('Access-Control-Max-Age', 1800);
+
+				// TODO support for authenticated requests
+			}
+			else {
+				// Nothing special to do for non-preflight OPTIONS requests... (?)
 			}
 		}
 		else {
-			// With no origin specified, all we can do is respond
-			// with the set of methods that are implemented...
-			$responseHeaders->set('Access-Control-Allow-Methods', implode(', ', $methods));
+			$method = strtoupper($requestInfo->method);
 		}
 
-		// 30 mintues expiry on preflight info so we can change things without a long wait
-		$responseHeaders->set('Access-Control-Max-Age', 1800);
-
-		// TODO support for authenticated requests
+		// Did the requester supply an origin?
+		if (! is_null($origin)) {
+			$allowedOrigin = $this->getMatchingOrigin($method, $origin);
+			if (! is_null($allowedOrigin)) {
+				$responseHeaders->set('Access-Control-Allow-Origin', $allowedOrigin);
+			}
+		}
 
 		return $responseHeaders;
 	}
-
 
 	/**
 	 * Caller forces specified method to be supported or throw exception (boilerplate reduction)

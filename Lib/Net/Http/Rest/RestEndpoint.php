@@ -174,9 +174,8 @@ abstract class RestEndpoint {
 			}
 
 			// Merge the CORS response headers in with our own
-			$httpResponse->headers->merge(
-				$this->corsPolicy->getResponseHeaders($httpRequest, $methods)
-			);
+			$corsHeaders = $this->corsPolicy->getResponseHeaders($httpRequest, $methods);
+			$httpResponse->headers->merge($corsHeaders);
 		}
 
 		return $httpResponse;

@@ -14,8 +14,6 @@
 
 namespace PHPGoodies;
 
-require_once(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
-
 /**
  * TreeManager - A class for managing "tree" type database tables
  */

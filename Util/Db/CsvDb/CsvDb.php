@@ -7,8 +7,6 @@
 
 namespace PHPGoodies;
 
-require_once(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
-
 /**
  * CsvDb - A class for using CSV data with a Mysql Database
  */

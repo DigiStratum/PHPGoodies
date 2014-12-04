@@ -11,8 +11,6 @@
 
 namespace PHPGoodies;
 
-require_once(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
-
 PHPGoodies::import('Lib.Dom.Node');
 PHPGoodies::import('Lib.Dom.NodeInterface');
 

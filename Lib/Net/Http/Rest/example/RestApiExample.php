@@ -23,9 +23,12 @@ class ChronometricsEndpoint extends RestEndpoint {
 
 		// Set up an optional CORS policy for this endpoint
 		$corsPolicy = PHPGoodies::instantiate('Lib.Net.Http.CorsPolicy', array(HttpRequest::HTTP_GET));
+		$corsPolicy->addOrigin(HttpRequest::HTTP_GET, '*');
 		$corsPolicy->addOrigin(HttpRequest::HTTP_GET, 'http://www.phpgoodies.org/');
 		$corsPolicy->addOrigin(HttpRequest::HTTP_GET, 'http://www.kellydiversified.com/');
-		$corsPolicy->addHeader(HttpRequest::HTTP_GET, 'CUSTOMHEADER');
+		$corsPolicy->addHeader(HttpRequest::HTTP_GET, 'Custom-Request-Header');
+		$corsPolicy->exposeHeader(HttpRequest::HTTP_GET, 'Custom-Response-Header');
+		$corsPolicy->allowCredentials(HttpRequest::HTTP_GET);
 		$this->setCorsPolicy($corsPolicy);
 	}
 
@@ -34,6 +37,7 @@ class ChronometricsEndpoint extends RestEndpoint {
 		$defaultResponse = parent::get($httpRequest);
 		$response = PHPGoodies::instantiate('Lib.Net.Http.Rest.JsonResponse');
 		$response->headers->merge($defaultResponse->headers);
+		$response->headers->set('Custom-Response-Header', 'ANOTHERVALUE');
 		$response->dto->setProperties(array(
 			'currentTime' => date('Y-m-d h:m:s')
 		));
@@ -54,7 +58,7 @@ $_SERVER['REQUEST_METHOD'] = HttpRequest::HTTP_OPTIONS;
 $_SERVER['REQUEST_URI'] = '/api/2/chronometrics';
 $_SERVER['REQUEST_HEADERS'] = array(
 	'Access-Control-Request-Method' => 'GET',
-	'Access-Control-Request-Headers' => 'CUSTOMHEADER',
+	'Access-Control-Request-Headers' => 'Custom-Request-Header',
 	'Origin' => 'http://www.phpgoodies.org/'
 );
 
@@ -66,8 +70,19 @@ print "\n\n" . $httpResponse->headers->see('Response Headers');
 // Then a GET
 $_SERVER['REQUEST_METHOD'] = HttpRequest::HTTP_GET;
 $_SERVER['REQUEST_HEADERS'] = array(
-	'CUSTOMHEADER' => 'CUSTOMVALUE',
+	'Custom-Request-Header' => 'CUSTOMVALUE',
 	'Origin' => 'http://www.phpgoodies.org/'
+);
+
+print "{$_SERVER['REQUEST_METHOD']}:\n";
+$httpResponse = $api->getResponse();
+$api->respond($httpResponse);
+print "\n\n" . $httpResponse->headers->see('Response Headers');
+
+// Then a GET ... with Cookie
+$_SERVER['REQUEST_HEADERS'] = array(
+	'Origin' => 'http://www.phpgoodies.org/',
+	'Cookie' => 'customcookie=whatever'
 );
 
 print "{$_SERVER['REQUEST_METHOD']}:\n";

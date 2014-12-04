@@ -13,6 +13,8 @@
  * Note that all method names are indexed in all CAPS as array indexes regardless of what is passed
  * to the method calls to ensure that they will always be found.
  *
+ * ref: http://www.w3.org/TR/cors/
+ *
  * @uses Collection
  * @uses String
  * @uses HttpRequest
@@ -112,11 +114,12 @@ class CorsPolicy {
 	 *
 	 * @param string $method The method we want to check
 	 * @param string $origin protocol://hostname:port
+	 * @param boolean $allowWildcard Wildcard in allowedOrigins will match if true (default)
 	 *
 	 * @return boolean true if the method has the specified origin, else false
 	 */
-	public function hasOrigin($method, $origin) {
-		return is_null($this->getMatchingOrigin($method, $origin)) ? false : true;	
+	public function hasOrigin($method, $origin, $allowWildcard = true) {
+		return is_null($this->getMatchingOrigin($method, $origin, $allowWildcard)) ? false : true;	
 	}
 
 	/**
@@ -127,14 +130,18 @@ class CorsPolicy {
 	 *
 	 * @param string $method The method we want to check
 	 * @param string $origin protocol://hostname:port
+	 * @param boolean $allowWildcard Wildcard in allowedOrigins will match if true (default)
 	 *
 	 * @return string The methodOrigin that matched, or null if none
 	 */
-	public function getMatchingOrigin($method, $origin) {
+	public function getMatchingOrigin($method, $origin, $allowWildcard = true) {
 		$this->requireSupportedMethod($method);
+
 		// Special support for wildcard
 		$any =& $this->methodPolicies[strtoupper($method)]->allowedOrigins->find('get', '*');
-		if (! is_null($any)) return '*';
+		if (! is_null($any)) {
+			return $allowWildcard ? '*' : $origin;
+		}
 		$match =& $this->methodPolicies[strtoupper($method)]->allowedOrigins->find('get', $origin);
 		return is_null($match) ? null : $match->get();
 	}
@@ -154,9 +161,9 @@ class CorsPolicy {
 	// HEADERS
 
 	/**
-	 * Adds an atypical request header to a method so that the CORS response may reflect it
+	 * Adds an atypical request header to a method so that the CORS preflight may reflect it
 	 *
-	 * No effort is made to de-duplicate
+	 * These are for REQUESTS; No effort is made to de-duplicate
 	 *
 	 * @param string $method The method we want to associate the header with
 	 * @param string $header The name of a header we want requesters to be able to send here
@@ -172,6 +179,8 @@ class CorsPolicy {
 	/**
 	 * Simple check for whether the method supports this specific header
 	 *
+	 * This is for REQUESTS;
+	 *
 	 * @param string $method The method we want to check
 	 * @param string $header The name of a header we want to check
 	 *
@@ -185,6 +194,8 @@ class CorsPolicy {
 	/**
 	 * Get the whole set of headers supported by this method
 	 *
+	 * This is for REQUESTS;
+	 *
 	 * @param string $method The method we want to check
 	 *
 	 * @return array Of strings where each is the name of an atypical header supported
@@ -193,6 +204,52 @@ class CorsPolicy {
 		$this->requireSupportedMethod($method);
 		return $this->methodPolicies[strtoupper($method)]->allowedHeaders->pluck('get');
 	}
+
+	/**
+	 * Adds an atypical response header to a method so that the CORS response may expose it
+	 *
+	 * These are for RESPONSES; No effort is made to de-duplicate
+	 *
+	 * @param string $method The method we want to associate the header with
+	 * @param string $header The name of a header we want requesters to be able to access
+	 *
+	 * @return object $this for chaining support...
+	 */
+	public function exposeHeader($method, $header) {
+		$this->requireSupportedMethod($method);
+		$this->methodPolicies[strtoupper($method)]->exposedHeaders->add(new String(HttpHeaders::properName($header)));
+		return $this;
+	}
+
+	/**
+	 * Simple check for whether the method exposes this specific header
+	 *
+	 * This is for RESPONSES;
+	 *
+	 * @param string $method The method we want to check
+	 * @param string $header The name of a header we want to check
+	 *
+	 * @return boolean true if the method exposes this header, else false
+	 */
+	public function hasExposed($method, $header) {
+		$this->requireSupportedMethod($method);
+		return $this->methodPolicies[strtoupper($method)]->exposedHeaders->hasWith('get', HttpHeaders::properName($header));
+	}
+
+	/**
+	 * Get the whole set of headers exposed by this method
+	 *
+	 * This is for RESPONSES;
+	 *
+	 * @param string $method The method we want to check
+	 *
+	 * @return array Of strings where each is the name of an atypical header exposed
+	 */
+	public function getExposed($method) {
+		$this->requireSupportedMethod($method);
+		return $this->methodPolicies[strtoupper($method)]->exposedHeaders->pluck('get');
+	}
+
 
 	// CREDENTIALS
 
@@ -288,10 +345,12 @@ class CorsPolicy {
 		$origin = $requestInfo->headers->has('Origin') ? $requestInfo->headers->get('Origin') : null;
 
 		// OPTIONS requests are checked for preflight/CORS headers...
+		$preflight = $allowCredentials = false;
 		if (strtoupper($requestInfo->method) == 'OPTIONS') {
 
 			// Did the requester ask about a specific method?
-			if ($requestInfo->headers->has('Access-Control-Request-Method')) {
+			$preflight = $requestInfo->headers->has('Access-Control-Request-Method');
+			if ($preflight) {
 
 				// This indicates the requester is running a preflight check
 				$method = strtoupper($requestInfo->headers->get('Access-Control-Request-Method'));
@@ -330,8 +389,6 @@ class CorsPolicy {
 
 				// 30 mintues expiry on preflight info so we can change things without a long wait
 				$responseHeaders->set('Access-Control-Max-Age', 1800);
-
-				// TODO support for authenticated requests
 			}
 			else {
 				// Nothing special to do for non-preflight OPTIONS requests... (?)
@@ -341,12 +398,46 @@ class CorsPolicy {
 			$method = strtoupper($requestInfo->method);
 		}
 
+		// Does this method allow credentials?
+		if ($this->credentialsDisabled($method)) {
+			// For preflight requests we want an explicit false
+			if ($preflight) {
+				$responseHeaders->set('Access-Control-Allow-Credentials', 'false');
+			}
+		}
+		else $allowCredentials = true;
+
 		// Did the requester supply an origin?
 		if (! is_null($origin)) {
-			$allowedOrigin = $this->getMatchingOrigin($method, $origin);
+
+			// Did the requester send credentials/cookie?
+			$allowWildcard = true;
+			$isCredentialed = false;
+			if ($requestInfo->headers->has('Cookie')) {
+
+				// Credentialed request: require exact match on origin
+				$allowWildcard = false;
+				$isCredentialed = true;
+			}
+			else {
+				// TODO support for authenticated requests
+			}
+
+			$allowedOrigin = $this->getMatchingOrigin($method, $origin, $allowWildcard);
 			if (! is_null($allowedOrigin)) {
 				$responseHeaders->set('Access-Control-Allow-Origin', $allowedOrigin);
+
+				if ($preflight || ($isCredentialed && $allowCredentials)) {
+					// For preflight requests we want an explicit true
+					$responseHeaders->set('Access-Control-Allow-Credentials', 'true');
+				}
 			}
+		}
+
+		// Expose whatever outbound response headers needed
+		$exposedHeaders = $this->getExposed($method);
+		if (count($exposedHeaders)) {
+			$responseHeaders->set('Access-Control-Expose-Headers', join(',', $exposedHeaders));
 		}
 
 		return $responseHeaders;
@@ -376,8 +467,11 @@ class CorsPolicy {
 		// The set of origins for each method for which CORS header(s) should be provided
 		$methodPolicy->allowedOrigins = PHPGoodies::instantiate('Lib.Data.Collection', 'String');
 
-		// The set of atypical headers that each method is prepared to receive
+		// The set of atypical headers that each method is prepared to receive (request)
 		$methodPolicy->allowedHeaders = PHPGoodies::instantiate('Lib.Data.Collection', 'String');
+
+		// The set of atypical headers that each method is prepared to send (response)
+		$methodPolicy->exposedHeaders = PHPGoodies::instantiate('Lib.Data.Collection', 'String');
 
 		// Credentialed requests may be disabled (ignored), allowed, or required
 		$methodPolicy->credentials = self::CREDENTIALS_DISABLED;

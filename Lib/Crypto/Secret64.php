@@ -79,8 +79,9 @@ class Secret64 {
 	 *
 	 * @return string Ciphered string encoded with the secret in bsae64 charset
 	 */
-	public function encode($str) {
-		return $this->b64Cipher(base64_encode($str));
+	public function encode(&$str) {
+		$b64 = base64_encode($str);
+		return $this->b64Cipher($b64);
 	}
 
 	/**
@@ -90,7 +91,7 @@ class Secret64 {
 	 *
 	 * @return string Original, unencoded string if the secret matches, or garbage if not
 	 */
-	public function decode($str) {
+	public function decode(&$str) {
 		return base64_decode($this->b64Cipher($str));
 	}
 
@@ -104,14 +105,11 @@ class Secret64 {
 	 *
 	 * @return string A string transformed by the cipher map in the same character set
 	 */
-	protected function b64Cipher($str) {
+	protected function b64Cipher(&$str) {
 		$max = strlen($this->map) - 1;
 		$inverted = '';
 		for ($xx = 0; $xx < strlen($str); $xx++) {
-			$chr = $str{$xx};
-			$pos = strpos($this->map, $chr);
-			$inv = $max - $pos;
-			$inverted .= $this->map{$inv};
+			$inverted .= $this->map{($max - strpos($this->map, $str{$xx}))};
 		}
 		return $inverted;
 	}

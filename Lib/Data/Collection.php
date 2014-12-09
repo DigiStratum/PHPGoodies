@@ -78,7 +78,8 @@ class Collection {
 	 * @return object A reference to the requested object instance, or null if it doesn't exist
 	 */
 	public function &get($index) {
-		if (! $this->has($index)) return null;
+		$null = null;
+		if (! $this->has($index)) return $null;
 		return $this->collection[$index];
 	}
 

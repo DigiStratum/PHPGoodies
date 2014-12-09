@@ -69,7 +69,22 @@ class RestApi {
 		if (! $restEndpoint instanceof RestEndpoint) {
 			throw new \Exception('Something other than a RestEndpoint was supplied');
 		}
-		$this->endpoints[$uri] =& $restEndpoint;
+
+		// Take a uri like '/this/{value}/that/{also}' and turn it into a regex pattern
+		$pattern = $uri;
+		$map = array();
+		if (preg_match_all('|{(.*?)}|', $uri, $matches)) {
+			foreach ($matches[0] as $index => $match) {
+				//print "Match [{$match}] -> [{$matches[1][$index]}]\n";
+				$map[$index] = $matches[1][$index];
+				$pattern = str_replace($match, '(.*?)', $pattern);
+			}
+		}
+
+		$this->endpoints[$pattern] = new \StdClass();
+		$this->endpoints[$pattern]->endpoint =& $restEndpoint;
+		$this->endpoints[$pattern]->map = $map;
+
 		return $this;
 	}
 
@@ -85,23 +100,67 @@ class RestApi {
 		$request = $httpRequest->getInfo();
 		$this->requestProtocol = $request->protocol;
 
+		$pattern = $this->getEndpointForUri($request->uri);
+
 		// Expect either baseUri or another validly defined endpoint URI
 		if ($request->uri == $this->baseUri) {
 			return $this->signatureResponse();
 		}
-		else if (! isset($this->endpoints[$request->uri])) {
+		//else if (! isset($this->endpoints[$request->uri])) {
+		else if (! isset($this->endpoints[$pattern])) {
 			return $this->errorResponse('Not Found', HttpResponse::HTTP_NOT_FOUND);
 		}
 
 		// Verify this RestEndpoint supports the request method
-		$restEndpoint =& $this->endpoints[$request->uri];
+		//$restEndpoint =& $this->endpoints[$request->uri]->endpoint;
+		$restEndpoint =& $this->endpoints[$pattern]->endpoint;
 		$restMethod = strtolower($request->method);
 		if (! $restEndpoint->isImplemented($restMethod)) {
 			return $this->errorResponse('Method Not Allowed', HttpResponse::HTTP_METHOD_NOT_ALLOWED);
 		}
 
 		// Get the natural response from the RestEndpoint
-		return $restEndpoint->$restMethod($httpRequest);
+		return $restEndpoint->$restMethod(
+			$httpRequest,
+			$this->getEndpointParams($request->uri, $pattern)
+		);
+	}
+
+	/**
+	 * Extract data elements from the URI with the pattern and associated map
+	 *
+	 * @param string $uri a URI as requested
+	 * @param string $pattern a previously configured pattern (key of $this->endpoints)
+	 *
+	 * @return array of name=value pairs from the URI or null if none
+	 */
+	protected function getEndpointParams($uri, $pattern) {
+		if (preg_match("|^{$pattern}$|", $uri, $matches)) {
+			$map =& $this->endpoints[$pattern]->map;
+			$params = array();
+
+			for ($xx = 1; $xx < count($matches); $xx++) {
+				$params[$map[$xx - 1]] = $matches[$xx];
+			}
+			return $params;
+		}
+		return null;
+	}
+
+	/**
+	 * Figure out which endpoint's pattern matches this uri
+	 *
+	 * @param string $uri a URI as requested
+	 *
+	 * @return string the pattern key from $this->endpoints which matches
+	 */
+	protected function getEndpointForUri($uri) {
+		foreach (array_keys($this->endpoints) as $pattern) {
+			if (preg_match("|^{$pattern}$|", $uri)) {
+				return $pattern;
+			}
+		}
+		return null;
 	}
 
 	/**

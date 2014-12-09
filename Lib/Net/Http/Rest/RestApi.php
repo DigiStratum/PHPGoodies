@@ -125,9 +125,12 @@ class RestApi {
 	protected function signatureResponse() {
 		$jsonResponse = PHPGoodies::instantiate('Lib.Net.Http.Rest.JsonResponse');
 		$jsonResponse->code = HttpResponse::HTTP_OK;
-		$jsonResponse->dto->setProperties(Array('signature', 'version'));
-		$jsonResponse->dto->set('signature', $this->signature);
-		$jsonResponse->dto->set('version', $this->version);
+		$jsonResponse->dto->setProperties(
+			Array(
+				'signature' => $this->signature,
+				'version' => $this->version
+			)
+		);
 		return $jsonResponse;
 	}
 

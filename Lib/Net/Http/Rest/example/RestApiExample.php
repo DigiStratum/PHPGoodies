@@ -45,12 +45,11 @@ class ChronometricsEndpoint extends RestEndpoint {
 		return $response;
 	}
 }
-$api = PHPGoodies::instantiate('Lib.Net.Http.Rest.RestApi', '/api/2', 'General Api', 2);
-$api->addEndpoint('/api/2/chronometrics', new ChronometricsEndpoint());
 
-// 4) Now mock up some HTTP requests to see how the endpoint responds
 
-// First the preflight (OPTIONS)
+// 4) Mock up an HTTP request to see how the endpoint responds
+
+// Preflight (OPTIONS)
 $_SERVER['REQUEST_SCHEME'] = 'http';
 $_SERVER['HTTP_HOST'] = 'localhost';
 $_SERVER['SERVER_PORT'] = 80;
@@ -61,6 +60,10 @@ $_SERVER['REQUEST_HEADERS'] = array(
 	'Access-Control-Request-Headers' => 'Custom-Request-Header',
 	'Origin' => 'http://www.phpgoodies.org/'
 );
+
+// 5) Set up the API with the request context in place
+$api = PHPGoodies::instantiate('Lib.Net.Http.Rest.RestApi', '/api/2', 'General Api', 2);
+$api->addEndpoint('/api/2/chronometrics', new ChronometricsEndpoint());
 
 print "{$_SERVER['REQUEST_METHOD']}:\n";
 $httpResponse = $api->getResponse();

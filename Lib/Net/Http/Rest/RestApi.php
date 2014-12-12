@@ -41,9 +41,9 @@ class RestApi {
 	protected $baseUri;
 
 	/**
-	 * The protocol used to make the request
+	 * The current REST request
 	 */
-	protected $requestProtocol;
+	protected $restRequest;
 
 	/**
 	 * Constructor
@@ -55,6 +55,7 @@ class RestApi {
 		$this->baseUri = $baseUri;
 		$this->signature = $signature;
 		$this->version = $version;
+
 	}
 
 	/**
@@ -75,7 +76,6 @@ class RestApi {
 		$map = array();
 		if (preg_match_all('|{(.*?)}|', $uri, $matches)) {
 			foreach ($matches[0] as $index => $match) {
-				//print "Match [{$match}] -> [{$matches[1][$index]}]\n";
 				$map[$index] = $matches[1][$index];
 				$pattern = str_replace($match, '(.*?)', $pattern);
 			}
@@ -95,35 +95,32 @@ class RestApi {
 	 */
 	public function getResponse() {
 
-		// Get some details about this request
-		$httpRequest = PHPGoodies::instantiate('Lib.Net.Http.HttpRequest');
-		$request = $httpRequest->getInfo();
-		$this->requestProtocol = $request->protocol;
-
+		// Capture some details about this request
+		$this->restRequest = PHPGoodies::instantiate('Lib.Net.Http.Rest.RestRequest');
+		$request = $this->restRequest->getInfo();
 		$pattern = $this->getEndpointForUri($request->uri);
+		$this->restRequest->setPattern($pattern);
+		$this->restRequest->setParams($this->getEndpointParams($request->uri, $pattern));
 
-		// Expect either baseUri or another validly defined endpoint URI
+		// Handle requests for the baseUri
 		if ($request->uri == $this->baseUri) {
 			return $this->signatureResponse();
 		}
-		//else if (! isset($this->endpoints[$request->uri])) {
-		else if (! isset($this->endpoints[$pattern])) {
-			return $this->errorResponse('Not Found', HttpResponse::HTTP_NOT_FOUND);
+
+		// Handle requests for undefined endpoints
+		$restEndpoint =& $this->getEndpointForPattern($pattern);
+		if (null == $restEndpoint) {
+			return $this->errorResponse('Not Found!', HttpResponse::HTTP_NOT_FOUND);
 		}
 
 		// Verify this RestEndpoint supports the request method
-		//$restEndpoint =& $this->endpoints[$request->uri]->endpoint;
-		$restEndpoint =& $this->endpoints[$pattern]->endpoint;
 		$restMethod = strtolower($request->method);
 		if (! $restEndpoint->isImplemented($restMethod)) {
 			return $this->errorResponse('Method Not Allowed', HttpResponse::HTTP_METHOD_NOT_ALLOWED);
 		}
 
 		// Get the natural response from the RestEndpoint
-		return $restEndpoint->$restMethod(
-			$httpRequest,
-			$this->getEndpointParams($request->uri, $pattern)
-		);
+		return $restEndpoint->$restMethod($this->restRequest);
 	}
 
 	/**
@@ -164,6 +161,31 @@ class RestApi {
 	}
 
 	/**
+	 * Get the endpoint with the specified URI pattern
+	 *
+	 * @param string $pattern A regex URI pattern that we want to check for
+	 *
+	 * @return object Reference to RestEndpoint that matches the pattern or null if no match
+	 */
+	protected function &getEndpointForPattern($pattern) {
+		if (! $this->hasEndpointForPattern($pattern)) {
+			$null = null;
+			return $null;
+		}
+		return $this->endpoints[$pattern]->endpoint;
+	}
+
+	/**
+	 * Check whether we have an endpoint for the specified URI patternn
+	 *
+	 * @param string $pattern A regex URI pattern that we want to check for
+	 *
+	 */
+	protected function hasEndpointForPattern($pattern) {
+		return isset($this->endpoints[$pattern]);
+	}
+
+	/**
 	 * Actually send the response out to the client, headers, code, body, and all
 	 */
 	public function respond($httpResponse) {
@@ -171,7 +193,8 @@ class RestApi {
 			throw new \Exception('Something other than an HttpResponse was supplied');
 		}
 		// Add a header for the HTTP/S response
-		$httpResponse->headers->set($this->requestProtocol, $httpResponse->code);
+		$requestProtocol = $this->restRequest->getInfo()->protocol;
+		$httpResponse->headers->set($requestProtocol, $httpResponse->code);
 		$httpResponse->headers->send();
 		print $httpResponse->getResponseBody();
 	}
@@ -204,10 +227,12 @@ class RestApi {
 	protected function errorResponse($message, $code) {
 		$jsonResponse = PHPGoodies::instantiate('Lib.Net.Http.Rest.JsonResponse');
 		$jsonResponse->code = $code;
-		$jsonResponse->dto->setProperties(Array(
-			'message' => $message,
-			'code' => $code
-		));
+		$jsonResponse->dto->setProperties(
+			Array(
+				'message' => $message,
+				'code' => $code
+			)
+		);
 		return $jsonResponse;
 	}
 }

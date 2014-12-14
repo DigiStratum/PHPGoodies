@@ -11,8 +11,6 @@
 
 namespace PHPGoodies;
 
-use ReflectionClass;
-
 /**
  * PHPGoodies support code
  */
@@ -30,11 +28,11 @@ abstract class PHPGoodies {
 	/**
 	 * Import the specified class/interface/trait resource definition with dotted notation
 	 *
-	 * This import implementation mimics Java's implementation by relativizing the path where classes
-	 * can be loaded from, and enforcing the class name matching the filename.
+	 * This import implementation mimics Java's implementation by relativizing the path where
+	 * classes can be loaded from, and enforcing the class name matching the filename.
 	 *
-	 * @todo - add support for an equivalent to CLASSPATH where import will attempt to do so from any
-	 * directory specified in CLASSPATH and in the order provided.
+	 * @todo - add support for an equivalent to CLASSPATH where import will attempt to do so
+	 * from any directory specified in CLASSPATH and in the order provided.
 	 *
 	 * @param string $resource The dotted notation resource specifier to import
 	 *
@@ -50,7 +48,8 @@ abstract class PHPGoodies {
 		// If no class parts, class missing
 		$numParts = count($resourceparts);
 		if ($numParts == 0) {
-			throw new \Exception('Resource name cannot be empty');
+			$msg = 'Resource name cannot be empty';
+			throw new \Exception($msg);
 		}
 
 		// If expected fully qualified name has already been imported, no-op.
@@ -62,14 +61,19 @@ abstract class PHPGoodies {
 
 		// If resultant path invalid, class missing
 		if (! @file_exists($path)) {
-			throw new \Exception("Could not import implementation for '{$resource}'; not found at [{$path}]");
+			$msg = "Could not import implementation for '{$resource}'; not found at [{$path}]";
+			throw new \Exception($msg);
 		}
 
-		@require_once($path);
+		if (! (@include_once $path)) {
+			$msg = "Could not import implementation for '{$resource}'; include failed for [{$path}] >> [{$res}]";
+			throw new \Exception($msg);
+		}
 
 		// If expected name undefined after loading, class missing
 		if (! static::isImported($name)) {
-			throw new \Exception("Could not import implementation for '{$resource}'");
+			$msg = "Could not import implementation for '{$resource}'";
+			throw new \Exception($msg);
 		}
 	}
 
@@ -136,15 +140,17 @@ abstract class PHPGoodies {
 		// Figure out the classname
 		$className = static::specifierClassName($resource);
 		if (! static::isImported($className, true)) {
-			throw new \Exception('Attempted to instantiate something other than an instantiable class');
+			$msg = 'Attempted to instantiate something other than an instantiable class';
+			throw new \Exception($msg);
 		}
 		$nsClassName = static::namespaced($className);
 
 		// Reflect so that we can pass args
 		// ref: http://stackoverflow.com/questions/2640208/call-a-constructor-from-variable-arguments-with-php
-		$reflectedClass = new ReflectionClass($nsClassName);
+		$reflectedClass = new \ReflectionClass($nsClassName);
 		if ($reflectedClass->isAbstract()) {
-			throw new \Exception('Attempted to instantiate an abstract (non-instantiable) class');
+			$msg = 'Attempted to instantiate an abstract (non-instantiable) class';
+			throw new \Exception($msg);
 		}
 
 		// Get the variable argument list ...

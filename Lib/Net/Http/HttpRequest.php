@@ -119,11 +119,12 @@ class HttpRequest {
 				}
 			}
 
-			// Query String / Params
-			if (isset($_SERVER['QUERY_STRING'])) {
-				$this->setQueryString($_SERVER['QUERY_STRING']);
-				PHPGoodies::import('Lib.Net.Http.QueryString');
-				$this->requestInfo->data = QueryString::getQueryStringAsData($_SERVER['QUERY_STRING']);
+			// Request data
+			$this->requestInfo->data = PHPGoodies::instantiate('Lib.Data.Hash');
+			if (is_array($_REQUEST) && count($_REQUEST)) {
+				foreach ($_REQUEST as $name => $value) {
+					$this->requestInfo->add($name, $valud);
+				}
 			}
 
 			// Headers

@@ -2,6 +2,7 @@
 /**
  * PHPGoodies:HttpRequest - Objectify a pile of information about a request
  *
+ * @uses Hash
  * @uses HttpHeaders
  *
  * @author Sean M. Kelly <smk@smkelly.com>
@@ -123,7 +124,7 @@ class HttpRequest {
 			$this->requestInfo->data = PHPGoodies::instantiate('Lib.Data.Hash');
 			if (is_array($_REQUEST) && count($_REQUEST)) {
 				foreach ($_REQUEST as $name => $value) {
-					$this->requestInfo->add($name, $valud);
+					$this->requestInfo->add($name, $value);
 				}
 			}
 

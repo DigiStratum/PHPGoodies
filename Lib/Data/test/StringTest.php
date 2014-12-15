@@ -94,5 +94,48 @@ class StringTest extends \PHPUnit_Framework_TestCase {
 		// It should not equal the other string
 		$this->assertFalse($str1->equals($str2));
 	}
+
+	/**
+	 * Test that bad sizes (like 0, -1) are ignored by getChunked()
+	 */
+	public function testThatGetChunkedIgnoresBadSizes() {
+		$str = PHPGoodies::instantiate('Lib.Data.String', '');
+		$res = $str->getChunked(0);
+		$this->assertTrue(is_array($res));
+		$this->assertEquals(0, count($res));
+		$res = $str->getChunked(-1);
+		$this->assertTrue(is_array($res));
+		$this->assertEquals(0, count($res));
+	}
+
+	/**
+	 * Test that good chunks are returned by getChunked() thousands of permutations considered!
+	 */
+	public function testThatGetChunkedDeliversGoodChunks() {
+		// A string of 0 to 8 chars will be tested
+		$source = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456879';
+
+		// Let chunkSize range from 1 to the entire source string length...
+		for ($chunkSize = 1; $chunkSize < strlen($source); $chunkSize++) {
+
+			// Let the source string we're working with range from 0 to the entire source string length
+			for ($sourceLen = 0; $sourceLen <= strlen($source); $sourceLen++) {
+				$expectedChunks = ((integer) ($sourceLen / $chunkSize)) + ((($sourceLen % $chunkSize) > 0) ? 1 : 0);
+				$val = substr($source, 0, $sourceLen);
+				$str = PHPGoodies::instantiate('Lib.Data.String', $val);
+				$res = $str->getChunked($chunkSize);
+				$this->assertTrue(is_array($res));
+				$this->assertEquals($expectedChunks, count($res));
+
+				for ($chunk = 0; $chunk < count($res); $chunk++) {
+					$pos = $chunk * $chunkSize;
+					$remaining = $sourceLen - $pos;
+					$expectedChunkLength = ($remaining >= $chunkSize) ? $chunkSize : $remaining;
+					$this->assertEquals($expectedChunkLength, strlen($res[$chunk]));
+					$this->assertEquals(substr($val, $pos, $expectedChunkLength), $res[$chunk]);
+				}
+			}
+		}
+	}
 }
 

@@ -61,6 +61,30 @@ class String {
 	}
 
 	/**
+	 * Get the contents of this strin as an array of fixed-length (chunkSize) chunks
+	 *
+	 * If chunkSize is 4 and the string length is 8, then you'll get two 4-character string
+	 * elements in the result array. If chunksize is 4 and string length is 7, then you'll get
+	 * one chunk of 4 chars and the second chunk with only 3 chars...
+	 *
+	 * @param integer $chunkSize Number of characters (>=1) for each chunk to have
+	 *
+	 * @return array An array of sub-strings each chunkSize in length, possible exception of last
+	 */
+	public function getChunked($chunkSize) {
+		$chunks = array();
+		$size = (integer) $chunkSize;
+		if ($size <= 0) return $chunks;
+		$tstr = $this->str;
+		while (strlen($tstr) > 0) {
+			$chunks[] = substr($tstr, 0, $size);
+			$tstr = substr($tstr, $size);
+		}
+
+		return $chunks;
+	}
+
+	/**
 	 * Get the value of either a native/primitive or OOP String
 	 *
 	 * With enforcement!

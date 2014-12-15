@@ -33,10 +33,16 @@
  * ... Not without making a cross-platform consistent pseudo random number generator algorithm, that
  * is...
  * 
+ * @uses String
+ * @uses Random
+ * @uses RandomAlgorithmIsaac
+ *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
 namespace PHPGoodies;
+
+PHPGoodies::import('Lib.Random.Random');
 
 /**
  * Secret64
@@ -49,20 +55,24 @@ class Secret64 {
 	protected $map;
 
 	/**
+	 * Our pseudo-random number generator instance
+	 */
+	protected $prng;
+
+	/**
 	 * Constructor
 	 *
-	 * @param integer $seed Seed the random number generator with this to make our unique map
+	 * @param string $secret Secret value to initialize randomness with to make a unique map
 	 */
-	public function __construct($seed) {
+	public function __construct($secret) {
+		$this->prng = PHPGoodies::instantiate('Lib.Random.Random', Random::RANDOM_ALG_ISAAC);
+		$this->prng->seed($secret);
 		$map = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/=';
-
-		// Scramble the sequencing
-		srand($seed);
 		$max = strlen($map) - 1;
 		for ($xx = 0; $xx < strlen($map); $xx++) {
 
 			// Encode
-			$pick = rand(0, $max);
+			$pick = $this->prng->rand($max);
 			if ($pick == $xx) continue;
 			$tmp = $map{$xx};
 			$map{$xx} = $map{$pick};

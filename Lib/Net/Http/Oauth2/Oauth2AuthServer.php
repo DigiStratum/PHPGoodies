@@ -159,22 +159,22 @@ class Oauth2AuthServer {
 		if ($this->requireTls && ($request->protocol != 'HTTPS')) return null;
 		if ($request->method != 'POST') return null;
 
-		// Check the supplied user credentials
+		// Get the AuthUser for the supplied user credentials
 		$username = $request->data->get('username');
 		$password = $request->data->get('password');
-		$userId = $this->authDb->checkCredentials($username, $password);
-		if (null == $userId) return false;
+		$authUser = $this->authDb->getAuthenticatedUser($username, $password);
+		if (null == $authUser) return false;
 
 		// Generate a token string
 		$tokenData = array(
 			'tokenType' => 'bearer',
-			'expires' => 0, // TODO set this to some future timestamp after which the token will no longer be accepted
-			'userId' => $userId,
-			'scope' => '' // TODO what scopes does this userId have access to with this token?
+			'expires' => 0 // TODO set this to some future timestamp after which the token will no longer be accepted
+			'authUser' => $authUser
 		);
-		$tokenString = $this->accessToken->toString($tokenData);
 
-		return $tokenString;
+		$token = $this->accessToken->toToken($tokenData);
+
+		return $token;
 	}
 }
 

@@ -15,17 +15,19 @@ interface Oauth2AccessTokenIfc {
 	/**
 	 * Convert our token data into an access token string
 	 *
-	 * @return string An AccessToken which may be decoded by fromString()
+	 * @param mixed $data Token data; it really should be something structured...
+	 *
+	 * @return string A token string which may be decoded by fromToken()
 	 */
-	public function toString();
+	public function toToken($data);
 
 	/**
 	 * Fill our token data from an access token string
 	 *
-	 * @param string $accessToken An Oauth2 AccessToken produced by toString()
+	 * @param string $token A token string produced by toToken()
 	 *
 	 * @return boolean true on successful decode, else false
 	 */
-	public function fromString($accessToken);
+	public function fromToken($token);
 }
 

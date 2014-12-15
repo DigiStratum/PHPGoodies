@@ -19,21 +19,24 @@
  * secret.
  *
  * @uses Secret64
+ * @uses Oauth2AccessTokenIfc
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
 namespace PHPGoodies;
 
+PHPGoodies::import('Lib.Net.Http.Oauth2.Oauth2AccessTokenIfc');
+
 /**
  * Oauth2 Access Token
  */
-class Oauth2AccessToken extends Hash implements Oauth2AccessTokenIfc {
+class Oauth2AccessToken implements Oauth2AccessTokenIfc {
 
 	/**
 	 * Our token data
 	 */
-	protected $data = array();
+	protected $data;
 
 	/**
 	 * Our instance of Secret64 for en/decode
@@ -45,25 +48,18 @@ class Oauth2AccessToken extends Hash implements Oauth2AccessTokenIfc {
 	 */
 	public function __construct($secret) {
 
-		// Convert secret string into a numeric seed
-		$seed = 0;
-		for ($xx = 0; $xx < strlen($secret); $xx++) {
-			$seed += ord($secret{$xx});
-		}
-
 		// Make our Secret64 en/decoder with the seed
-		$this->s64 = PHPGoodies::instantiate('Lib.Crypto.Secret64', $seed);
+		$this->s64 = PHPGoodies::instantiate('Lib.Crypto.Secret64', $secret);
 	}
 
 	/**
 	 * Convert our token data into an access token string
 	 *
-	 * @return string An AccessToken which may be decoded by fromString()
+	 * @param mixed $data Token data; it really should be something structured...
+	 *
+	 * @return string A token string which may be decoded by fromToken()
 	 */
-	public function toString($data) {
-		if (! is_array($data)) {
-			throw new \Exception('Token data must be supplied as an associative array');
-		}
+	public function toToken($data) {
 		$this->data = $data;
 		$obj = (object) $this->data;
 		$json = json_encode($obj);
@@ -73,14 +69,14 @@ class Oauth2AccessToken extends Hash implements Oauth2AccessTokenIfc {
 	/**
 	 * Fill our token data from an access token string
 	 *
-	 * @param string $accessToken An Oauth2 AccessToken produced by toString()
+	 * @param string $token A token string produced by toToken()
 	 *
 	 * @return boolean true on successful decode, else false
 	 */
-	public function fromString($accessToken) {
-		$json = $this->s64->decode($accessToken);
+	public function fromToken($token) {
+		$json = $this->s64->decode($token);
 		$data = json_decode($json, true);
-		if ((null === $data) || (! is_array($data))) return false;
+		if (null === $data) return false;
 
 		// Empty our data structure and fill it with the token contents
 		$this->data = $data;

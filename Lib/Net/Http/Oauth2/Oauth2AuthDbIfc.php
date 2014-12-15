@@ -1,9 +1,9 @@
 <?php
 /**
- * PHPGoodies:Oauth2AuthDbIfc - Oauth2 Authorization Database Interface
+ * PHPGoodies:Oauth2AuthDbIfc - Oauth2 Authentication Database Interface
  *
  * Any class implementing this interface will be usable as an AuthDb for the AuthServer to check
- * user authentication credentials
+ * user authentication credentials. Any implementation will need to use Oauth2AuthUser.
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -11,17 +11,18 @@
 namespace PHPGoodies;
 
 /**
- * Oauth2 Authorization Database Interface
+ * Oauth2 Authentication Database Interface
  */
 interface Oauth2AuthDbIfc {
 
 	/**
-	 * Check whether the specified credentials are valid for authentication
+	 * Gets authenticated user info if the specified credentials are valid
 	 *
 	 * @param string $username The username we want to look up
 	 * @param string $password The password we want to compare
 	 *
-	 * @return mixed integer ID for the matching user, or null if not found
+	 * @return object Oauth2AuthUser record for the matching user, or null if not found
 	 */
-	public function checkCredentials($usernme, $password);
+	public function getAuthenticatedUser($username, $password);
 }
+

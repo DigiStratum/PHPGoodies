@@ -7,7 +7,7 @@
  * @uses Hash
  * @uses HttpRequest
  * @uses Oauth2AuthDbIfc
- * @uses Oauth2AccessTokenIfc
+ * @uses Oauth2AccessToken
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -15,7 +15,7 @@
 namespace PHPGoodies;
 
 PHPGoodies::import('Lib.Net.Http.Oauth2.Oauth2AuthDbIfc');
-PHPGoodies::import('Lib.Net.Http.Oauth2.Oauth2AccessTokenIfc');
+PHPGoodies::import('Lib.Net.Http.Oauth2.Oauth2AccessToken');
 
 /**
 * Oauth2 Authorization Server
@@ -59,8 +59,8 @@ class Oauth2AuthServer {
 		}
 		$this->authDb =& $authDb;
 
-		if (! $accessToken instanceof Oauth2AccessTokenIfc) {
-			throw new \Exception('Something other than an Oauth2AccessTokenIfc supplied for the AccessToken');
+		if (! $accessToken instanceof Oauth2AccessToken) {
+			throw new \Exception('Something other than an Oauth2AccessToken supplied for the AccessToken');
 		}
 		$this->accessToken =& $accessToken;
 

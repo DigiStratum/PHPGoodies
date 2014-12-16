@@ -2,10 +2,17 @@
 /**
  * PHPGoodies:RestApi - RESTful API shell
  *
+ * @todo Abstract Oauth2AuthServer as some sort of generic AuthServer or "request filter" that will
+ * allow the calling code to supply anything within a range of classes derived from a common
+ * interface so that not just Oauth2 may be used. Unclear how important this is as Oauth2 may be
+ * both sufficient and desired for everything moving forward... but to make the change sooner than
+ * not would improve futureproofing...
+ *
  * @uses HttpResponse
  * @uses HttpRequest
  * @uses RestEndpoint
  * @uses JsonResponse
+ * @uses Oauth2AuthServer
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -14,6 +21,7 @@ namespace PHPGoodies;
 
 PHPGoodies::import('Lib.Net.Http.RestEndpoint');
 PHPGoodies::import('Lib.Net.Http.HttpResponse');
+PHPGoodies::import('Lib.Net.Http.Oauth2.Oauth2AuthServer');
 
 /**
  * RESTful API shell
@@ -46,6 +54,11 @@ class RestApi {
 	protected $restRequest;
 
 	/**
+	 * The Auth Server that we will be using
+	 */
+	protected $authServer = null;
+
+	/**
 	 * Constructor
 	 *
 	 * @param string $baseUri The base URI for this API all others are relative to
@@ -55,18 +68,33 @@ class RestApi {
 		$this->baseUri = $baseUri;
 		$this->signature = $signature;
 		$this->version = $version;
+	}
 
+	/**
+	 * Sets the custom Auth Server that we will be using
+	 *
+	 * @param object $authServer an instance of Oauth2AuthServer
+	 *
+	 * @return object $this for chaining support
+	 */
+	public function setAuthServer($authServer) {
+		if (! $authServer instanceof Oauth2AuthServer) {
+			throw new \Exception('Something other than an Oauth2AuthServer was supplied');
+		}
+		$this->authServer = $authServer;
+		return $this;
 	}
 
 	/**
 	 * Add an API endpoint
 	 *
 	 * @param string $uri The URI that will invoke this RestEndpoint's handlers
-	 * @param object RestEndpoint handler for this URI
+	 * @param object $RestEndpoint handler for this URI
+	 * @param string $authScope The authorization scope required to access this endpoint
 	 *
 	 * @return object $this for chaining support...
 	 */
-	public function addEndpoint($uri, &$restEndpoint) {
+	public function addEndpoint($uri, &$restEndpoint, $authScope = '') {
 		if (! $restEndpoint instanceof RestEndpoint) {
 			throw new \Exception('Something other than a RestEndpoint was supplied');
 		}
@@ -84,6 +112,7 @@ class RestApi {
 		$this->endpoints[$pattern] = new \StdClass();
 		$this->endpoints[$pattern]->endpoint =& $restEndpoint;
 		$this->endpoints[$pattern]->map = $map;
+		$this->endpoints[$pattern]->authScope = is_string($authScope) ? $authScope : '';
 
 		return $this;
 	}
@@ -98,9 +127,6 @@ class RestApi {
 		// Capture some details about this request
 		$this->restRequest = PHPGoodies::instantiate('Lib.Net.Http.Rest.RestRequest');
 		$request = $this->restRequest->getInfo();
-		$pattern = $this->getEndpointForUri($request->uri);
-		$this->restRequest->setPattern($pattern);
-		$this->restRequest->setParams($this->getEndpointParams($request->uri, $pattern));
 
 		// Handle requests for the baseUri
 		if ($request->uri == $this->baseUri) {
@@ -108,6 +134,7 @@ class RestApi {
 		}
 
 		// Handle requests for undefined endpoints
+		$pattern = $this->getEndpointForUri($request->uri);
 		$restEndpoint =& $this->getEndpointForPattern($pattern);
 		if (null == $restEndpoint) {
 			return $this->errorResponse('Not Found!', HttpResponse::HTTP_NOT_FOUND);
@@ -119,7 +146,16 @@ class RestApi {
 			return $this->errorResponse('Method Not Allowed', HttpResponse::HTTP_METHOD_NOT_ALLOWED);
 		}
 
+		// Check authentication/authorization
+		if (strlen($this->endpoints[$pattern]->authScope) && ($this->authServer instanceof Oauth2AuthServer)) {
+			if (! $this->authServer->hasScopeAuthorization($this->restRequest, $this->endpoints[$pattern]->authScope)) {
+				return $this->errorResponse('Unauthorized', HttpResponse::HTTP_UNAUTHORIZED);
+			}
+		}
+
 		// Get the natural response from the RestEndpoint
+		$this->restRequest->setPattern($pattern);
+		$this->restRequest->setParams($this->getEndpointParams($request->uri, $pattern));
 		return $restEndpoint->$restMethod($this->restRequest);
 	}
 

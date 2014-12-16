@@ -140,14 +140,16 @@ class Oauth2AuthServer {
 
 		// Extract clientId and clientSecret from the Authorization header
 		$auth = base64_decode($request->headers->get('Authorization'));
-		list ($clientId, $secret) = explode(':', $auth);
+		list ($method, $data) = explode(' ', $auth);
+		if (strtolower($method) != 'basic') return false;
+		list ($clientId, $secret) = explode(':', $data);
 
 		// The request is an authorized client if there's a registered match
 		return $this->doesSecretMatchRegisteredClient($clientId, $secret);
 	}
 
 	/**
-	 * Handle requests for the token endpoint
+	 * Generate tokens for requests to the token endpoint
 	 *
 	 * @param object $httpRequest An HttpRequest instance
 	 *
@@ -175,12 +177,50 @@ class Oauth2AuthServer {
 		if (null == $authUser) return null;
 
 		// Generate a token string
-		$tokenData->nil();
+		$tokenData = PHPGoodies::instantiate('Lib.Data.Hash');
 		$tokenData->set('tokenType', 'bearer');
 		$tokenData->set('expires', time() + TOKEN_EXPIRES_SECONDS);
 		$tokenData->set('authUser', $authUser);
 
-		return $this->accessToken->toToken();
+		return $this->accessToken->dataToToken($tokenData);
+	}
+
+	/**
+	 * Check the token for scope authorization (on resource endpoints)
+	 *
+	 * @param object $httpRequest An HttpRequest instance
+	 * @param string $scope The scope that we want to look for in this token
+	 *
+	 * @return true if the token authorization has the named scope in it, else false
+	 */
+	public function hasScopeAuthorization(&$httpRequest, $scope) {
+
+		// Make sure we got an HttpRequest object
+		if (! $httpRequest instanceof HttpRequest) {
+			throw new \Exception('Something other than an HttpRequest supplied');
+		}
+
+		// Get the request data and ensure that it meets our requirements
+		$request = $httpRequest->getInfo();
+		if ($this->requireTls && ($request->protocol != 'HTTPS')) return false;
+		if (! $request->headers->has('Authorization')) return false;
+
+		// Extract the authorization method and data from the header
+		$auth = base64_decode($request->headers->get('Authorization'));
+		list ($method, $data) = explode(' ', $auth);
+
+		// Expect the authorization method to be a bearer token
+		if (strtolower($method) != 'bearer') return false;
+		$tokenData = $this->accessToken->tokenToData($data);
+		if (is_null($tokenData)) return false;
+
+		// Expect there to be an authUser structure in the token data
+		if (! $tokenData->has('authUser')) return false;
+		$authUser = $tokenData->get('authUser');
+
+		// Expect authorizedScopes to be an array with the requested scope in it
+		if (! is_array($authUser->authorizedScopes)) return false;
+		return in_array($sopce, $authUser->authorizedScopes);
 	}
 }
 

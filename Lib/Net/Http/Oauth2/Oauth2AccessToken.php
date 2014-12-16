@@ -20,20 +20,16 @@
  *
  * @uses Hash
  * @uses Secret64
- * @uses Oauth2AccessTokenIfc
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
 namespace PHPGoodies;
 
-PHPGoodies::import('Lib.Data.Hash');
-PHPGoodies::import('Lib.Net.Http.Oauth2.Oauth2AccessTokenIfc');
-
 /**
  * Oauth2 Access Token
  */
-class Oauth2AccessToken extends Hash implements Oauth2AccessTokenIfc {
+class Oauth2AccessToken {
 
 	/**
 	 * Our instance of Secret64 for en/decode
@@ -50,35 +46,41 @@ class Oauth2AccessToken extends Hash implements Oauth2AccessTokenIfc {
 	}
 
 	/**
-	 * Convert our token data into an access token string
+	 * Translate token data into an access token string
 	 *
-	 * @return string A token string which may be decoded by fromToken()
+	 * @param object Hash instance with token data in it
+	 *
+	 * @return string A token string which represents the supplied data
 	 */
-	public function toToken() {
-		$obj = (object) $this->all();
+	public function dataToToken($hash) {
+		PHPGoodies::import('Lib.Data.Hash');
+		if (! $hash instanceof Hash) {
+			throw new \Exception('Something other than a Hash supplied for token data');
+		}
+		$obj = (object) $hash->all();
 		$json = json_encode($obj);
 		return $this->s64->encode($json);
 	}
 
 	/**
-	 * Fill our token data from an access token string
+	 * Get token data from the supplied access token string
 	 *
 	 * @param string $token A token string produced by toToken()
 	 *
-	 * @return boolean true on successful decode, else false
+	 * @return object Hash instance populated with data on success, else null
 	 */
-	public function fromToken($token) {
+	public function tokenToData($token) {
 		$json = $this->s64->decode($token);
 		$data = json_decode($json, true);
-		if (null === $data) return false;
+		if (null === $data) return null;
 
 		// Empty our data structure and fill it with the token contents
-		$this->nil();
+		$hash = PHPGoodies::instantiate('Lib.Data.Hash');
 		foreach ($data as $name => $value) {
-			$this->set($name, $value);
+			$hash->set($name, $value);
 		}
 
-		return true;
+		return $hash;
 	}
 }
 

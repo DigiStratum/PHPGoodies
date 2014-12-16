@@ -74,6 +74,20 @@ class ObjectNamed extends Object {
 		}
 		return parent::set($name, $value);
 	}
+        /**
+	 * Magic property setter
+	 *
+	 * This magic function is used whenever there is any attempt to directly assign a property
+	 * to the object. This logic forces any such attempt to be moderated by our set() method.
+	 *
+	 * @param string $name Name of the property we want to set
+	 * @param mixed $value The value we want to set it to
+	 *
+	 * @return object $this for chaining support...
+	 */
+	public function __set($name, $value) {
+		return $this->set($name, $value);
+	}
 
 	/**
 	 * Check whether the named property is defined

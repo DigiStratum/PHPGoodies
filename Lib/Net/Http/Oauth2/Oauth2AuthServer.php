@@ -22,6 +22,9 @@ PHPGoodies::import('Lib.Net.Http.Oauth2.Oauth2AccessTokenIfc');
 */
 class Oauth2AuthServer {
 
+	// TODO - Get configurations from an outside source...
+	const TOKEN_EXPIRES_SECONDS = 600;
+
 	/**
 	 * Enforce requests be made over TLS (HTTPS)
 	 */
@@ -148,8 +151,14 @@ class Oauth2AuthServer {
 	 *
 	 * @param object $httpRequest An HttpRequest instance
 	 *
+	 * @reutn string Access token string, or null on error
 	 */
-	public function getAccessToken($httpRequest) {
+	public function getAccessToken(&$httpRequest) {
+
+		// Make sure we got an HttpRequest object
+		if (! $httpRequest instanceof HttpRequest) {
+			throw new \Exception('Something other than an HttpRequest supplied');
+		}
 
 		// Request must be accompanied by an authorized client
 		if (! $this->isAuthorizedClient($httpRequest)) return null;
@@ -163,18 +172,15 @@ class Oauth2AuthServer {
 		$username = $request->data->get('username');
 		$password = $request->data->get('password');
 		$authUser = $this->authDb->getAuthenticatedUser($username, $password);
-		if (null == $authUser) return false;
+		if (null == $authUser) return null;
 
 		// Generate a token string
-		$tokenData = array(
-			'tokenType' => 'bearer',
-			'expires' => 0 // TODO set this to some future timestamp after which the token will no longer be accepted
-			'authUser' => $authUser
-		);
+		$tokenData->nil();
+		$tokenData->set('tokenType', 'bearer');
+		$tokenData->set('expires', time() + TOKEN_EXPIRES_SECONDS);
+		$tokenData->set('authUser', $authUser);
 
-		$token = $this->accessToken->toToken($tokenData);
-
-		return $token;
+		return $this->accessToken->toToken();
 	}
 }
 

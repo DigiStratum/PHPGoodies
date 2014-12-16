@@ -18,6 +18,7 @@
  * base64 character set but precludes any other application from decoding the token without the
  * secret.
  *
+ * @uses Hash
  * @uses Secret64
  * @uses Oauth2AccessTokenIfc
  *
@@ -26,17 +27,13 @@
 
 namespace PHPGoodies;
 
+PHPGoodies::import('Lib.Data.Hash');
 PHPGoodies::import('Lib.Net.Http.Oauth2.Oauth2AccessTokenIfc');
 
 /**
  * Oauth2 Access Token
  */
-class Oauth2AccessToken implements Oauth2AccessTokenIfc {
-
-	/**
-	 * Our token data
-	 */
-	protected $data;
+class Oauth2AccessToken extends Hash implements Oauth2AccessTokenIfc {
 
 	/**
 	 * Our instance of Secret64 for en/decode
@@ -55,13 +52,10 @@ class Oauth2AccessToken implements Oauth2AccessTokenIfc {
 	/**
 	 * Convert our token data into an access token string
 	 *
-	 * @param mixed $data Token data; it really should be something structured...
-	 *
 	 * @return string A token string which may be decoded by fromToken()
 	 */
-	public function toToken($data) {
-		$this->data = $data;
-		$obj = (object) $this->data;
+	public function toToken() {
+		$obj = (object) $this->all();
 		$json = json_encode($obj);
 		return $this->s64->encode($json);
 	}
@@ -79,7 +73,10 @@ class Oauth2AccessToken implements Oauth2AccessTokenIfc {
 		if (null === $data) return false;
 
 		// Empty our data structure and fill it with the token contents
-		$this->data = $data;
+		$this->nil();
+		foreach ($data as $name => $value) {
+			$this->set($name, $value);
+		}
 
 		return true;
 	}

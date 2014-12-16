@@ -31,20 +31,56 @@ class Oauth2AccessTokenTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Test that newly instantiated Oauth2AccessToken has no data in it
+	 * Test that toToken generates valid token strings for valid data
 	 */
 	public function testThatToTokenGeneratesTokenStringsForValidData() {
-		$accessToken = PHPGoodies::instantiate('Lib.net.Http.Oauth2.Oauth2AccessToken', 'secret');
+		$createToken = PHPGoodies::instantiate('Lib.net.Http.Oauth2.Oauth2AccessToken', 'secret');
+		$token = $createToken->toToken();
 
-		$data = Array(
-			'a' => 1,
-			'b' => 2
-		);
-		$token = $accessToken->toToken($data);
-print "token = '{$token}'\n";
+		$this->assertTrue(strlen($token) > 0);
+	}
 
-		//$this->assertEquals(0, $hash->num());
-		//$this->assertEquals(0, count($hash->keys()));
+	/**
+	 * Test that toToken generates different token strings for different secrets
+	 */
+	public function testThatToTokenGeneratesDifferentTokenStringsForDifferentSecrets() {
+		$createToken1 = PHPGoodies::instantiate('Lib.net.Http.Oauth2.Oauth2AccessToken', 'secret1');
+		$createToken1->set('a', 1);
+		$createToken1->set('b', 2);
+		$createToken1->set('c', 3);
+		$token1 = $createToken1->toToken();
+
+		$createToken2 = PHPGoodies::instantiate('Lib.net.Http.Oauth2.Oauth2AccessToken', 'secret2');
+		$createToken2->set('a', 1);
+		$createToken2->set('b', 2);
+		$createToken2->set('c', 3);
+		$token2 = $createToken2->toToken();
+
+		$this->assertTrue($token1 != $token2);
+	}
+
+	/**
+	 * Test that generated tokens decode again into the expected data
+	 */
+	public function testThatGeneratedTokenDecodesIntoExpectedData() {
+		$createToken = PHPGoodies::instantiate('Lib.net.Http.Oauth2.Oauth2AccessToken', 'secret');
+		$createToken->set('a', 1);
+		$createToken->set('b', 2);
+		$createToken->set('c', 3);
+		$token = $createToken->toToken();
+
+		$readToken = PHPGoodies::instantiate('Lib.net.Http.Oauth2.Oauth2AccessToken', 'secret');
+		$readToken->fromToken($token);
+		$data = $readToken->all();
+
+		$this->assertTrue(is_array($data));
+		$this->assertEquals(3, count($data));
+		$this->assertTrue(isset($data['a']));
+		$this->assertEquals(1, $data['a']);
+		$this->assertTrue(isset($data['b']));
+		$this->assertEquals(2, $data['b']);
+		$this->assertTrue(isset($data['c']));
+		$this->assertEquals(3, $data['c']);
 	}
 }
 

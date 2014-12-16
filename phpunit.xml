@@ -4,6 +4,7 @@
 			<directory>test</directory>
 			<directory>Lib/Data/test</directory>
 			<directory>Lib/File/Csv/test</directory>
+			<directory>Lib/Net/Http/Oauth2/test</directory>
 		</testsuite>
 	</testsuites>
 </phpunit>

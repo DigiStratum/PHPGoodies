@@ -1,10 +1,10 @@
 <?php
 /**
- * PHPGoodies:Obj - A class to manage a collection of object instances
+ * PHPGoodies:Singletons - A class to manage a collection of singleton object instances
  *
- * With only a single instance of this class, all the objects within its collection could be treated
- * as application-wide singletons; however multiple instances would enable multiple collections with
- * one instance of each object per.
+ * With only a single instance of this class, all the instances within its collection could be
+ * treated as application-wide singletons; however multiple instances would enable multiple
+ * collections with one instance of each object per.
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -12,14 +12,14 @@
 namespace PHPGoodies;
 
 /**
- * Obj - A class to manage a collection of object instances
+ * Singletons - A class to manage a collection of singleton object instances
  */
-class Obj {
+class Singletons {
 
 	/**
-	 * The collection of objects we are working with
+	 * The collection of instances we are working with
 	 */
-	protected $objects = array();
+	protected $instances = array();
 
 	/**
 	 * Constructor
@@ -36,11 +36,11 @@ class Obj {
 	 */
 	public function &get($resource) {
 		if ($this->has($resource)) {
-			return $this->objects[$resource];
+			return $this->instances[$resource];
 		}
-		$this->objects[$resource] = PHPGoodies::instantiate($resource);
+		$this->instances[$resource] = PHPGoodies::instantiate($resource);
 
-		return $this->objects[$resource];
+		return $this->instances[$resource];
 	}
 
 	/**
@@ -50,7 +50,7 @@ class Obj {
 	 */
 	public function destroy($resource) {
 		if ($this->has($resource)) {
-			unset($this->objects[$resource]);
+			unset($this->instances[$resource]);
 		}
 	}
 
@@ -62,7 +62,7 @@ class Obj {
 	 * @return boolen true if we have an instance, else false
 	 */
 	public function has($resource) {
-		return isset($this->objects[$resource]);
+		return isset($this->instances[$resource]);
 	}
 }
 

@@ -10,10 +10,10 @@ use PHPGoodies\PHPGoodies as PHPGoodies;
 
 // 2) Load up our goodies
 require(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
-$obj = PHPGoodies::instantiate('Lib.Oop.Obj');
+$singletons = PHPGoodies::instantiate('Lib.Oop.Singletons');
 
-// Use our global Obj to get a reference to an instance of Lib.Db.Mysql
-$db =& $obj->get('Lib.Db.Mysql.Mysql');
+// Use our global Singletons to get a reference to an instance of Lib.Db.Mysql
+$db =& $singletons->get('Lib.Db.Mysql.Mysql');
 if (! $db->connect('localhost', 'root', '', 'mysql')) {
 	die("error connecting to database\n");
 }
@@ -21,11 +21,11 @@ if (! $db->connect('localhost', 'root', '', 'mysql')) {
 print "MySQL thinks the time is: " . myFunction() . "\n\n";
 $db->close();
 
-// Get at the db object via our global Obj
+// Get at the db object via our global Singletons
 function myFunction() {
-	global $obj;
+	global $singletons;
 
-	$db =& $obj->get('Lib.Db.Mysql.Mysql');
+	$db =& $singletons->get('Lib.Db.Mysql.Mysql');
 
 	$res = $db->query('SELECT NOW() AS `rightnow`;');
 	return $res[0]['rightnow'];

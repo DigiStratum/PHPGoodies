@@ -2,6 +2,10 @@
 /**
  * PHPGoodies:TClass - A 'Typed' class with strong type enforcement
  *
+ * ref: http://php.net/manual/en/language.oop5.overloading.php#object.set
+ * ref: http://php.net/manual/en/functions.anonymous.php
+ * ref: http://php.net/manual/en/closure.bind.php
+ *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
@@ -115,6 +119,22 @@ class TClass {
 	}
 
 	/**
+	 * Magic method caller
+	 *
+	 * This method is invoked whenever anyone from the outside attempts to call a method inside
+	 * the class with the specific name. We will use this to invoke our dynamically added code
+	 * if possible.
+	 *
+	 * @param string $name The name of the function to call
+	 * @param array $args The set of calling arguments for the function call to be made
+	 *
+	 * @return mixed Returns whatever the function call does normally
+	 */
+	public function __call($name, $args) {
+		return $this->call($name, $args, self::SCOPE_PUBLIC);
+	}
+
+	/**
 	 * Get the 'type' for the supplied object
 	 *
 	 * Our types expand on the PHP primitives by combining objects with their class names if
@@ -127,7 +147,14 @@ class TClass {
 	protected function getType($obj) {
 		$type = gettype($obj);
 		if ($type == 'object') {
+
+			// Nope, must be a regular object class
 			$class = get_class($obj);
+
+			// Functions are class "Closure"
+			if ($class == 'Closure') return 'function';
+
+			// Anything else is a normal class
 			return ($class == 'StdClass') ? 'object' : "class:{$class}";
 		}
 		return $type;
@@ -210,6 +237,8 @@ class TClass {
 			case 'boolean':
 			case 'resource':
 			case 'object':
+			// Made up types...
+			case 'function':
 				return true;
 
 			default:
@@ -248,6 +277,11 @@ class TClass {
 	/**
 	 * Add a class member with the specified type and scope
 	 *
+	 * Note that if the ClassMember being added is a function, then type should be set to the
+	 * expected return type for that function, and the function callable should be provided as
+	 * the value. These will be reworked into the classMembers such that type becomes function,
+	 * returnType becomes type, and the function callable is stored in value.
+	 *
 	 * @param string $name The name of the class member to add
 	 * @param string $type The type that will be enforced for this class member
 	 * @param string $scope The visibility scope for this class member (public|private)
@@ -273,11 +307,24 @@ class TClass {
 			throw new \Exception("A class member named '{$name}' already exists");
 		}
 
+		// Special handling for functions to get the return type
+		if (! is_null($value)) {
+			$vtype = $this->getType($value);
+			if ($vtype == 'function') {
+				$returnType = $type;
+				$type = 'function';
+			}
+		}
+		else {
+			$returnType = null;
+		}
+
 		// Add the new property member
 		$this->classMembers[$name] = (object) array(
 			'type' => $type,
 			'scope' => $scope,
-			'value' => null
+			'value' => null,
+			'returnType' => $returnType	// Only used for functions
 		);
 
 		// Now set the value for the class member with type enforcement
@@ -352,6 +399,29 @@ class TClass {
 	}
 
 	/**
+	 * Check whether the named class member is a function that can be called
+	 *
+	 * @param string $name The name of the class member to check
+	 *
+	 * @return boolean true if it is a function, else false
+	 */ 
+	protected function isFunction($name) {
+		$member = $this->getClassMember($name);
+		if (is_null($member)) return false;
+		return $member->type == 'function';
+	}
+
+	/**
+	 * Require that the named class member is a function that can be called
+	 *
+	 * @param string $name The name of the class member to check
+	 */
+	protected function requireFunction($name) {
+		if ($this->isFunction($name)) return;
+		throw new \Exception('Attempted to invoke a non-existent function/method');
+	}
+
+	/**
 	 * Sets the named property to the supplied value
 	 *
 	 * @param string $name Name of the property we want to set
@@ -364,8 +434,39 @@ class TClass {
 		$this->requireTypeMatch($name, $value);
 		$this->requireAccess($name, $scope);
 		$member =$ $this->getClassMember($name);
-		$member->value = $value;
+
+		// For functions we need to create a closure so they can get at the rest of our class members
+		if ($this->isFunction($name)) {
+			$member->value = Closure::bind($value, $this, get_class());
+		}
+		else $member->value = $value;
+
 		return $this;
+	}
+
+	/**
+	 * Internal method caller
+	 *
+	 * This is the only way to call one of the dynamically added private scoped functions
+	 * internally such that the requireAccess() call will be satisfied. External calls that go
+	 * through __call() are scoped public, but direct calls here are scoped any by default...
+	 *
+	 * The function's return data type is enforced to match what is on record...
+	 *
+	 * @param string $name The name of the function to call
+	 * @param array $args The set of calling arguments for the function call to be made
+	 * @param string $scope The visibility scope of the requester
+	 *
+	 * @return mixed Returns whatever the function call does normally
+	 */
+	protected function call($name, $args, $scope = self::SCOPE_ANY) {
+		$this->requireFunction($name);
+		$this->requireAccess($name, $scope);
+		$member = $this->getClassMember($name);
+		$res = call_user_func_array($member->value, $args);
+		$returnType = $this->getType($res);
+		if ($returnType === $member->returnType) return $res;
+		throw new \Exception("Type mismatch for result from function call to '{$name}'; expected '{$member->returnType}', but got '{$returnType}'");
 	}
 
 	/**

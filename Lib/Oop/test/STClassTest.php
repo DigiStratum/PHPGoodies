@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:TClass class test cases
+ * PHPGoodies:STClass class test cases
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -9,9 +9,9 @@ namespace PHPGoodies;
 
 require_once(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
 
-PHPGoodies::import('Lib.Oop.TClass');
+PHPGoodies::import('Lib.Oop.STClass');
 
-class TClassTest extends \PHPUnit_Framework_TestCase {
+class STClassTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * Constructor
@@ -34,17 +34,17 @@ class TClassTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Just verify that we can instantiate such a class
 	 */
-	public function testThatTClassIsInstantiable() {
-		$tClass = PHPGoodies::instantiate('Lib.Oop.TClass');
+	public function testThatSTClassIsInstantiable() {
+		$tClass = PHPGoodies::instantiate('Lib.Oop.STClass');
 		$this->assertTrue(is_object($tClass));
-		$this->assertTrue($tClass instanceof TClass);
+		$this->assertTrue($tClass instanceof STClass);
 	}
 
 	/**
 	 * Test that added public properties are accessible internally and externally
 	 */
 	public function testThatPublicPropertiesAreAccessible() {
-		$tClass = PHPGoodies::instantiate('Lib.Oop.TClass');
+		$tClass = PHPGoodies::instantiate('Lib.Oop.STClass');
 
 		// Add properties
 		$tClass->add('fortyTwo', 42);
@@ -61,7 +61,7 @@ class TClassTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException InvalidArgumentException
 	 */
 	public function testThatMismatchedDataAssignmentsAreRejected() {
-		$tClass = PHPGoodies::instantiate('Lib.Oop.TClass');
+		$tClass = PHPGoodies::instantiate('Lib.Oop.STClass');
 		$tClass->add('fortyTwo', 42);		// Add a number
 		$tClass->fortyTwo = 'Forty Two!';	// Try to set it to a string!
 	}
@@ -72,9 +72,9 @@ class TClassTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException InvalidArgumentException
 	 */
 	public function testThatMismatchedTypeAdditionsAreRejected() {
-		$tClass = PHPGoodies::instantiate('Lib.Oop.TClass');
+		$tClass = PHPGoodies::instantiate('Lib.Oop.STClass');
 		// A number can't be a string, you silly goose!
-		$tClass->add('fortyTwo', 42, TClass::TYPE_STRING);
+		$tClass->add('fortyTwo', 42, ST_TYPE_STRING);
 	}
 
 	/**
@@ -83,7 +83,7 @@ class TClassTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException LogicException
 	 */
 	public function testThatDuplicateAddsAreRejected() {
-		$tClass = PHPGoodies::instantiate('Lib.Oop.TClass');
+		$tClass = PHPGoodies::instantiate('Lib.Oop.STClass');
 		$tClass->add('fortyTwo', 42);
 		$tClass->add('fortyTwo', 42);
 	}
@@ -94,7 +94,7 @@ class TClassTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException InvalidArgumentException
 	 */
 	public function testThatInvalidPropertyNamesAddedAreRejected() {
-		$tClass = PHPGoodies::instantiate('Lib.Oop.TClass');
+		$tClass = PHPGoodies::instantiate('Lib.Oop.STClass');
 		$tClass->add('42', 42);
 	}
 
@@ -104,7 +104,7 @@ class TClassTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException InvalidArgumentException
 	 */
 	public function testThatInvalidTypesAddedAreRejected() {
-		$tClass = PHPGoodies::instantiate('Lib.Oop.TClass');
+		$tClass = PHPGoodies::instantiate('Lib.Oop.STClass');
 		$tClass->add('fortyTwo', 42, 'Baloney Sandwich');
 	}
 
@@ -112,7 +112,7 @@ class TClassTest extends \PHPUnit_Framework_TestCase {
 	 * Test that the magic __set(), __get(), __isset(), and __unset() do what is expected
 	 */
 	public function testThatMagicMethodsBehave() {
-		$tClassExt = new TClassExtended();
+		$tClassExt = new STClassExtended();
 		$data = $tClassExt->spy();
 		$classMembers =& $data['classMembers'];
 
@@ -127,8 +127,8 @@ class TClassTest extends \PHPUnit_Framework_TestCase {
 		$this->assertTrue(isset($classMembers['publicProperty2']));
 		$tmp =& $classMembers['publicProperty2'];
 		$this->assertTrue(is_object($tmp));
-		$this->assertEquals(TClass::TYPE_STRING, $tmp->type);
-		$this->assertEquals(TClass::SCOPE_PUBLIC, $tmp->scope);
+		$this->assertEquals(ST_TYPE_STRING, $tmp->type);
+		$this->assertEquals(ST_SCOPE_PUBLIC, $tmp->scope);
 		$this->assertNull($tmp->returnType);
 		$this->assertEquals('Graham Crackers', $tmp->value);
 
@@ -140,8 +140,8 @@ class TClassTest extends \PHPUnit_Framework_TestCase {
 		$this->assertTrue(isset($classMembers['publicProperty2']));
 		$tmp =& $classMembers['publicProperty2'];
 		$this->assertTrue(is_object($tmp));
-		$this->assertEquals(TClass::TYPE_STRING, $tmp->type);
-		$this->assertEquals(TClass::SCOPE_PUBLIC, $tmp->scope);
+		$this->assertEquals(ST_TYPE_STRING, $tmp->type);
+		$this->assertEquals(ST_SCOPE_PUBLIC, $tmp->scope);
 		$this->assertNull($tmp->returnType);
 		$this->assertEquals('Gumballs', $tmp->value);
 
@@ -158,10 +158,10 @@ class TClassTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Test that an extended TClass gets the expected classMembers set up
+	 * Test that an extended STClass gets the expected classMembers set up
 	 */
-	public function testThatTClassExtendedHasExpectedClassMembers() {
-		$tClassExt = new TClassExtended();
+	public function testThatSTClassExtendedHasExpectedClassMembers() {
+		$tClassExt = new STClassExtended();
 		$data = $tClassExt->spy();
 		$classMembers =& $data['classMembers'];
 
@@ -175,8 +175,8 @@ class TClassTest extends \PHPUnit_Framework_TestCase {
 		$this->assertTrue(isset($classMembers['privateProperty1']));
 		$tmp =& $classMembers['privateProperty1'];
 		$this->assertTrue(is_object($tmp));
-		$this->assertEquals(TClass::TYPE_STRING, $tmp->type);
-		$this->assertEquals(TClass::SCOPE_PRIVATE, $tmp->scope);
+		$this->assertEquals(ST_TYPE_STRING, $tmp->type);
+		$this->assertEquals(ST_SCOPE_PRIVATE, $tmp->scope);
 		$this->assertNull($tmp->returnType);
 		$this->assertEquals('Hot Tamales', $tmp->value);
 		$this->assertEquals('Hot Tamales', $tClassExt->get('privateProperty1'));
@@ -185,8 +185,8 @@ class TClassTest extends \PHPUnit_Framework_TestCase {
 		$this->assertTrue(isset($classMembers['publicProperty1']));
 		$tmp =& $classMembers['publicProperty1'];
 		$this->assertTrue(is_object($tmp));
-		$this->assertEquals(TClass::TYPE_STRING, $tmp->type);
-		$this->assertEquals(TClass::SCOPE_PUBLIC, $tmp->scope);
+		$this->assertEquals(ST_TYPE_STRING, $tmp->type);
+		$this->assertEquals(ST_SCOPE_PUBLIC, $tmp->scope);
 		$this->assertNull($tmp->returnType);
 		$this->assertEquals('Lemon Drops', $tmp->value);
 		$this->assertEquals('Lemon Drops', $tClassExt->get('publicProperty1'));
@@ -199,17 +199,17 @@ class TClassTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException PHPGoodies\AccessDeniedException
 	 */
 	public function testThatOutsideRequestsForPrivatePropertiesAreRejected() {
-		$tClassExt = new TClassExtended();
+		$tClassExt = new STClassExtended();
 		$value = $tClassExt->privateProperty1;
 	}
 }
 
 /**
- * Extends and populares TClass as it would be in a normal application
+ * Extends and populares STClass as it would be in a normal application
  *
- * Note: update tests in f.testThatTClassExtendedHasExpectedClassMembers() when additions are made:
+ * Note: update tests in f.testThatSTClassExtendedHasExpectedClassMembers() when additions are made:
  */
-class TClassPopulated extends TClass {
+class STClassPopulated extends STClass {
 
 	/**
 	 * Constructor
@@ -217,17 +217,17 @@ class TClassPopulated extends TClass {
 	public function __construct() {
 
 		// Add a private property
-		$this->addClassMember('privateProperty1', TClass::TYPE_STRING, TClass::SCOPE_PRIVATE, 'Hot Tamales');
+		$this->addClassMember('privateProperty1', ST_TYPE_STRING, ST_SCOPE_PRIVATE, 'Hot Tamales');
 
 		// Add a public property
-		$this->addClassMember('publicProperty1', TClass::TYPE_STRING, TClass::SCOPE_PUBLIC, 'Lemon Drops');
+		$this->addClassMember('publicProperty1', ST_TYPE_STRING, ST_SCOPE_PUBLIC, 'Lemon Drops');
 	}
 }
 
 /**
- * Extends the populated TClass for testing to expose all protected members
+ * Extends the populated STClass for testing to expose all protected members
  */
-class TClassExtended extends TClassPopulated {
+class STClassExtended extends STClassPopulated {
 
 	/**
 	 * A spy method for testing that allows us to inspect the non-public data structures
@@ -238,7 +238,7 @@ class TClassExtended extends TClassPopulated {
 		return $data;
 	}
 
-	// Expose all the protected features of TClass
+	// Expose all the protected features of STClass
 	public function getType(&$obj) {
 		return parent::getType($obj);
 	}
@@ -292,11 +292,11 @@ class TClassExtended extends TClassPopulated {
 		return parent::requireFunction($name);
 	}
 
-	public function set($name, $value, $scope = self::SCOPE_ANY) {
+	public function set($name, $value, $scope = ST_SCOPE_ANY) {
 		return parent::set($name, $value, $scope);
 	}
 
-	public function call($name, $args, $scope = self::SCOPE_ANY) {
+	public function call($name, $args, $scope = ST_SCOPE_ANY) {
 		return parent::call($name, $args, $scope);
 	}
 
@@ -304,15 +304,15 @@ class TClassExtended extends TClassPopulated {
 		return parent::has($name);
 	}
 
-	public function chk($name, $scope = self::SCOPE_ANY) {
+	public function chk($name, $scope = ST_SCOPE_ANY) {
 		return parent::chk($name, $scope);
 	}
 
-	public function get($name, $scope = self::SCOPE_ANY) {
+	public function get($name, $scope = ST_SCOPE_ANY) {
 		return parent::get($name, $scope);
 	}
 
-	public function del($name, $scope = self::SCOPE_ANY) {
+	public function del($name, $scope = ST_SCOPE_ANY) {
 		return parent::del($name, $scope);
 	}
 }

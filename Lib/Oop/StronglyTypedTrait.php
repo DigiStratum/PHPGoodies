@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:TClass - A 'Typed' class with strong type enforcement
+ * PHPGoodies:StronglyTypedTrait - A set of traits for a 'Strongly Typed' class
  *
  * ref: http://php.net/manual/en/language.oop5.overloading.php#object.set
  * ref: http://php.net/manual/en/functions.anonymous.php
@@ -17,28 +17,28 @@
 namespace PHPGoodies;
 
 /**
- * A 'Typed' class with strong type enforcement
+ * Scope constants
  */
-class TClass {
+const ST_SCOPE_ANY	= 'any';
+const ST_SCOPE_PUBLIC	= 'public';
+const ST_SCOPE_PRIVATE	= 'private';
 
-	/**
-	 * Scope constants
-	 */
-	const SCOPE_ANY		= 'any';
-	const SCOPE_PUBLIC	= 'public';
-	const SCOPE_PRIVATE	= 'private';
+/**
+ * Type constants
+ */
+const ST_TYPE_STRING	= 'string';
+const ST_TYPE_INTEGER	= 'integer';
+const ST_TYPE_DOUBLE	= 'double';
+const ST_TYPE_BOOLEAN	= 'boolean';
+const ST_TYPE_RESOURCE	= 'resource';
+const ST_TYPE_OBJECT	= 'object';
+const ST_TYPE_ARRAY	= 'array';
+const ST_TYPE_FUNCTION	= 'function';
 
-	/**
-	 * Type constants
-	 */
-	const TYPE_STRING	= 'string';
-	const TYPE_INTEGER	= 'integer';
-	const TYPE_DOUBLE	= 'double';
-	const TYPE_BOOLEAN	= 'boolean';
-	const TYPE_RESOURCE	= 'resource';
-	const TYPE_OBJECT	= 'object';
-	const TYPE_ARRAY	= 'array';
-	const TYPE_FUNCTION	= 'function';
+/**
+ * A set of traits for a 'Strongly Typed' class
+ */
+trait StronglyTypedTrait {
 
 	/**
 	 *
@@ -60,7 +60,7 @@ class TClass {
 	 */
 	public function add($name, $value, $type = null) {
 		if (is_null($type)) $type = $this->getType($value);
-		return $this->addClassMember($name, $type, self::SCOPE_PUBLIC, $value);
+		return $this->addClassMember($name, $type, ST_SCOPE_PUBLIC, $value);
 	}
 
 	/**
@@ -80,7 +80,7 @@ class TClass {
 	 */
 	public function __set($name, $value) {
 		if ($this->hasClassMember($name)) {
-			return $this->set($name, $value, self::SCOPE_PUBLIC);
+			return $this->set($name, $value, ST_SCOPE_PUBLIC);
 		}
 		else {
 			return $this->add($name, $value);
@@ -102,7 +102,7 @@ class TClass {
 	 * @return boolean true if the property is set, else false
 	 */
 	public function __isset($name) {
-		return $this->chk($name, self::SCOPE_PUBLIC);
+		return $this->chk($name, ST_SCOPE_PUBLIC);
 	}
 
 	/**
@@ -117,7 +117,7 @@ class TClass {
 	 * @return mixed The value of the named property, or null if it is not set
 	 */
 	public function __get($name) {
-		return $this->get($name, self::SCOPE_PUBLIC);
+		return $this->get($name, ST_SCOPE_PUBLIC);
 	}
 
 	/**
@@ -130,7 +130,7 @@ class TClass {
 	 * @param string $name Name of the property we want to delete
 	 */
 	public function __unset($name) {
-		$this->del($name, self::SCOPE_PUBLIC);
+		$this->del($name, ST_SCOPE_PUBLIC);
 	}
 
 	/**
@@ -146,7 +146,7 @@ class TClass {
 	 * @return mixed Returns whatever the function call does normally
 	 */
 	public function __call($name, $args) {
-		return $this->call($name, $args, self::SCOPE_PUBLIC);
+		return $this->call($name, $args, ST_SCOPE_PUBLIC);
 	}
 
 	/**
@@ -161,16 +161,16 @@ class TClass {
 	 */
 	protected function getType(&$obj) {
 		$type = gettype($obj);
-		if ($type == self::TYPE_OBJECT) {
+		if ($type == ST_TYPE_OBJECT) {
 
 			// Nope, must be a regular object class
 			$class = get_class($obj);
 
 			// Functions are class "Closure"
-			if ($class == 'Closure') return self::TYPE_FUNCTION;
+			if ($class == 'Closure') return ST_TYPE_FUNCTION;
 
 			// Anything else is a normal class
-			return ($class == 'StdClass') ? self::TYPE_OBJECT : "class:{$class}";
+			return ($class == 'StdClass') ? ST_TYPE_OBJECT : "class:{$class}";
 		}
 		return $type;
 	}
@@ -209,7 +209,7 @@ class TClass {
 		if ($member->type == $type) return;
 
 		// If the value is an object...
-		if ($type == self::TYPE_OBJECT) {
+		if ($type == ST_TYPE_OBJECT) {
 			$class = get_class($value);
 			// ... and we have a classname match then we're good...
 			if ($member->type == "class:{$class}") return;
@@ -247,15 +247,15 @@ class TClass {
 
 		switch ($type) {
 			// The essential types...
-			case self::TYPE_STRING:
-			case self::TYPE_INTEGER:
-			case self::TYPE_DOUBLE:
-			case self::TYPE_BOOLEAN:
-			case self::TYPE_RESOURCE:
-			case self::TYPE_OBJECT:
-			case self::TYPE_ARRAY:
+			case ST_TYPE_STRING:
+			case ST_TYPE_INTEGER:
+			case ST_TYPE_DOUBLE:
+			case ST_TYPE_BOOLEAN:
+			case ST_TYPE_RESOURCE:
+			case ST_TYPE_OBJECT:
+			case ST_TYPE_ARRAY:
 			// Made up types...
-			case self::TYPE_FUNCTION:
+			case ST_TYPE_FUNCTION:
 				return true;
 
 			default:
@@ -283,9 +283,9 @@ class TClass {
 	 */
 	protected function isLegalScope($scope) {
 		switch ($scope) {
-			case self::SCOPE_ANY:
-			case self::SCOPE_PUBLIC:
-			case self::SCOPE_PRIVATE:
+			case ST_SCOPE_ANY:
+			case ST_SCOPE_PUBLIC:
+			case ST_SCOPE_PRIVATE:
 				return true;
 		}
 		return false;
@@ -328,9 +328,9 @@ class TClass {
 		$returnType = null;
 		if (! is_null($value)) {
 			$vtype = $this->getType($value);
-			if ($vtype == self::TYPE_FUNCTION) {
+			if ($vtype == ST_TYPE_FUNCTION) {
 				$returnType = $type;
-				$type = self::TYPE_FUNCTION;
+				$type = ST_TYPE_FUNCTION;
 			}
 		}
 
@@ -396,12 +396,12 @@ class TClass {
 		switch ($scope) {
 
 			// Privileged access; 'any' accesses members with any scope
-			case self::SCOPE_ANY:
+			case ST_SCOPE_ANY:
 				return true;
 
 			// Explicit access; scope must match that of named member
-			case self::SCOPE_PUBLIC:
-			case self::SCOPE_PRIVATE:
+			case ST_SCOPE_PUBLIC:
+			case ST_SCOPE_PRIVATE:
 				$member =& $this->getClassMember($name);
 				return $member->scope == $scope;
 		}
@@ -434,7 +434,7 @@ class TClass {
 	protected function isFunction($name) {
 		$member =& $this->getClassMember($name);
 		if (is_null($member)) return false;
-		return $member->type == self::TYPE_FUNCTION;
+		return $member->type == ST_TYPE_FUNCTION;
 	}
 
 	/**
@@ -456,7 +456,7 @@ class TClass {
 	 *
 	 * @return object $this for chaining support...
 	 */
-	protected function set($name, $value, $scope = self::SCOPE_ANY) {
+	protected function set($name, $value, $scope = ST_SCOPE_ANY) {
 		$this->requireTypeMatch($name, $value);
 		$this->requireAccess($name, $scope);
 		$member =& $this->getClassMember($name);
@@ -485,7 +485,7 @@ class TClass {
 	 *
 	 * @return mixed Returns whatever the function call does normally
 	 */
-	protected function call($name, $args, $scope = self::SCOPE_ANY) {
+	protected function call($name, $args, $scope = ST_SCOPE_ANY) {
 		$this->requireFunction($name);
 		$this->requireAccess($name, $scope);
 		$member =& $this->getClassMember($name);
@@ -514,7 +514,7 @@ class TClass {
 	 *
 	 * @return boolean true if the property is set, else false
 	 */
-	protected function chk($name, $scope = self::SCOPE_ANY) {
+	protected function chk($name, $scope = ST_SCOPE_ANY) {
 		if (! $this->isClassMemberScopeAccessible($name, $scope)) return false;
 		$member =& $this->getClassMember($name);
 		return is_null($member->value) ? false : true;
@@ -528,7 +528,7 @@ class TClass {
 	 *
 	 * @return mixed The value of the named property
 	 */
-	protected function get($name, $scope = self::SCOPE_ANY) {
+	protected function get($name, $scope = ST_SCOPE_ANY) {
 		$this->requireMember($name);
 		$this->requireAccess($name, $scope);
 		$member =& $this->getClassMember($name);
@@ -543,7 +543,7 @@ class TClass {
 	 *
 	 * @return object $this for chaining support...
 	 */
-	protected function del($name, $scope = self::SCOPE_ANY) {
+	protected function del($name, $scope = ST_SCOPE_ANY) {
 		$this->requireAccess($name, $scope);
 		unset($this->classMembers[$name]);
 		return $this;

@@ -5,6 +5,7 @@
  * ref: http://php.net/manual/en/language.oop5.overloading.php#object.set
  * ref: http://php.net/manual/en/functions.anonymous.php
  * ref: http://php.net/manual/en/closure.bind.php
+ * ref: http://php.net/manual/en/spl.exceptions.php
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -24,13 +25,6 @@ class TClass {
 	 *
 	 */
 	protected $classMembers = array();
-
-	/**
-	 *
-	 */
-	public function __construct() {
-
-	}
 
 	/**
 	 * Add a public class member
@@ -166,9 +160,10 @@ class TClass {
 	 * @param string $name The name we require to exist
 	 */
 	protected function requireMember($name) {
-		if (! $this->hasClassMember($name)) {
-			throw new \Exception("Attempted to access non-existent class member '{$name}'");
-		}
+		if ($this->hasClassMember($name)) return;
+		throw PHPGoodies::instantiate('Lib.Oop.Exception.MemberDoesNotExistException',
+			'Attempted to access non-existent class member'
+		);
 	}
 
 	/**
@@ -186,7 +181,7 @@ class TClass {
 		if (is_null($value)) return;
 
 		// Look more closely...
-		$member = $this->getClassMember($name);
+		$member =& $this->getClassMember($name);
 		$type = gettype($value);
 
 		// An exact match on type is great...
@@ -199,7 +194,7 @@ class TClass {
 			if ($member->type == "class:{$class}") return;
 		}
 		
-		throw new \Exception("Type mismatch accessing class member '{$name}'; expected '{$member->type}', got '{$type}'");
+		throw new \InvalidArgumentException("Type mismatch accessing class member '{$name}'; expected '{$member->type}', got '{$type}'");
 	}
 
 	/**
@@ -293,30 +288,28 @@ class TClass {
 
 		//  Check for legal name, type, and scope
 		if (! $this->isLegalName($name)) {
-			throw new \Exception('Illegal class member name specified: ' . (is_string($name) ? "'{$name}'" : "[ {$this->getType($name)} ]"));
+			throw new \InvalidArgumentException('Illegal class member name specified: ' . (is_string($name) ? "'{$name}'" : "[ {$this->getType($name)} ]"));
 		}
 		if (! $this->isLegalType($type)) {
-			throw new \Exception('Illegal class member type specified: ' . (is_string($type) ? "'{$type}'" : "[ {$this->getType($type)} ]"));
+			throw new \InvalidArgumentException('Illegal class member type specified: ' . (is_string($type) ? "'{$type}'" : "[ {$this->getType($type)} ]"));
 		}
 		if (! $this->isLegalScope($scope)) {
-			throw new \Exception('Illegal class member scope specified: ' . (is_string($scope) ? "'{$scope}'" : "[ {$this->getType($scope)} ]"));
+			throw new \InvalidArgumentException('Illegal class member scope specified: ' . (is_string($scope) ? "'{$scope}'" : "[ {$this->getType($scope)} ]"));
 		}
 
 		// Prevent redefinition
 		if ($this->hasClassMember($name)) {
-			throw new \Exception("A class member named '{$name}' already exists");
+			throw new \LogicException("A class member named '{$name}' already exists");
 		}
 
 		// Special handling for functions to get the return type
+		$returnType = null;
 		if (! is_null($value)) {
 			$vtype = $this->getType($value);
 			if ($vtype == 'function') {
 				$returnType = $type;
 				$type = 'function';
 			}
-		}
-		else {
-			$returnType = null;
 		}
 
 		// Add the new property member
@@ -347,13 +340,21 @@ class TClass {
 	/**
 	 * Get the definition for the class member with the specified name
 	 *
+	 * For performance reasons, most-to-all usages of this method should get a reference to the
+	 * classMember data instead of a value copy. This avoids copying properties of classMember
+	 * such as the value which could potentially have enormous amounts of data in it...
+	 *
 	 * @param string $name The name of the class member to add
 	 *
 	 * @return object Class member definition that we're after or null if it doesn't exist
 	 */
 	protected function &getClassMember($name) {
-		$null = null;
-		return $this->hasClassMember($name) ? $this->classMembers[$name] : $null;
+		if (! $this->hasClassMember($name)) {
+			$null = null;
+			return $null;
+		}
+		return $this->classMembers[$name];
+		//return $this->hasClassMember($name) ? $this->classMembers[$name] : $null;
 	}
 
 	/**
@@ -379,7 +380,7 @@ class TClass {
 			// Explicit access; scope must match that of named member
 			case self::SCOPE_PUBLIC:
 			case self::SCOPE_PRIVATE:
-				$member = $this->getClassMember($name);
+				$member =& $this->getClassMember($name);
 				return $member->scope == $scope;
 		}
 
@@ -393,9 +394,12 @@ class TClass {
 	 * @param string $scope The visibility scope of the requester
 	 */
 	protected function requireAccess($name, $scope) {
+
+		// Basically we shouldn't be able to access private scope on a public request...
 		if ($this->isClassMemberScopeAccessible($name, $scope)) return;
-		// Basically we shouldn't be able to access private scope on a public request
-		throw new \Exception('Attempted to access non-existent or private class member from public scope.');
+		throw PHPGoodies::instantiate('Lib.Oop.Exception.AccessDeniedException',
+			'Attempted to access private class member from public scope'
+		);
 	}
 
 	/**
@@ -406,7 +410,7 @@ class TClass {
 	 * @return boolean true if it is a function, else false
 	 */ 
 	protected function isFunction($name) {
-		$member = $this->getClassMember($name);
+		$member =& $this->getClassMember($name);
 		if (is_null($member)) return false;
 		return $member->type == 'function';
 	}
@@ -418,7 +422,7 @@ class TClass {
 	 */
 	protected function requireFunction($name) {
 		if ($this->isFunction($name)) return;
-		throw new \Exception('Attempted to invoke a non-existent function/method');
+		throw new \BadMethodCallException('Attempted to invoke a non-existent function/method');
 	}
 
 	/**
@@ -433,7 +437,7 @@ class TClass {
 	protected function set($name, $value, $scope = self::SCOPE_ANY) {
 		$this->requireTypeMatch($name, $value);
 		$this->requireAccess($name, $scope);
-		$member =$ $this->getClassMember($name);
+		$member =& $this->getClassMember($name);
 
 		// For functions we need to create a closure so they can get at the rest of our class members
 		if ($this->isFunction($name)) {
@@ -462,11 +466,11 @@ class TClass {
 	protected function call($name, $args, $scope = self::SCOPE_ANY) {
 		$this->requireFunction($name);
 		$this->requireAccess($name, $scope);
-		$member = $this->getClassMember($name);
+		$member =& $this->getClassMember($name);
 		$res = call_user_func_array($member->value, $args);
 		$returnType = $this->getType($res);
 		if ($returnType === $member->returnType) return $res;
-		throw new \Exception("Type mismatch for result from function call to '{$name}'; expected '{$member->returnType}', but got '{$returnType}'");
+		throw new \UnexpectedValueException("Type mismatch for result from function call to '{$name}'; expected '{$member->returnType}', but got '{$returnType}'");
 	}
 
 	/**
@@ -490,7 +494,7 @@ class TClass {
 	 */
 	protected function chk($name, $scope = self::SCOPE_ANY) {
 		if (! $this->isClassMemberScopeAccessible($name, $scope)) return false;
-		$member = $this->getClassMember($name);
+		$member =& $this->getClassMember($name);
 		return is_null($member->value) ? false : true;
 	}
 
@@ -500,12 +504,12 @@ class TClass {
 	 * @param string $name Name of the property we want to get
 	 * @param string $scope The visibility scope of the requester
 	 *
-	 * @return mixed The value of the named property, or null if it is not set
+	 * @return mixed The value of the named property
 	 */
 	protected function get($name, $scope = self::SCOPE_ANY) {
-		if (! $this->hasClassMember($name)) return null;
-		if (! $this->isClassMemberScopeAccessible($name, $scope)) return null;
-		$member = $this->getClassMember($name);
+		$this->requireMember($name);
+		$this->requireAccess($name, $scope);
+		$member =& $this->getClassMember($name);
 		return $member->value;
 	}
 

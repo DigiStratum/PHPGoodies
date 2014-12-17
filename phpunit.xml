@@ -1,7 +1,9 @@
 <phpunit>
 	<testsuites>
 		<testsuite name="phpgoodies">
+			<!-- Test the most foundaitonal classes first so we can catch low-level failures early... -->
 			<directory>test</directory>
+			<directory>Lib/Oop/test</directory>
 			<directory>Lib/Data/test</directory>
 			<directory>Lib/Crypto/test</directory>
 			<directory>Lib/File/Csv/test</directory>

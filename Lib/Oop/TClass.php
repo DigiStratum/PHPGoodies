@@ -7,6 +7,10 @@
  * ref: http://php.net/manual/en/closure.bind.php
  * ref: http://php.net/manual/en/spl.exceptions.php
  *
+ * @todo Add support for strongly typed method calls by adding function prototypes to declarations
+ * @todo With strongly typed method calls, it should be possible to support polymorphism...
+ * @todo Add support for varargs on method calls (for strongly typed/polymorphic)
+ *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
@@ -17,9 +21,24 @@ namespace PHPGoodies;
  */
 class TClass {
 
+	/**
+	 * Scope constants
+	 */
 	const SCOPE_ANY		= 'any';
 	const SCOPE_PUBLIC	= 'public';
 	const SCOPE_PRIVATE	= 'private';
+
+	/**
+	 * Type constants
+	 */
+	const TYPE_STRING	= 'string';
+	const TYPE_INTEGER	= 'integer';
+	const TYPE_DOUBLE	= 'double';
+	const TYPE_BOOLEAN	= 'boolean';
+	const TYPE_RESOURCE	= 'resource';
+	const TYPE_OBJECT	= 'object';
+	const TYPE_ARRAY	= 'array';
+	const TYPE_FUNCTION	= 'function';
 
 	/**
 	 *
@@ -29,7 +48,9 @@ class TClass {
 	/**
 	 * Add a public class member
 	 *
-	 * Note that type is automatically the type of that value unless overridden.
+	 * Note that type is automatically the type of that value unless overridden; however the
+	 * only purpose for this method to exist is to facilitate overriding the type, otherwise a
+	 * member could be easily added with direct assignment routing through the _set() method.
 	 *
 	 * @param string $name The name of the class member to add
 	 * @param mixed $value The default value to assign to this class member (data|function)
@@ -138,18 +159,18 @@ class TClass {
 	 *
 	 * @return string the type of the object that we will use internally
 	 */
-	protected function getType($obj) {
+	protected function getType(&$obj) {
 		$type = gettype($obj);
-		if ($type == 'object') {
+		if ($type == self::TYPE_OBJECT) {
 
 			// Nope, must be a regular object class
 			$class = get_class($obj);
 
 			// Functions are class "Closure"
-			if ($class == 'Closure') return 'function';
+			if ($class == 'Closure') return self::TYPE_FUNCTION;
 
 			// Anything else is a normal class
-			return ($class == 'StdClass') ? 'object' : "class:{$class}";
+			return ($class == 'StdClass') ? self::TYPE_OBJECT : "class:{$class}";
 		}
 		return $type;
 	}
@@ -188,7 +209,7 @@ class TClass {
 		if ($member->type == $type) return;
 
 		// If the value is an object...
-		if ($type == 'object') {
+		if ($type == self::TYPE_OBJECT) {
 			$class = get_class($value);
 			// ... and we have a classname match then we're good...
 			if ($member->type == "class:{$class}") return;
@@ -213,6 +234,8 @@ class TClass {
 	/**
 	 * Check whether the specified type name is a legal one
 	 *
+	 * @todo Add support for typed arrays...
+	 *
 	 * @param string $type The type name we want to check out
 	 *
 	 * @return boolean true if it is legal, else false
@@ -224,16 +247,15 @@ class TClass {
 
 		switch ($type) {
 			// The essential types...
-			case 'string':
-			case 'integer':
-			case 'int':
-			case 'float':
-			case 'double':
-			case 'boolean':
-			case 'resource':
-			case 'object':
+			case self::TYPE_STRING:
+			case self::TYPE_INTEGER:
+			case self::TYPE_DOUBLE:
+			case self::TYPE_BOOLEAN:
+			case self::TYPE_RESOURCE:
+			case self::TYPE_OBJECT:
+			case self::TYPE_ARRAY:
 			// Made up types...
-			case 'function':
+			case self::TYPE_FUNCTION:
 				return true;
 
 			default:
@@ -306,9 +328,9 @@ class TClass {
 		$returnType = null;
 		if (! is_null($value)) {
 			$vtype = $this->getType($value);
-			if ($vtype == 'function') {
+			if ($vtype == self::TYPE_FUNCTION) {
 				$returnType = $type;
-				$type = 'function';
+				$type = self::TYPE_FUNCTION;
 			}
 		}
 
@@ -412,7 +434,7 @@ class TClass {
 	protected function isFunction($name) {
 		$member =& $this->getClassMember($name);
 		if (is_null($member)) return false;
-		return $member->type == 'function';
+		return $member->type == self::TYPE_FUNCTION;
 	}
 
 	/**

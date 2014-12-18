@@ -451,6 +451,26 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 		// Jelly beans are, most decidedly, neither true, nor false
 		$class->publicFunc('Jelly Beans');
 	}
+
+	/**
+	 * Test that adding a function, once added, it cannot be reassigned to null
+	 *
+	 * @expectedException InvalidArgumentException
+	 */
+	public function testThatAddingFunctionNullAssignmentIsRejected() {
+		$class = new STClass();
+
+		// Define a public function
+		$class->add(
+			'publicFunc',
+			function ($value) {
+				return $value;
+			},
+			ST_TYPE_BOOLEAN
+		);
+
+		$class->publicFunc = null;
+	}
 }
 
 /**

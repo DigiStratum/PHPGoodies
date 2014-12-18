@@ -194,7 +194,7 @@ trait StronglyTypedTrait {
 	/**
 	 * Require value's type to match unless it's null which is always ok
 	 *
-	 * @todo Maybe we should disallow null for function type members?
+	 * We disallow null for function type members, but allow it for pretty much anything else...
 	 *
 	 * @param string $name Name of the class member whose type we are comparing to
 	 * @param mixed $value The value whose type we are interested in relative to named member
@@ -206,11 +206,16 @@ trait StronglyTypedTrait {
 		// So long as the class member exists...
 		$this->requireMember($name);
 
-		// A null value is always acceptable...
-		if (is_null($value)) return $this;
-
 		// Look more closely...
 		$member =& $this->getClassMember($name);
+		
+		// A null value is usually acceptable...
+		if (is_null($value)) {
+
+			// As long as the classMember is nullable...
+			if ($member->isNullable) return $this;
+		}
+
 		$type = gettype($value);
 
 		// An exact match on native type is great...

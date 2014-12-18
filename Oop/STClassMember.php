@@ -20,6 +20,7 @@ const ST_ENFORCEMENT_STRICT	= 'strict';
 class STClassMember {
 
 	public $enforcement = ST_ENFORCEMENT_STRICT;
+	public $isNullable = true;
 
 	public $type;
 	public $scope;
@@ -28,9 +29,15 @@ class STClassMember {
 	// For functions
 	public $returnType;
 
+	/**
+	 * Constructor
+	 */
 	public function __construct($scope, $type, $returnType) {
 		$this->scope = $scope;
 		$this->type = $type;
 		$this->returnType = $returnType;
+		if ($type == ST_TYPE_FUNCTION) {
+			$this->isNullable = false;
+		}
 	}
 }

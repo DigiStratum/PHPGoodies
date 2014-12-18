@@ -17,6 +17,8 @@
 
 namespace PHPGoodies;
 
+PHPGoodies::import('Oop.STClassMember');
+
 /**
  * Scope constants
  */
@@ -342,12 +344,7 @@ trait StronglyTypedTrait {
 		}
 
 		// Add the new property member
-		$this->classMembers[$name] = (object) array(
-			'type' => $type,
-			'scope' => $scope,
-			'value' => null,
-			'returnType' => $returnType	// Only used for functions
-		);
+		$this->classMembers[$name] = PHPGoodies::instantiate('Oop.STClassMember', $scope, $type, $returnType);
 
 		// Now set the value for the class member with type enforcement
 		$this->set($name, $value);

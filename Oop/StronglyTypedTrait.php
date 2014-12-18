@@ -544,6 +544,7 @@ trait StronglyTypedTrait {
 	 * @return object $this for chaining support...
 	 */
 	protected function del($name, $scope = ST_SCOPE_ANY) {
+		$this->requireMember($name);
 		$this->requireAccess($name, $scope);
 		unset($this->classMembers[$name]);
 		return $this;

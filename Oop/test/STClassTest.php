@@ -2,6 +2,8 @@
 /**
  * PHPGoodies:STClass class test cases
  *
+ * @groups basic, types, data, magic, scope, names, functions
+ *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
@@ -34,7 +36,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Just verify that we can instantiate such a class
 	 *
-	 * @group testThatSTClassIsInstantiable
+	 * @group basic
 	 */
 	public function testThatSTClassIsInstantiable() {
 		$class = PHPGoodies::instantiate('Oop.STClass');
@@ -45,7 +47,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Test that added public properties are accessible internally and externally
 	 *
-	 * @group testThatPublicPropertiesAreAccessible
+	 * @group data
 	 */
 	public function testThatPublicPropertiesAreAccessible() {
 		$class = PHPGoodies::instantiate('Oop.STClass');
@@ -64,7 +66,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 *
 	 * @expectedException InvalidArgumentException
 	 *
-	 * @group testThatMismatchedDataAssignmentsAreRejected
+	 * @group types
 	 */
 	public function testThatMismatchedDataAssignmentsAreRejected() {
 		$class = PHPGoodies::instantiate('Oop.STClass');
@@ -77,7 +79,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 *
 	 * @expectedException InvalidArgumentException
 	 *
-	 * @group testThatMismatchedTypeAdditionsAreRejected
+	 * @group types
 	 */
 	public function testThatMismatchedTypeAdditionsAreRejected() {
 		$class = PHPGoodies::instantiate('Oop.STClass');
@@ -90,7 +92,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 *
 	 * @expectedException LogicException
 	 *
-	 * @group testThatDuplicateAddsAreRejected
+	 * @group data
 	 */
 	public function testThatDuplicateAddsAreRejected() {
 		$class = PHPGoodies::instantiate('Oop.STClass');
@@ -103,7 +105,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 *
 	 * @expectedException InvalidArgumentException
 	 *
-	 * @group testThatInvalidPropertyNamesAddedAreRejected
+	 * @group names
 	 */
 	public function testThatInvalidPropertyNamesAddedAreRejected() {
 		$class = PHPGoodies::instantiate('Oop.STClass');
@@ -115,7 +117,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 *
 	 * @expectedException InvalidArgumentException
 	 *
-	 * @group testThatInvalidTypesAddedAreRejected
+	 * @group types
 	 */
 	public function testThatInvalidTypesAddedAreRejected() {
 		$class = PHPGoodies::instantiate('Oop.STClass');
@@ -125,7 +127,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Test that an extended STClass gets the expected classMembers set up
 	 *
-	 * @group testThatSTClassExtendedHasExpectedClassMembers
+	 * @group data
 	 */
 	public function testThatSTClassExtendedHasExpectedClassMembers() {
 		$classExt = new STClassExtended();
@@ -163,7 +165,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Test that the magic __set(), __get(), __isset(), and __unset() do what is expected
 	 *
-	 * @group testThatMagicMethodsBehave
+	 * @group magic
 	 */
 	public function testThatMagicMethodsBehave() {
 		$classExt = new STClassExtended();
@@ -219,7 +221,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 *
 	 * @expectedException PHPGoodies\MemberDoesNotExistException
 	 *
-	 * @group testThatGettingNonexistentMemberIsRejected
+	 * @group data
 	 */
 	public function testThatGettingNonexistentMemberIsRejected() {
 		$class = new STClass();
@@ -231,7 +233,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 *
 	 * @expectedException PHPGoodies\AccessDeniedException
 	 *
-	 * @group testThatGettingInaccessibleMemberIsRejected
+	 * @group scope
 	 */
 	public function testThatGettingInaccessibleMemberIsRejected() {
 		$classExt = new STClassExtended();
@@ -243,7 +245,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 *
 	 * @expectedException PHPGoodies\MemberDoesNotExistException
 	 *
-	 * @group testThatUnsettingNonexistentMemberIsRejected
+	 * @group data
 	 */
 	public function testThatUnsettingNonexistentMemberIsRejected() {
 		$class = new STClass();
@@ -255,7 +257,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 *
 	 * @expectedException PHPGoodies\AccessDeniedException
 	 *
-	 * @group testThatUnsettingInaccessibleMemberIsRejected
+	 * @group scope
 	 */
 	public function testThatUnsettingInaccessibleMemberIsRejected() {
 		$classExt = new STClassExtended();
@@ -265,7 +267,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Test that getType returns expected types
 	 *
-	 * @group testThatGetTypeReturnsExpectedTypes
+	 * @group types
 	 */
 	public function testThatGetTypeReturnsExpectedTypes() {
 		$classExt = new STClassExtended();
@@ -287,7 +289,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 *
 	 * @expectedException PHPGoodies\MemberDoesNotExistException
 	 *
-	 * @group testThatRequireTypeMatchRequiresMemeberToExist
+	 * @group types
 	 */
 	public function testThatRequireTypeMatchRequiresMemeberToExist() {
 		$classExt = new STClassExtended();
@@ -297,7 +299,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Test that requireTypeMatch() allows null regardless of the named member's type
 	 *
-	 * @group testThatRequireTypeMatchAllowsNull
+	 * @group types
 	 */
 	public function testThatRequireTypeMatchAllowsNull() {
 		$classExt = new STClassExtended();
@@ -308,7 +310,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Test that requireTypeMatch() allows matching types
 	 *
-	 * @group testThatRequireTypeMatchAllowsMatchingTypes
+	 * @group types
 	 */
 	public function testThatRequireTypeMatchAllowsMatchingTypes() {
 		$classExt = new STClassExtended();
@@ -326,7 +328,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Test that isLegalName() accepts only legal names
 	 *
-	 * @group testThatIsLegalNameAcceptsOnlyLegalNames
+	 * @group names
 	 */
 	public function testThatIsLegalNameAcceptsOnlyLegalNames() {
 		$classExt = new STClassExtended();
@@ -343,7 +345,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Test that isLegalType() accepts only legal types
 	 *
-	 * @group testThatIsLegalTypeAcceptsOnlyLegalTypes
+	 * @group types
 	 */
 	public function testThatIsLegalTypeAcceptsOnlyLegalTypes() {
 		$classExt = new STClassExtended();
@@ -365,7 +367,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Test that isLegalScope() accepts only legal scopes
 	 *
-	 * @group testThatIsLegalScopeAcceptsOnlyLegalScopes
+	 * @group scope
 	 */
 	public function testThatIsLegalScopeAcceptsOnlyLegalScopes() {
 		$classExt = new STClassExtended();
@@ -379,7 +381,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Test that adding function members (without prototypes) work as expected
 	 *
-	 * @group testThatAddingFunctionMembersWorkAsExpected
+	 * @group functions
 	 */
 	public function testThatAddingFunctionMembersWorkAsExpected() {
 		$classExt = new STClassExtended();
@@ -435,7 +437,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Test that a function being added with a prototype shows up with the expected details
 	 *
-	 * @group testThatAddingFunctionWithPrototypeLooksAsExpected
+	 * @group functions
 	 */
 	public function testThatAddingFunctionWithPrototypeLooksAsExpected() {
 		$classExt = new STClassExtended();
@@ -486,7 +488,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Test that adding a (non-prototyped) function, the member is callable; exercises __call() magic function
 	 *
-	 * @group testThatAddingFunctionMemberIsCallable
+	 * @group functions
 	 */
 	public function testThatAddingFunctionMemberIsCallable() {
 		$class = new STClass();
@@ -507,7 +509,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Test that adding a (prototyped) function, the member is callable
 	 *
-	 * @group testThatAddingPrototypedFunctionMemberIsCallable
+	 * @group functions
 	 */
 	public function testThatAddingPrototypedFunctionMemberIsCallable() {
 		$classExt = new STClassExtended();
@@ -534,7 +536,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 *
 	 * @expectedException BadMethodCallException
 	 *
-	 * @group testThatAddingPrototypedFunctionMemberMismatchedCallsAreRejected
+	 * @group functions
 	 */
 	public function testThatAddingPrototypedFunctionMemberMismatchedCallsAreRejected() {
 		$classExt = new STClassExtended();
@@ -560,7 +562,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 *
 	 * @expectedException PHPGoodies\AccessDeniedException
 	 *
-	 * @group testThatAddingFunctionPrivateMemberIsNotExternallyCallable
+	 * @group functions
 	 */
 	public function testThatAddingFunctionPrivateMemberIsNotExternallyCallable() {
 		$classExt = new STClassExtended();
@@ -588,7 +590,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 *
 	 * @expectedException UnexpectedValueException
 	 *
-	 * @group testThatAddingFunctionReturnValueIsTypeEnforced
+	 * @group functions
 	 */
 	public function testThatAddingFunctionReturnValueIsTypeEnforced() {
 		$class = new STClass();
@@ -611,7 +613,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 *
 	 * @expectedException InvalidArgumentException
 	 *
-	 * @group testThatAddingFunctionNullAssignmentIsRejected
+	 * @group functions
 	 */
 	public function testThatAddingFunctionNullAssignmentIsRejected() {
 		$class = new STClass();
@@ -633,7 +635,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 *
 	 * @expectedException BadMethodCallException
 	 *
-	 * @group testThatUnsettingPublicFunctionIsAllowed
+	 * @group functions
 	 */
 	public function testThatUnsettingPublicFunctionIsAllowed() {
 		$classExt = new STClassExtended();

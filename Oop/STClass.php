@@ -7,7 +7,7 @@
 
 namespace PHPGoodies;
 
-PHPGoodies::import('Lib.Oop.StronglyTypedTrait');
+PHPGoodies::import('Oop.StronglyTypedTrait');
 
 /**
  * A 'Strongly Typed' class with strong type enforcement

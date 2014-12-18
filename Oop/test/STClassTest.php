@@ -7,9 +7,9 @@
 
 namespace PHPGoodies;
 
-require_once(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
+require_once(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
 
-PHPGoodies::import('Lib.Oop.STClass');
+PHPGoodies::import('Oop.STClass');
 
 class STClassTest extends \PHPUnit_Framework_TestCase {
 
@@ -35,7 +35,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * Just verify that we can instantiate such a class
 	 */
 	public function testThatSTClassIsInstantiable() {
-		$tClass = PHPGoodies::instantiate('Lib.Oop.STClass');
+		$tClass = PHPGoodies::instantiate('Oop.STClass');
 		$this->assertTrue(is_object($tClass));
 		$this->assertTrue($tClass instanceof STClass);
 	}
@@ -44,7 +44,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * Test that added public properties are accessible internally and externally
 	 */
 	public function testThatPublicPropertiesAreAccessible() {
-		$tClass = PHPGoodies::instantiate('Lib.Oop.STClass');
+		$tClass = PHPGoodies::instantiate('Oop.STClass');
 
 		// Add properties
 		$tClass->add('fortyTwo', 42);
@@ -61,7 +61,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException InvalidArgumentException
 	 */
 	public function testThatMismatchedDataAssignmentsAreRejected() {
-		$tClass = PHPGoodies::instantiate('Lib.Oop.STClass');
+		$tClass = PHPGoodies::instantiate('Oop.STClass');
 		$tClass->add('fortyTwo', 42);		// Add a number
 		$tClass->fortyTwo = 'Forty Two!';	// Try to set it to a string!
 	}
@@ -72,7 +72,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException InvalidArgumentException
 	 */
 	public function testThatMismatchedTypeAdditionsAreRejected() {
-		$tClass = PHPGoodies::instantiate('Lib.Oop.STClass');
+		$tClass = PHPGoodies::instantiate('Oop.STClass');
 		// A number can't be a string, you silly goose!
 		$tClass->add('fortyTwo', 42, ST_TYPE_STRING);
 	}
@@ -83,7 +83,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException LogicException
 	 */
 	public function testThatDuplicateAddsAreRejected() {
-		$tClass = PHPGoodies::instantiate('Lib.Oop.STClass');
+		$tClass = PHPGoodies::instantiate('Oop.STClass');
 		$tClass->add('fortyTwo', 42);
 		$tClass->add('fortyTwo', 42);
 	}
@@ -94,7 +94,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException InvalidArgumentException
 	 */
 	public function testThatInvalidPropertyNamesAddedAreRejected() {
-		$tClass = PHPGoodies::instantiate('Lib.Oop.STClass');
+		$tClass = PHPGoodies::instantiate('Oop.STClass');
 		$tClass->add('42', 42);
 	}
 
@@ -104,7 +104,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException InvalidArgumentException
 	 */
 	public function testThatInvalidTypesAddedAreRejected() {
-		$tClass = PHPGoodies::instantiate('Lib.Oop.STClass');
+		$tClass = PHPGoodies::instantiate('Oop.STClass');
 		$tClass->add('fortyTwo', 42, 'Baloney Sandwich');
 	}
 

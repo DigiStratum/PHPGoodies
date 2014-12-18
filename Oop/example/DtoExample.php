@@ -10,8 +10,8 @@ use PHPGoodies\PHPGoodies as PHPGoodies;
 use PHPGoodies\Dto as Dto;
 
 // 2) Load up our goodies
-require(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
-PHPGoodies::import('Lib.Oop.Dto');
+require(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
+PHPGoodies::import('Oop.Dto');
 
 /**
  * Message Dto

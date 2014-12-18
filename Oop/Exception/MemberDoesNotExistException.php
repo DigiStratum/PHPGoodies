@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:AccessDeniedException - Extension of SPL's LogicException
+ * PHPGoodies:MemberDoesNotExistException - Extension of SPL's LogicException
  *
  * ref: http://php.net/manual/en/language.exceptions.extending.php
  * ref: http://php.net/manual/en/spl.exceptions.php
@@ -10,12 +10,12 @@
 
 namespace PHPGoodies;
 
-PHPGoodies::import('Lib.Oop.Exception.DataAccessException');
+PHPGoodies::import('Oop.Exception.DataAccessException');
 
 /**
  * Extension of SPL's LogicException
  */
-class AccessDeniedException extends DataAccessException {
+class MemberDoesNotExistException extends DataAccessException {
 
 	/**
 	 * Constructor

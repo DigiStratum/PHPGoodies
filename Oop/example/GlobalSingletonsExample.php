@@ -9,8 +9,8 @@
 use PHPGoodies\PHPGoodies as PHPGoodies;
 
 // 2) Load up our goodies
-require(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
-$singletons = PHPGoodies::instantiate('Lib.Oop.Singletons');
+require(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
+$singletons = PHPGoodies::instantiate('Oop.Singletons');
 
 // Use our global Singletons to get a reference to an instance of Lib.Db.Mysql
 $db =& $singletons->get('Lib.Db.Mysql.Mysql');

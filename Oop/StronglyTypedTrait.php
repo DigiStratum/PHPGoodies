@@ -182,7 +182,7 @@ trait StronglyTypedTrait {
 	 */
 	protected function requireMember($name) {
 		if ($this->hasClassMember($name)) return;
-		throw PHPGoodies::instantiate('Lib.Oop.Exception.MemberDoesNotExistException',
+		throw PHPGoodies::instantiate('Oop.Exception.MemberDoesNotExistException',
 			'Attempted to access non-existent class member'
 		);
 	}
@@ -419,7 +419,7 @@ trait StronglyTypedTrait {
 
 		// Basically we shouldn't be able to access private scope on a public request...
 		if ($this->isClassMemberScopeAccessible($name, $scope)) return;
-		throw PHPGoodies::instantiate('Lib.Oop.Exception.AccessDeniedException',
+		throw PHPGoodies::instantiate('Oop.Exception.AccessDeniedException',
 			'Attempted to access private class member from public scope'
 		);
 	}

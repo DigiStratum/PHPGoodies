@@ -12,7 +12,7 @@
 
 namespace PHPGoodies;
 
-PHPGoodies::import('Lib.Oop.Dto');
+PHPGoodies::import('Oop.Dto');
 
 /**
  * Generic DTO implementation

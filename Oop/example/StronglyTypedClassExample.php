@@ -11,8 +11,8 @@
 use PHPGoodies\STClass as STClass;
 
 // 2) Load up our goodies
-require(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
-PHPGoodies\PHPGoodies::import('Lib.Oop.STClass');
+require(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
+PHPGoodies\PHPGoodies::import('Oop.STClass');
 
 /**
  * Extend and populate STClass as it would be in a normal application

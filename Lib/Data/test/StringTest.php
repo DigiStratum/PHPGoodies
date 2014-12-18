@@ -41,10 +41,15 @@ class StringTest extends \PHPUnit_Framework_TestCase {
 			"this\nand\tthat\n\n"
 		);
 
+		$ok = true;
 		foreach ($values as $val) {
 			$str = PHPGoodies::instantiate('Lib.Data.String', $val);
-			$this->assertEquals($val, $str->get());
+			if ($val !== $str->get()) {
+				$ok = false;
+				break;
+			}
 		}
+		$this->assertTrue($ok);
 	}
 
 	/**
@@ -58,10 +63,15 @@ class StringTest extends \PHPUnit_Framework_TestCase {
 			"this\nand\tthat\n\n"
 		);
 
+		$ok = true;
 		foreach ($values as $val) {
 			$str = PHPGoodies::instantiate('Lib.Data.String', $val);
-			$this->assertEquals(strlen($val), $str->len());
+			if (strlen($val) !== $str->len()) {
+				$ok = false;
+				break;
+			}
 		}
+		$this->assertTrue($ok);
 	}
 
 	/**
@@ -116,6 +126,7 @@ class StringTest extends \PHPUnit_Framework_TestCase {
 		$source = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456879';
 
 		// Let chunkSize range from 1 to the entire source string length...
+		$ok = true;
 		for ($chunkSize = 1; $chunkSize < strlen($source); $chunkSize++) {
 
 			// Let the source string we're working with range from 0 to the entire source string length
@@ -124,18 +135,26 @@ class StringTest extends \PHPUnit_Framework_TestCase {
 				$val = substr($source, 0, $sourceLen);
 				$str = PHPGoodies::instantiate('Lib.Data.String', $val);
 				$res = $str->getChunked($chunkSize);
-				$this->assertTrue(is_array($res));
-				$this->assertEquals($expectedChunks, count($res));
+
+				if ((! is_array($res)) || ($expectedChunks != count($res))) {
+					$ok = false;
+					break(2);
+				}
 
 				for ($chunk = 0; $chunk < count($res); $chunk++) {
 					$pos = $chunk * $chunkSize;
 					$remaining = $sourceLen - $pos;
 					$expectedChunkLength = ($remaining >= $chunkSize) ? $chunkSize : $remaining;
-					$this->assertEquals($expectedChunkLength, strlen($res[$chunk]));
-					$this->assertEquals(substr($val, $pos, $expectedChunkLength), $res[$chunk]);
+
+					if (($expectedChunkLength != strlen($res[$chunk])) || (substr($val, $pos, $expectedChunkLength) != $res[$chunk])) {
+						$ok = false;
+						break(2);
+					}
 				}
 			}
 		}
+
+		$this->assertTrue($ok);
 	}
 }
 

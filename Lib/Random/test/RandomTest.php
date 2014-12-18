@@ -36,6 +36,7 @@ class RandomTest extends \PHPUnit_Framework_TestCase {
 	public function testThatRandNumbersAreConsistent() {
 		$secret = 'ThisIsTheTestSecret';
 		$limit = 10000;
+		$ok = true;
 		for ($alg = 0; $alg <= 1; $alg++) {
 			$prng = PHPGoodies::instantiate('Lib.Random.Random', $alg);
 
@@ -53,14 +54,20 @@ class RandomTest extends \PHPUnit_Framework_TestCase {
 
 			// Expect somewhere around 99-100% distinct values...
 			$minDistinct = (integer) ($limit * 99 / 100);
-			$this->assertTrue($minDistinct <= count($distinct));
+			if ($minDistinct > count($distinct)) {
+				$ok = false;
+				break;
+			}
 
 			// Now re-seed and veryify that we can get the same sequence again
 			$prng->seed($secret);
 			for ($xx = 0; $xx < $limit; $xx++) {
-				$this->assertEquals($set[$xx], $prng->rand());
+				if ($set[$xx] !== $prng->rand()) {
+					$ok = false;
+					break(2);
+				}
 			}
 		}
-
+		$this->assertTrue($ok);
 	}
 }

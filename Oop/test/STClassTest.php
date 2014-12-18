@@ -471,6 +471,28 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 
 		$class->publicFunc = null;
 	}
+
+	/**
+	 * Test that a public function may be unset
+	 *
+	 * @expectedException BadMethodCallException
+	 */
+	public function testThatUnsettingPublicFunctionIsAllowed() {
+		$class = new STClass();
+
+		// Define a public function
+		$class->add(
+			'publicFunc',
+			function ($value) {
+				return $value;
+			},
+			ST_TYPE_BOOLEAN
+		);
+
+		$this->assertTrue($class->publicFunc(true));
+		unset($class->publicFunc);
+		$class->publicFunc(false);
+	}
 }
 
 /**

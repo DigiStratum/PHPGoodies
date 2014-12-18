@@ -33,6 +33,8 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * Just verify that we can instantiate such a class
+	 *
+	 * @group testThatSTClassIsInstantiable
 	 */
 	public function testThatSTClassIsInstantiable() {
 		$class = PHPGoodies::instantiate('Oop.STClass');
@@ -42,6 +44,8 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * Test that added public properties are accessible internally and externally
+	 *
+	 * @group testThatPublicPropertiesAreAccessible
 	 */
 	public function testThatPublicPropertiesAreAccessible() {
 		$class = PHPGoodies::instantiate('Oop.STClass');
@@ -59,6 +63,8 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * Test that attempts to set a different value type after the property is added are rejected
 	 *
 	 * @expectedException InvalidArgumentException
+	 *
+	 * @group testThatMismatchedDataAssignmentsAreRejected
 	 */
 	public function testThatMismatchedDataAssignmentsAreRejected() {
 		$class = PHPGoodies::instantiate('Oop.STClass');
@@ -70,6 +76,8 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * Test that attempts to add a property with an overridden type that does not match are rejected
 	 *
 	 * @expectedException InvalidArgumentException
+	 *
+	 * @group testThatMismatchedTypeAdditionsAreRejected
 	 */
 	public function testThatMismatchedTypeAdditionsAreRejected() {
 		$class = PHPGoodies::instantiate('Oop.STClass');
@@ -81,6 +89,8 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * Test that an attempt to add the same member twice are rejected
 	 *
 	 * @expectedException LogicException
+	 *
+	 * @group testThatDuplicateAddsAreRejected
 	 */
 	public function testThatDuplicateAddsAreRejected() {
 		$class = PHPGoodies::instantiate('Oop.STClass');
@@ -92,6 +102,8 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * Test that invalid property names are rejected for addition
 	 *
 	 * @expectedException InvalidArgumentException
+	 *
+	 * @group testThatInvalidPropertyNamesAddedAreRejected
 	 */
 	public function testThatInvalidPropertyNamesAddedAreRejected() {
 		$class = PHPGoodies::instantiate('Oop.STClass');
@@ -102,6 +114,8 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * Test that additions with invalid types are rejected
 	 *
 	 * @expectedException InvalidArgumentException
+	 *
+	 * @group testThatInvalidTypesAddedAreRejected
 	 */
 	public function testThatInvalidTypesAddedAreRejected() {
 		$class = PHPGoodies::instantiate('Oop.STClass');
@@ -110,6 +124,8 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * Test that an extended STClass gets the expected classMembers set up
+	 *
+	 * @group testThatSTClassExtendedHasExpectedClassMembers
 	 */
 	public function testThatSTClassExtendedHasExpectedClassMembers() {
 		$classExt = new STClassExtended();
@@ -146,6 +162,8 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * Test that the magic __set(), __get(), __isset(), and __unset() do what is expected
+	 *
+	 * @group testThatMagicMethodsBehave
 	 */
 	public function testThatMagicMethodsBehave() {
 		$classExt = new STClassExtended();
@@ -200,6 +218,8 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * Test that attempts to get a nonexistent member are rejected
 	 *
 	 * @expectedException PHPGoodies\MemberDoesNotExistException
+	 *
+	 * @group testThatGettingNonexistentMemberIsRejected
 	 */
 	public function testThatGettingNonexistentMemberIsRejected() {
 		$class = new STClass();
@@ -210,6 +230,8 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * Test that attempts to get an inaccessible member are rejected
 	 *
 	 * @expectedException PHPGoodies\AccessDeniedException
+	 *
+	 * @group testThatGettingInaccessibleMemberIsRejected
 	 */
 	public function testThatGettingInaccessibleMemberIsRejected() {
 		$classExt = new STClassExtended();
@@ -220,6 +242,8 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * Test that attempts to unset a nonexistent member are rejected
 	 *
 	 * @expectedException PHPGoodies\MemberDoesNotExistException
+	 *
+	 * @group testThatUnsettingNonexistentMemberIsRejected
 	 */
 	public function testThatUnsettingNonexistentMemberIsRejected() {
 		$class = new STClass();
@@ -230,6 +254,8 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * Test that attempts to unset an inaccessible member are rejected
 	 *
 	 * @expectedException PHPGoodies\AccessDeniedException
+	 *
+	 * @group testThatUnsettingInaccessibleMemberIsRejected
 	 */
 	public function testThatUnsettingInaccessibleMemberIsRejected() {
 		$classExt = new STClassExtended();
@@ -238,6 +264,8 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * Test that getType returns expected types
+	 *
+	 * @group testThatGetTypeReturnsExpectedTypes
 	 */
 	public function testThatGetTypeReturnsExpectedTypes() {
 		$classExt = new STClassExtended();
@@ -258,6 +286,8 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * Test that requireTypeMatch() rejects requests for nonexistent members
 	 *
 	 * @expectedException PHPGoodies\MemberDoesNotExistException
+	 *
+	 * @group testThatRequireTypeMatchRequiresMemeberToExist
 	 */
 	public function testThatRequireTypeMatchRequiresMemeberToExist() {
 		$classExt = new STClassExtended();
@@ -266,6 +296,8 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * Test that requireTypeMatch() allows null regardless of the named member's type
+	 *
+	 * @group testThatRequireTypeMatchAllowsNull
 	 */
 	public function testThatRequireTypeMatchAllowsNull() {
 		$classExt = new STClassExtended();
@@ -275,6 +307,8 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * Test that requireTypeMatch() allows matching types
+	 *
+	 * @group testThatRequireTypeMatchAllowsMatchingTypes
 	 */
 	public function testThatRequireTypeMatchAllowsMatchingTypes() {
 		$classExt = new STClassExtended();
@@ -291,6 +325,8 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * Test that isLegalName() accepts only legal names
+	 *
+	 * @group testThatIsLegalNameAcceptsOnlyLegalNames
 	 */
 	public function testThatIsLegalNameAcceptsOnlyLegalNames() {
 		$classExt = new STClassExtended();
@@ -306,6 +342,8 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * Test that isLegalType() accepts only legal types
+	 *
+	 * @group testThatIsLegalTypeAcceptsOnlyLegalTypes
 	 */
 	public function testThatIsLegalTypeAcceptsOnlyLegalTypes() {
 		$classExt = new STClassExtended();
@@ -326,6 +364,8 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * Test that isLegalScope() accepts only legal scopes
+	 *
+	 * @group testThatIsLegalScopeAcceptsOnlyLegalScopes
 	 */
 	public function testThatIsLegalScopeAcceptsOnlyLegalScopes() {
 		$classExt = new STClassExtended();
@@ -337,12 +377,15 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Test that adding function members work as expected
+	 * Test that adding function members (without prototypes) work as expected
+	 *
+	 * @group testThatAddingFunctionMembersWorkAsExpected
 	 */
 	public function testThatAddingFunctionMembersWorkAsExpected() {
 		$classExt = new STClassExtended();
 
 		// Define a public function
+		$protoname = $prototype = $classExt->makePrototype('publicFunc', array(), true);
 		$res = $classExt->addClassMember(
 			'publicFunc',
 			ST_TYPE_BOOLEAN,
@@ -354,12 +397,14 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 		$this->assertTrue(is_object($res));
 		$data = $classExt->spy();
 		$classMembers =& $data['classMembers'];
-		$this->assertTrue(isset($classMembers['publicFunc']));
-		$this->assertEquals(ST_TYPE_FUNCTION, $classMembers['publicFunc']->type);
-		$this->assertEquals(ST_SCOPE_PUBLIC, $classMembers['publicFunc']->scope);
-		$this->assertEquals(ST_TYPE_BOOLEAN, $classMembers['publicFunc']->returnType);
+		$this->assertTrue(isset($classMembers[$protoname]));
+		$this->assertEquals(ST_TYPE_FUNCTION, $classMembers[$protoname]->type);
+		$this->assertEquals(ST_SCOPE_PUBLIC, $classMembers[$protoname]->scope);
+		$this->assertEquals(ST_TYPE_BOOLEAN, $classMembers[$protoname]->returnType);
+		$this->assertEquals($prototype, $classMembers[$protoname]->prototype);
 
 		// Define a private function
+		$protoname = $prototype = $classExt->makePrototype('privateFunc', array(), true);
 		$res = $classExt->addClassMember(
 			'privateFunc',
 			ST_TYPE_BOOLEAN,
@@ -371,14 +416,15 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 		$this->assertTrue(is_object($res));
 		$data = $classExt->spy();
 		$classMembers =& $data['classMembers'];
-		$this->assertTrue(isset($classMembers['privateFunc']));
-		$this->assertEquals(ST_TYPE_FUNCTION, $classMembers['privateFunc']->type);
-		$this->assertEquals(ST_SCOPE_PRIVATE, $classMembers['privateFunc']->scope);
-		$this->assertEquals(ST_TYPE_BOOLEAN, $classMembers['privateFunc']->returnType);
+		$this->assertTrue(isset($classMembers[$protoname]));
+		$this->assertEquals(ST_TYPE_FUNCTION, $classMembers[$protoname]->type);
+		$this->assertEquals(ST_SCOPE_PRIVATE, $classMembers[$protoname]->scope);
+		$this->assertEquals(ST_TYPE_BOOLEAN, $classMembers[$protoname]->returnType);
+		$this->assertEquals($prototype, $classMembers[$protoname]->prototype);
 
-		// Try to reassign the public function some new code...
+		// Try to redefine the public function with new code...
 		$res = $classExt->set(
-			'publicFunc',
+			$protoname,
 			function () {
 				return false;
 			}
@@ -387,7 +433,60 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Test that adding a function, the member is callable; exercises __call() magic function
+	 * Test that a function being added with a prototype shows up with the expected details
+	 *
+	 * @group testThatAddingFunctionWithPrototypeLooksAsExpected
+	 */
+	public function testThatAddingFunctionWithPrototypeLooksAsExpected() {
+		$classExt = new STClassExtended();
+
+		// Define a public function
+		$func = 'publicFunc';
+		$protoname = $prototype = $classExt->makePrototype($func, array(ST_TYPE_BOOLEAN));
+		$res = $classExt->addClassMember(
+			$func,
+			ST_TYPE_BOOLEAN,
+			ST_SCOPE_PUBLIC,
+			function ($value) {
+				return $value;
+			},
+			$prototype
+		);
+		$this->assertTrue(is_object($res));
+		$data = $classExt->spy();
+		$classMembers =& $data['classMembers'];
+		$this->assertTrue(isset($classMembers[$protoname]));
+		$this->assertEquals(ST_TYPE_FUNCTION, $classMembers[$protoname]->type);
+		$this->assertEquals(ST_SCOPE_PUBLIC, $classMembers[$protoname]->scope);
+		$this->assertEquals(ST_TYPE_BOOLEAN, $classMembers[$protoname]->returnType);
+		$this->assertEquals($prototype, $classMembers[$protoname]->prototype);
+
+		// Define a private function
+		$func = 'privateFunc';
+		$protoname = $prototype = $classExt->makePrototype($func, array(ST_TYPE_BOOLEAN));
+		$res = $classExt->addClassMember(
+			$func,
+			ST_TYPE_BOOLEAN,
+			ST_SCOPE_PRIVATE,
+			function () {
+				return true;
+			},
+			$prototype
+		);
+		$this->assertTrue(is_object($res));
+		$data = $classExt->spy();
+		$classMembers =& $data['classMembers'];
+		$this->assertTrue(isset($classMembers[$protoname]));
+		$this->assertEquals(ST_TYPE_FUNCTION, $classMembers[$protoname]->type);
+		$this->assertEquals(ST_SCOPE_PRIVATE, $classMembers[$protoname]->scope);
+		$this->assertEquals(ST_TYPE_BOOLEAN, $classMembers[$protoname]->returnType);
+		$this->assertEquals($prototype, $classMembers[$protoname]->prototype);
+	}
+
+	/**
+	 * Test that adding a (non-prototyped) function, the member is callable; exercises __call() magic function
+	 *
+	 * @group testThatAddingFunctionMemberIsCallable
 	 */
 	public function testThatAddingFunctionMemberIsCallable() {
 		$class = new STClass();
@@ -406,9 +505,62 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Test that adding a (prototyped) function, the member is callable
+	 *
+	 * @group testThatAddingPrototypedFunctionMemberIsCallable
+	 */
+	public function testThatAddingPrototypedFunctionMemberIsCallable() {
+		$classExt = new STClassExtended();
+
+		// Define a public function
+		$func = 'publicFunc';
+		$protoname = $prototype = $classExt->makePrototype($func, array(ST_TYPE_BOOLEAN));
+		$res = $classExt->addClassMember(
+			$func,
+			ST_TYPE_BOOLEAN,
+			ST_SCOPE_PUBLIC,
+			function ($value) {
+				return $value;
+			},
+			$prototype
+		);
+		$this->assertTrue(is_object($res));
+		$this->assertTrue($classExt->publicFunc(true));
+		$this->assertFalse($classExt->publicFunc(false));
+	}
+
+	/**
+	 * Test that adding a (prototyped) function, the member rejects calls not matching the prototype
+	 *
+	 * @expectedException BadMethodCallException
+	 *
+	 * @group testThatAddingPrototypedFunctionMemberMismatchedCallsAreRejected
+	 */
+	public function testThatAddingPrototypedFunctionMemberMismatchedCallsAreRejected() {
+		$classExt = new STClassExtended();
+
+		// Define a public function
+		$func = 'publicFunc';
+		$protoname = $prototype = $classExt->makePrototype($func, array(ST_TYPE_BOOLEAN));
+		$res = $classExt->addClassMember(
+			$func,
+			ST_TYPE_BOOLEAN,
+			ST_SCOPE_PUBLIC,
+			function ($value) {
+				return $value;
+			},
+			$prototype
+		);
+		$this->assertTrue(is_object($res));
+		$this->assertTrue($classExt->publicFunc(1));
+	}
+
+	/**
 	 * Test that ading a private function, the member is NOT externally callable
 	 *
 	 * @expectedException PHPGoodies\AccessDeniedException
+	 *
+	 * @group testThatAddingFunctionPrivateMemberIsNotExternallyCallable
 	 */
 	public function testThatAddingFunctionPrivateMemberIsNotExternallyCallable() {
 		$classExt = new STClassExtended();
@@ -435,6 +587,8 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * Test that adding a function, the return value is type-enforced
 	 *
 	 * @expectedException UnexpectedValueException
+	 *
+	 * @group testThatAddingFunctionReturnValueIsTypeEnforced
 	 */
 	public function testThatAddingFunctionReturnValueIsTypeEnforced() {
 		$class = new STClass();
@@ -456,6 +610,8 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * Test that adding a function, once added, it cannot be reassigned to null
 	 *
 	 * @expectedException InvalidArgumentException
+	 *
+	 * @group testThatAddingFunctionNullAssignmentIsRejected
 	 */
 	public function testThatAddingFunctionNullAssignmentIsRejected() {
 		$class = new STClass();
@@ -476,22 +632,29 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * Test that a public function may be unset
 	 *
 	 * @expectedException BadMethodCallException
+	 *
+	 * @group testThatUnsettingPublicFunctionIsAllowed
 	 */
 	public function testThatUnsettingPublicFunctionIsAllowed() {
-		$class = new STClass();
+		$classExt = new STClassExtended();
+
+		$func = 'publicFunc';
+		$prototype = $classExt->makePrototype($func, array(ST_TYPE_BOOLEAN));
 
 		// Define a public function
-		$class->add(
-			'publicFunc',
+		$classExt->add(
+			$func,
 			function ($value) {
 				return $value;
 			},
-			ST_TYPE_BOOLEAN
+			ST_TYPE_BOOLEAN,
+			$prototype
 		);
 
-		$this->assertTrue($class->publicFunc(true));
-		unset($class->publicFunc);
-		$class->publicFunc(false);
+		$this->assertTrue($classExt->publicFunc(true));
+
+		unset($classExt->$func);
+		$classExt->publicFunc(false);
 	}
 }
 
@@ -529,82 +692,86 @@ class STClassExtended extends STClassPopulated {
 		return $data;
 	}
 
-	// Expose all the protected features of STClass
-	public function getType(&$obj) {
-		return parent::getType($obj);
+	// Expose all the protected methods of STClass
+	public function getType() {
+		return call_user_func_array(array('parent', __FUNCTION__), func_get_args());
 	}
 
-	public function requireMember($name) {
-		return parent::requireMember($name);
+	public function requireMember() {
+		return call_user_func_array(array('parent', __FUNCTION__), func_get_args());
 	}
 
-	public function requireTypeMatch($name, &$value) {
-		return parent::requireTypeMatch($name, $value);
+	public function requireTypeMatch() {
+		return call_user_func_array(array('parent', __FUNCTION__), func_get_args());
 	}
 
-	public function isLegalName($name) {
-		return parent::isLegalName($name);
+	public function isLegalName() {
+		return call_user_func_array(array('parent', __FUNCTION__), func_get_args());
 	}
 
-	public function isLegalType($type) {
-		return parent::isLegalType($type);
+	public function isLegalType() {
+		return call_user_func_array(array('parent', __FUNCTION__), func_get_args());
 	}
 
-	public function isLegalScope($scope) {
-		return parent::isLegalScope($scope);
+	public function isLegalScope() {
+		return call_user_func_array(array('parent', __FUNCTION__), func_get_args());
 	}
 
-	public function addClassMember($name, $type, $scope, $value = null) {
-		return parent::addClassMember($name, $type, $scope, $value);
+	public function addClassMember() {
+		return call_user_func_array(array('parent', __FUNCTION__), func_get_args());
 	}
 
-	public function hasClassMember($name) {
-		return parent::hasClassMember($name);
+	public function hasClassMember() {
+		return call_user_func_array(array('parent', __FUNCTION__), func_get_args());
 	}
 
-	public function &getClassMember($name) {
-		$member = parent::getClassMember($name);
-		return $member;
+	public function &getClassMember() {
+		$res = call_user_func_array(array('parent', __FUNCTION__), func_get_args());
+		return $res;
 	}
 
-	public function isClassMemberScopeAccessible($name, $scope) {
-		return parent::isClassMemberScopeAccessible($name, $scope);
+	public function isClassMemberScopeAccessible() {
+		return call_user_func_array(array('parent', __FUNCTION__), func_get_args());
 	}
 
-	public function requireAccess($name, $scope) {
-		return parent::requireAccess($name, $scope);
+	public function requireAccess() {
+		return call_user_func_array(array('parent', __FUNCTION__), func_get_args());
 	}
 
-	public function isFunction($name) {
-		return parent::isFunction($name);
+	public function isFunction() {
+		return call_user_func_array(array('parent', __FUNCTION__), func_get_args());
 	}
 
-	public function requireFunction($name) {
-		return parent::requireFunction($name);
+	public function requireFunction() {
+		return call_user_func_array(array('parent', __FUNCTION__), func_get_args());
 	}
 
-	public function set($name, $value, $scope = ST_SCOPE_ANY) {
-		return parent::set($name, $value, $scope);
+	public function set() {
+		return call_user_func_array(array('parent', __FUNCTION__), func_get_args());
 	}
 
-	public function call($name, $args, $scope = ST_SCOPE_ANY) {
-		return parent::call($name, $args, $scope);
+	public function call() {
+		return call_user_func_array(array('parent', __FUNCTION__), func_get_args());
 	}
 
-	public function has($name) {
-		return parent::has($name);
+	public function has() {
+		return call_user_func_array(array('parent', __FUNCTION__), func_get_args());
 	}
 
-	public function chk($name, $scope = ST_SCOPE_ANY) {
-		return parent::chk($name, $scope);
+	public function chk() {
+		return call_user_func_array(array('parent', __FUNCTION__), func_get_args());
 	}
 
-	public function get($name, $scope = ST_SCOPE_ANY) {
-		return parent::get($name, $scope);
+	public function get() {
+		return call_user_func_array(array('parent', __FUNCTION__), func_get_args());
 	}
 
-	public function del($name, $scope = ST_SCOPE_ANY) {
-		return parent::del($name, $scope);
+	public function del() {
+		return call_user_func_array(array('parent', __FUNCTION__), func_get_args());
+	}
+
+	public function makePrototype() {
+		return call_user_func_array(array('parent', __FUNCTION__), func_get_args());
 	}
 }
 

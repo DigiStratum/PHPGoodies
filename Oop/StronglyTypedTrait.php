@@ -38,6 +38,7 @@ const ST_TYPE_OBJECT	= 'object';
 const ST_TYPE_ARRAY	= 'array';
 const ST_TYPE_FUNCTION	= 'function';
 const ST_TYPE_UNKNOWN	= 'unknown type';
+const ST_TYPE_VARARGS	= '...';
 
 /**
  * A set of traits for a 'Strongly Typed' class
@@ -208,7 +209,7 @@ trait StronglyTypedTrait {
 
 		// Look more closely...
 		$member =& $this->getClassMember($name);
-		
+
 		// A null value is usually acceptable...
 		if (is_null($value)) {
 
@@ -232,11 +233,11 @@ trait StronglyTypedTrait {
 	}
 
 	/**
-	 * Check whether the specified name is a legal one to use for a property
+	 * Check whether the specified name is legal to use for a class member
 	 *
 	 * @param string $name The name we want to verify out
 	 *
-	 * @return boolean true if the name is legal for use as a property name, else false
+	 * @return boolean true if the name is legal to use as a class member name, else false
 	 */
 	protected function isLegalName($name) {
 		if (! is_string($name)) return false;
@@ -323,7 +324,7 @@ trait StronglyTypedTrait {
 	 *
 	 * @return object $this for chaining support...
 	 */
-	protected function addClassMember($name, $type, $scope, $value = null) {
+	protected function addClassMember($name, $type, $scope, $value = null, $prototype = null) {
 
 		//  Check for legal name, type, and scope
 		if (! $this->isLegalName($name)) {
@@ -336,11 +337,6 @@ trait StronglyTypedTrait {
 			throw new \InvalidArgumentException('Illegal class member scope specified: ' . (is_string($scope) ? "'{$scope}'" : "[ {$this->getType($scope)} ]"));
 		}
 
-		// Prevent redefinition
-		if ($this->hasClassMember($name)) {
-			throw new \LogicException("A class member named '{$name}' already exists");
-		}
-
 		// Special handling for functions to get the return type
 		$returnType = null;
 		if (! is_null($value)) {
@@ -351,8 +347,33 @@ trait StronglyTypedTrait {
 			}
 		}
 
-		// Add the new property member
-		$this->classMembers[$name] = PHPGoodies::instantiate('Oop.STClassMember', $scope, $type, $returnType);
+		// For functions...
+		if (ST_TYPE_FUNCTION == $type) {
+
+			// Make a new function member...
+			$member = PHPGoodies::instantiate('Oop.STClassMember', $name, $scope, $type, $returnType, $prototype);
+
+			// The real name will now be the member's prototype
+			$name = $member->prototype;
+
+			// Prevent redefinition
+			if ($this->hasClassMember($member->prototype)) {
+				throw new \LogicException("A class method with the same prototype already exists: {$member->prototype}");
+			}
+
+			// Add it to the collection of class members
+			$this->classMembers[$name] = $member;
+		}
+		else {
+
+			// Prevent redefinition
+			if ($this->hasClassMember($name)) {
+				throw new \LogicException("A class member named '{$name}' already exists");
+			}
+
+			// Add it to the collection of class members
+			$this->classMembers[$name] = PHPGoodies::instantiate('Oop.STClassMember', $name, $scope, $type);
+		}
 
 		// Now set the value for the class member with type enforcement
 		$this->set($name, $value);
@@ -459,9 +480,9 @@ trait StronglyTypedTrait {
 	}
 
 	/**
-	 * Sets the named property to the supplied value
+	 * Sets the named class member to the supplied value
 	 *
-	 * @param string $name Name of the property we want to set
+	 * @param string $name Name of the class member we want to set
 	 * @param mixed $value The value we want to set it to
 	 * @param string $scope The visibility scope of the requester
 	 *
@@ -482,6 +503,54 @@ trait StronglyTypedTrait {
 	}
 
 	/**
+	 * Make a function prototype string from the supplied name and argument types
+	 *
+	 * Note that we are just doing what we are told with no error checking. The caller should
+	 * verify that the supplied name and argTypes are all legal/valid.
+	 *
+	 * @param string $name Name of the function
+	 * @param array An arry of strings (each one of the ST_TYPE_* constants)
+	 * @param boolean $variadic Optionally add varargs argument to the end, default false
+	 *
+	 * @return string A function prototype string that matches what was supplied
+	 */
+	protected function makePrototype($name, $argTypes, $variadic = false) {
+
+		// Each one of these ends with varargs since it is impossible for
+		// there to be an exact match on anything with FEWER than the
+		// number of calling arguments we actually received...
+		if ($variadic) $argTypes[] = ST_TYPE_VARARGS;
+		return $name . '(' . join(',', $argTypes) . ')';
+	}
+
+	/**
+	 * Find a function proto name amongst the class members matching the name/argument types
+	 *
+	 * @param string $name Name of the function
+	 * @param array An arry of strings (each one of the ST_TYPE_* constants)
+	 *
+	 * @return string Protoname of the matching class member, or null if none found
+	 */
+	protected function findProtoname($name, $argTypes = array()) {
+		// First see if there is an exact match for this argument prototype
+		$protoname = $this->makePrototype($name, $argTypes);
+		if (! $this->isFunction($protoname)) {
+
+			// For each possible prototype match from most to least specific
+			for ($xx = count($argTypes); $xx >= 0; $xx--) {
+
+				// Each one of these possibilities must be variadic since it is
+				// impossible for there to be an exact match on anything with FEWER
+				// than the number of calling arguments we actually received...
+				$protoname = $this->makePrototype($name, array_slice($argTypes, 0, $xx), true);
+				if ($this->isFunction($protoname)) break;
+			}
+		}
+
+		return $this->isFunction($protoname) ? $protoname : null;
+	}
+
+	/**
 	 * Internal method caller
 	 *
 	 * This is the only way to call one of the dynamically added private scoped functions
@@ -497,33 +566,52 @@ trait StronglyTypedTrait {
 	 * @return mixed Returns whatever the function call does normally
 	 */
 	protected function call($name, $args, $scope = ST_SCOPE_ANY) {
-		$this->requireFunction($name);
-		$this->requireAccess($name, $scope);
-		$member =& $this->getClassMember($name);
+
+		// Convert the calling arguments into a set of prototype matchers
+		$argTypes = array();
+		foreach ($args as $arg) $argTypes[] = $this->getType($arg);
+		// TODO: any need for special accounting of object vs class:classname?
+
+		$protoname = $this->findProtoname($name, $argTypes);
+		if (is_null($protoname)) {
+			$msg = "There is no class method matching: {$this->makePrototype($name, $argTypes)}";
+			throw new \BadMethodCallException($msg);
+		}
+
+		// TODO: account for internal calls on ST_SCOPE_PRIVATE functions without having to send args through an array (?)
+		$this->requireFunction($protoname);
+		$this->requireAccess($protoname, $scope);
+		$member =& $this->getClassMember($protoname);
 		$res = call_user_func_array($member->value, $args);
 		$returnType = $this->getType($res);
-		if ($returnType === $member->returnType) return $res;
-		throw new \UnexpectedValueException("Type mismatch for result from function call to '{$name}'; expected '{$member->returnType}', but got '{$returnType}'");
+
+		// TODO : conditional enforcement and hybrid types (like object vs. class:classname) for return value
+		if ($returnType !== $member->returnType) {
+			$msg = "Type mismatch for result from function call to '{$name}'; expected '{$member->returnType}', but got '{$returnType}'";
+			throw new \UnexpectedValueException($msg);
+		}
+
+		return $res;
 	}
 
 	/**
-	 * Check whether the named property is defined
+	 * Check whether the named class member is defined
 	 *
-	 * @param string $name Name of the property we want to check
+	 * @param string $name Name of the class member we want to check
 	 *
-	 * @return boolean true if the property is defined, else false
+	 * @return boolean true if the class member is defined, else false
 	 */
 	protected function has($name) {
 		return $this->hasClassMember($name);
 	}
 
 	/**
-	 * Internal property checker
+	 * Check whether the named class member is set and visible to the named scope
 	 *
-	 * @param string $name Name of the property we want to check
+	 * @param string $name Name of the class member we want to check
 	 * @param string $scope The visibility scope of the requester
 	 *
-	 * @return boolean true if the property is set, else false
+	 * @return boolean true if the class member is set, else false
 	 */
 	protected function chk($name, $scope = ST_SCOPE_ANY) {
 		if (! $this->isClassMemberScopeAccessible($name, $scope)) return false;
@@ -532,12 +620,12 @@ trait StronglyTypedTrait {
 	}
 
 	/**
-	 * Get the value of the named property
+	 * Get the value of the named class member
 	 *
-	 * @param string $name Name of the property we want to get
+	 * @param string $name Name of the class member we want to get
 	 * @param string $scope The visibility scope of the requester
 	 *
-	 * @return mixed The value of the named property
+	 * @return mixed The value of the named class member
 	 */
 	protected function get($name, $scope = ST_SCOPE_ANY) {
 		$this->requireMember($name);
@@ -547,17 +635,59 @@ trait StronglyTypedTrait {
 	}
 
 	/**
-	 * Delete the named property if it is defined
+	 * Delete the named class member if it is defined
 	 *
-	 * @param string $name Name of the property we want to delete
+	 * In order to support removal of functions, there is some trickery. The problem we have is
+	 * that a call to unset() must be supplied with the instance->propertyName. Functions are
+	 * organized by prototypes which are not valid property names because they include special
+	 * characters like '(,.)' in them; Indeed it would be impossible to rework the prototype
+	 * string schema to use only valid characters without stepping on the normal domain of
+	 * valid property names that could potentially collide with user-defined names. Therefore
+	 * what we have done is made it so that when you attempt to unset(instance->propetyName),
+	 * we enter here, look for a normal property with the exact match on the propertyName and
+	 * unset it if present. Otherwise we look through all defined functions and any function
+	 * whose name matches propertyName - not prototype - will be unset. That means that, with
+	 * a polymorphic pair such as myfunc(boolean) and myfunc(integer), unset(instance->myfunc)
+	 * will remove both forms of the function. At the end of the day, this is a peculiar
+	 * convenience capability anyway which will probably only see occasional use, so this seems
+	 * like a decent compromise to facilitate dynamic removal of functions at all.
+	 *
+	 * @param string $name Name of the class member we want to delete
 	 * @param string $scope The visibility scope of the requester
 	 *
 	 * @return object $this for chaining support...
 	 */
 	protected function del($name, $scope = ST_SCOPE_ANY) {
-		$this->requireMember($name);
-		$this->requireAccess($name, $scope);
-		unset($this->classMembers[$name]);
+
+		// If there is a direct match, then it's easy...
+		if ($this->hasClassMember($name)) {
+			$this->requireAccess($name, $scope);
+			unset($this->classMembers[$name]);
+			return $this;
+		}
+
+		// If there are any functions by this name...
+		$matched = false;
+		foreach ($this->classMembers as $protoname => $member) {
+
+			// If this class member is not a function keep looking...
+			if (ST_TYPE_FUNCTION !== $member->type) continue;
+
+			// If this class member's name is not the one we want keep looking...
+			if ($name !== $member->name) continue;
+
+			// This is a match - kill it!
+			$matched = true;
+			$this->requireAccess($protoname, $scope);
+			unset($this->classMembers[$protoname]);
+		}
+
+		if (! $matched) {
+			throw PHPGoodies::instantiate('Oop.Exception.MemberDoesNotExistException',
+				'Attempted to remove non-existent class member'
+			);
+		}
+
 		return $this;
 	}
 }

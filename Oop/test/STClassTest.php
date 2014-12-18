@@ -235,10 +235,226 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 		$classExt = new STClassExtended();
 		unset($classExt->privateProperty1);
 	}
+
+	/**
+	 * Test that getType returns expected types
+	 */
+	public function testThatGetTypeReturnsExpectedTypes() {
+		$classExt = new STClassExtended();
+		$this->assertEquals(ST_TYPE_STRING, $classExt->getType($v = 'Jelly Beans'));
+		$this->assertEquals(ST_TYPE_INTEGER, $classExt->getType($v = 42));
+		$this->assertEquals(ST_TYPE_DOUBLE, $classExt->getType($v = 3.14159));
+		$this->assertEquals(ST_TYPE_BOOLEAN, $classExt->getType($v = true));
+		$this->assertEquals(ST_TYPE_ARRAY, $classExt->getType($v = array()));
+		$this->assertEquals('class:stdClass', $classExt->getType($v = (object) array()));
+		$this->assertEquals(ST_TYPE_FUNCTION, $classExt->getType($v = function () { return 1; }));
+		$v = fopen(__FILE__, 'r');
+		$this->assertEquals(ST_TYPE_RESOURCE, $classExt->getType($v));
+		fclose($v);
+		$this->assertEquals(ST_TYPE_UNKNOWN, $classExt->getType($v));
+	}
+
+	/**
+	 * Test that requireTypeMatch() rejects requests for nonexistent members
+	 *
+	 * @expectedException PHPGoodies\MemberDoesNotExistException
+	 */
+	public function testThatRequireTypeMatchRequiresMemeberToExist() {
+		$classExt = new STClassExtended();
+		$classExt->requireTypeMatch('nonexistentProperty', $v = 'Gummi Bears');
+	}
+
+	/**
+	 * Test that requireTypeMatch() allows null regardless of the named member's type
+	 */
+	public function testThatRequireTypeMatchAllowsNull() {
+		$classExt = new STClassExtended();
+		$res = $classExt->requireTypeMatch('privateProperty1', $v = null);
+		$this->assertTrue(is_object($res));
+	}
+
+	/**
+	 * Test that requireTypeMatch() allows matching types
+	 */
+	public function testThatRequireTypeMatchAllowsMatchingTypes() {
+		$classExt = new STClassExtended();
+
+		// Simple type direct comparison...
+		$res = $classExt->requireTypeMatch('privateProperty1', $v = 'Cherry Pie');
+		$this->assertTrue(is_object($res));
+
+		// Class type, computed comparison...
+		$classExt->publicObject = new \StdClass();
+		$res = $classExt->requireTypeMatch('publicObject', $v = new \StdClass());
+		$this->assertTrue(is_object($res));
+	}
+
+	/**
+	 * Test that isLegalName() accepts only legal names
+	 */
+	public function testThatIsLegalNameAcceptsOnlyLegalNames() {
+		$classExt = new STClassExtended();
+		$this->assertTrue($classExt->isLegalName('apple'));
+		$this->assertTrue($classExt->isLegalName('Banana'));
+		$this->assertTrue($classExt->isLegalName('_'));
+		$this->assertTrue($classExt->isLegalName('_2_0_1_4_'));
+		$this->assertFalse($classExt->isLegalName(1));
+		$this->assertFalse($classExt->isLegalName('1'));
+		$this->assertFalse($classExt->isLegalName('1orange'));
+		$this->assertFalse($classExt->isLegalName('fig-newton'));
+	}
+
+	/**
+	 * Test that isLegalType() accepts only legal types
+	 */
+	public function testThatIsLegalTypeAcceptsOnlyLegalTypes() {
+		$classExt = new STClassExtended();
+		$this->assertFalse($classExt->isLegalType(1));
+		$this->assertTrue($classExt->isLegalType(ST_TYPE_STRING));
+		$this->assertTrue($classExt->isLegalType(ST_TYPE_INTEGER));
+		$this->assertTrue($classExt->isLegalType(ST_TYPE_DOUBLE));
+		$this->assertTrue($classExt->isLegalType(ST_TYPE_BOOLEAN));
+		$this->assertTrue($classExt->isLegalType(ST_TYPE_RESOURCE));
+		$this->assertTrue($classExt->isLegalType(ST_TYPE_OBJECT));
+		$this->assertTrue($classExt->isLegalType(ST_TYPE_ARRAY));
+		$this->assertTrue($classExt->isLegalType(ST_TYPE_FUNCTION));
+		$this->assertTrue($classExt->isLegalType('class:StdClass'));
+		$this->assertTrue($classExt->isLegalType('class:PHPGoodies\STClassExtended'));
+		$this->assertFalse($classExt->isLegalType('bogus type'));
+		$this->assertFalse($classExt->isLegalType('class:bogusClassName'));
+	}
+
+	/**
+	 * Test that isLegalScope() accepts only legal scopes
+	 */
+	public function testThatIsLegalScopeAcceptsOnlyLegalScopes() {
+		$classExt = new STClassExtended();
+		$this->assertFalse($classExt->isLegalScope(1));
+		$this->assertFalse($classExt->isLegalScope('bogus scope'));
+		$this->assertTrue($classExt->isLegalScope(ST_SCOPE_ANY));
+		$this->assertTrue($classExt->isLegalScope(ST_SCOPE_PUBLIC));
+		$this->assertTrue($classExt->isLegalScope(ST_SCOPE_PRIVATE));
+	}
+
+	/**
+	 * Test that adding function members work as expected
+	 */
+	public function testThatAddingFunctionMembersWorkAsExpected() {
+		$classExt = new STClassExtended();
+
+		// Define a public function
+		$res = $classExt->addClassMember(
+			'publicFunc',
+			ST_TYPE_BOOLEAN,
+			ST_SCOPE_PUBLIC,
+			function () {
+				return true;
+			}
+		);
+		$this->assertTrue(is_object($res));
+		$data = $classExt->spy();
+		$classMembers =& $data['classMembers'];
+		$this->assertTrue(isset($classMembers['publicFunc']));
+		$this->assertEquals(ST_TYPE_FUNCTION, $classMembers['publicFunc']->type);
+		$this->assertEquals(ST_SCOPE_PUBLIC, $classMembers['publicFunc']->scope);
+		$this->assertEquals(ST_TYPE_BOOLEAN, $classMembers['publicFunc']->returnType);
+
+		// Define a private function
+		$res = $classExt->addClassMember(
+			'privateFunc',
+			ST_TYPE_BOOLEAN,
+			ST_SCOPE_PRIVATE,
+			function () {
+				return true;
+			}
+		);
+		$this->assertTrue(is_object($res));
+		$data = $classExt->spy();
+		$classMembers =& $data['classMembers'];
+		$this->assertTrue(isset($classMembers['privateFunc']));
+		$this->assertEquals(ST_TYPE_FUNCTION, $classMembers['privateFunc']->type);
+		$this->assertEquals(ST_SCOPE_PRIVATE, $classMembers['privateFunc']->scope);
+		$this->assertEquals(ST_TYPE_BOOLEAN, $classMembers['privateFunc']->returnType);
+
+		// Try to reassign the public function some new code...
+		$res = $classExt->set(
+			'publicFunc',
+			function () {
+				return false;
+			}
+		);
+		$this->assertTrue(is_object($res));
+	}
+
+	/**
+	 * Test that adding a function, the member is callable; exercises __call() magic function
+	 */
+	public function testThatAddingFunctionMemberIsCallable() {
+		$class = new STClass();
+
+		// Define a public function
+		$res = $class->add(
+			'publicFunc',
+			function ($value) {
+				return $value;
+			},
+			ST_TYPE_BOOLEAN
+		);
+		$this->assertTrue(is_object($res));
+		$this->assertTrue($class->publicFunc(true));
+		$this->assertFalse($class->publicFunc(false));
+	}
+
+	/**
+	 * Test that ading a private function, the member is NOT externally callable
+	 *
+	 * @expectedException PHPGoodies\AccessDeniedException
+	 */
+	public function testThatAddingFunctionPrivateMemberIsNotExternallyCallable() {
+		$classExt = new STClassExtended();
+
+		// Define a private function
+		$res = $classExt->addClassMember(
+			'privateFunc',
+			ST_TYPE_BOOLEAN,
+			ST_SCOPE_PRIVATE,
+			function ($value) {
+				return $value;
+			}
+		);
+
+		// Verify that it's callable privately...
+		$this->assertTrue($classExt->call('privateFunc', array(true)));
+		$this->assertFalse($classExt->call('privateFunc', array(false)));
+
+		// Now trigger our error by trying to call the private function from the outside.
+		$classExt->privateFunc(true);
+	}
+
+	/**
+	 * Test that adding a function, the return value is type-enforced
+	 *
+	 * @expectedException UnexpectedValueException
+	 */
+	public function testThatAddingFunctionReturnValueIsTypeEnforced() {
+		$class = new STClass();
+
+		// Define a public function
+		$class->add(
+			'publicFunc',
+			function ($value) {
+				return $value;
+			},
+			ST_TYPE_BOOLEAN
+		);
+
+		// Jelly beans are, most decidedly, neither true, nor false
+		$class->publicFunc('Jelly Beans');
+	}
 }
 
 /**
- * Extends and populares STClass as it would be in a normal application
+ * Extends and populates STClass as it would be in a normal application
  *
  * Note: update tests in f.testThatSTClassExtendedHasExpectedClassMembers() when additions are made:
  */

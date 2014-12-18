@@ -10,6 +10,7 @@
  * @todo Add support for strongly typed method calls by adding function prototypes to declarations
  * @todo With strongly typed method calls, it should be possible to support polymorphism...
  * @todo Add support for varargs on method calls (for strongly typed/polymorphic)
+ * @todo Add support for typed arrays...
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -34,6 +35,7 @@ const ST_TYPE_RESOURCE	= 'resource';
 const ST_TYPE_OBJECT	= 'object';
 const ST_TYPE_ARRAY	= 'array';
 const ST_TYPE_FUNCTION	= 'function';
+const ST_TYPE_UNKNOWN	= 'unknown type';
 
 /**
  * A set of traits for a 'Strongly Typed' class
@@ -190,8 +192,12 @@ trait StronglyTypedTrait {
 	/**
 	 * Require value's type to match unless it's null which is always ok
 	 *
+	 * @todo Maybe we should disallow null for function type members?
+	 *
 	 * @param string $name Name of the class member whose type we are comparing to
 	 * @param mixed $value The value whose type we are interested in relative to named member
+	 *
+	 * @return object $this for chaining support...
 	 */
 	protected function requireTypeMatch($name, &$value) {
 
@@ -199,21 +205,18 @@ trait StronglyTypedTrait {
 		$this->requireMember($name);
 
 		// A null value is always acceptable...
-		if (is_null($value)) return;
+		if (is_null($value)) return $this;
 
 		// Look more closely...
 		$member =& $this->getClassMember($name);
 		$type = gettype($value);
 
-		// An exact match on type is great...
-		if ($member->type == $type) return;
+		// An exact match on native type is great...
+		if ($member->type == $type) return $this;
 
-		// If the value is an object...
-		if ($type == ST_TYPE_OBJECT) {
-			$class = get_class($value);
-			// ... and we have a classname match then we're good...
-			if ($member->type == "class:{$class}") return;
-		}
+		// Translated type might be a better match...
+		$type = $this->getType($value);
+		if ($member->type == $type) return $this;
 		
 		throw new \InvalidArgumentException("Type mismatch accessing class member '{$name}'; expected '{$member->type}', got '{$type}'");
 	}
@@ -227,14 +230,13 @@ trait StronglyTypedTrait {
 	 */
 	protected function isLegalName($name) {
 		if (! is_string($name)) return false;
-		// Legal names start with A-Z, a-z, or '_' and are followed by the same and/or digits
-		return preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $name);
+		// Legal names start with A-Z, a-z, or '_' and are followed by
+		// the same and/or digits; added '\' to support namespaced names
+		return preg_match('/^[\\\\A-Za-z_][\\\\A-Za-z0-9_]*$/', $name) ? true : false;
 	}
 
 	/**
 	 * Check whether the specified type name is a legal one
-	 *
-	 * @todo Add support for typed arrays...
 	 *
 	 * @param string $type The type name we want to check out
 	 *
@@ -267,10 +269,10 @@ trait StronglyTypedTrait {
 					if (! $this->isLegalName($name)) return false;
 
 					// And that the class is defined
-					// TODO: anything needed to account for namespacing here?
 					return class_exists($name);
 				}
 		}
+
 		return false;
 	}
 
@@ -282,12 +284,17 @@ trait StronglyTypedTrait {
 	 * @return boolean true if it is legal, else false
 	 */
 	protected function isLegalScope($scope) {
+
+		// Scope specifier MUST be a native string!
+		if (! is_string($scope)) return false;
+
 		switch ($scope) {
 			case ST_SCOPE_ANY:
 			case ST_SCOPE_PUBLIC:
 			case ST_SCOPE_PRIVATE:
 				return true;
 		}
+
 		return false;
 	}
 
@@ -376,7 +383,6 @@ trait StronglyTypedTrait {
 			return $null;
 		}
 		return $this->classMembers[$name];
-		//return $this->hasClassMember($name) ? $this->classMembers[$name] : $null;
 	}
 
 	/**
@@ -463,7 +469,7 @@ trait StronglyTypedTrait {
 
 		// For functions we need to create a closure so they can get at the rest of our class members
 		if ($this->isFunction($name)) {
-			$member->value = Closure::bind($value, $this, get_class());
+			$member->value = \Closure::bind($value, $this, get_class());
 		}
 		else $member->value = $value;
 

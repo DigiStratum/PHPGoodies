@@ -165,16 +165,16 @@ trait StronglyTypedTrait {
 	 */
 	protected function getType(&$obj) {
 		$type = gettype($obj);
-		if ($type == ST_TYPE_OBJECT) {
+		if (ST_TYPE_OBJECT == $type) {
 
 			// Nope, must be a regular object class
 			$class = get_class($obj);
 
 			// Functions are class "Closure"
-			if ($class == 'Closure') return ST_TYPE_FUNCTION;
+			if ('Closure' == $class) return ST_TYPE_FUNCTION;
 
 			// Anything else is a normal class
-			return ($class == 'StdClass') ? ST_TYPE_OBJECT : "class:{$class}";
+			return ('StdClass' == $class) ? ST_TYPE_OBJECT : "class:{$class}";
 		}
 		return $type;
 	}
@@ -215,6 +215,9 @@ trait StronglyTypedTrait {
 			// As long as the classMember is nullable...
 			if ($member->isNullable) return $this;
 		}
+
+		// If the member has enforcement disabled then any value is OK...
+		if (ST_ENFORCEMENT_DISABLED == $member->enforcement) return $this;
 
 		$type = gettype($value);
 
@@ -342,7 +345,7 @@ trait StronglyTypedTrait {
 		$returnType = null;
 		if (! is_null($value)) {
 			$vtype = $this->getType($value);
-			if ($vtype == ST_TYPE_FUNCTION) {
+			if (ST_TYPE_FUNCTION == $vtype) {
 				$returnType = $type;
 				$type = ST_TYPE_FUNCTION;
 			}

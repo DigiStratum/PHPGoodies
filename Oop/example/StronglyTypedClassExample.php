@@ -23,8 +23,8 @@ class STClassPopulated extends STClass {
 	 * Constructor
 	 */
 	public function __construct() {
-		
-		$this->___constructor();
+
+		$this->___constructor(func_get_args());
 
 		// Add a private property
 		$this->addClassMember(
@@ -41,6 +41,39 @@ class STClassPopulated extends STClass {
 			PHPGoodies\ST_SCOPE_PUBLIC,
 			'Lemon Drops'
 		);
+	}
+
+	/**
+	 * Default constructor
+	 *
+	 * @proto public null __construct()
+	 */
+	public function ___proto_____construct___1() {
+		return function () {
+			print "Default constructor\n";
+		};
+	}
+
+	/**
+	 * String constructor
+	 *
+	 * @proto public null __construct(string)
+	 */
+	public function ___proto_____construct___2() {
+		return function ($str) {
+			print "String constructor [{$str}]\n";
+		};
+	}
+
+	/**
+	 * String/Int constructor
+	 *
+	 * @proto public null __construct(string,integer)
+	 */
+	public function ___proto_____construct___3() {
+		return function ($str, $int) {
+			print "String/Int constructor [{$str}] [{$int}]\n";
+		};
 	}
 
 	/**
@@ -62,7 +95,7 @@ class STClassPopulated extends STClass {
 	}
 }
 
-$a = new STClassPopulated;
+$a = new STClassPopulated();
 
 if (isset($a->publicProperty1)) {
 	print "publicProperty1 = [{$a->publicProperty1}]\n";
@@ -86,4 +119,7 @@ catch (\Exception $e) {
 if (13 == $a->myProtoMethod('Hello, World!')) {
 	print "Successfully applied ad hoc polymorphism to get myProtoMethod(string)\n";
 }
+
+$b = new STClassPopulated('Forty Two');
+$c = new STClassPopulated('Forty Two', 42);
 

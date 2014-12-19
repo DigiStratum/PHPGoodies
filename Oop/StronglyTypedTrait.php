@@ -8,9 +8,7 @@
  * ref: http://php.net/manual/en/spl.exceptions.php
  *
  * @todo Rename all internal methods to something more obscure, less likely to collide with subcless methog names
- * @todo Add support for strongly typed method calls by adding function prototypes to declarations
- * @todo With strongly typed method calls, it should be possible to support polymorphism...
- * @todo Add support for varargs on method calls (for strongly typed/polymorphic)
+ * @todo Add support for __call()ing private methods from inside the class (privileged __call)
  * @todo Add support for typed arrays...
  *
  * @author Sean M. Kelly <smk@smkelly.com>
@@ -41,6 +39,9 @@ const ST_TYPE_FUNCTION	= 'function';
 const ST_TYPE_UNKNOWN	= 'unknown type';
 const ST_TYPE_VARARGS	= '...';
 
+// Just used for return types on protoMethods that don't return data:
+const ST_TYPE_NULL	= 'null';
+
 const ST_PROTO_LEADER	= '___proto___';
 
 /**
@@ -67,7 +68,7 @@ trait StronglyTypedTrait {
 	 * constructor which doesn't interfere with this, and also to facilitate polymorphic
 	 * constructors...
 	 */
-	protected function ___constructor() {
+	protected function ___constructor($args) {
 
 		// Reflect on ourselves to see what final private ___proto___*() functions we have
 		$myself = new \ReflectionClass($this);
@@ -109,13 +110,44 @@ trait StronglyTypedTrait {
 			}
 			$prototype = $characteristics[2];
 
-			// Register the ProtoMethod
-			$this->protoMethods[$prototype] = new \StdClass();
-			$this->protoMethods[$prototype]->reflectedMethod =& $methods[$index];
-			$this->protoMethods[$prototype]->name = $name;
-			$this->protoMethods[$prototype]->scope = $characteristics[0];
-			$this->protoMethods[$prototype]->returnType = $characteristics[1];
-			$this->protoMethods[$prototype]->protoName = $method->name;
+			// If this protoMethod is a constructor...
+			if ('__construct' == $name) {
+
+				// Load it up now because we're going to call it after the loop
+				$this->loadProtoMethod(
+					$name,
+					$prototype,
+					$method->name,
+					$characteristics[1],
+					$characteristics[0]
+				);
+			}
+			else {
+
+				// Otherwise, just register the ProtoMethod
+				$this->protoMethods[$prototype] = new \StdClass();
+				$this->protoMethods[$prototype]->name = $name;
+				$this->protoMethods[$prototype]->scope = $characteristics[0];
+				$this->protoMethods[$prototype]->returnType = $characteristics[1];
+				$this->protoMethods[$prototype]->protoName = $method->name;
+			}
+		}
+
+		// Now call the constructor requested, if there is one
+		try {
+			$this->call('__construct', $args, ST_SCOPE_PUBLIC);
+		}
+		catch (\Exception $e) {
+
+			// If there were any args supplied
+			if (count($args) > 0) {
+
+				// Rethrow the exception; obviously there was no matching constructor
+				throw $e;
+			}
+
+			// Otherwise we let it slide silently because PHP objects
+			// should be instantiable even with no constructor at all
 		}
 	}
 
@@ -134,37 +166,56 @@ trait StronglyTypedTrait {
 			// If the name does not match, keep looking, otherwise load it up!
 			if ($name != $protoMethod->name) continue;
 
-			// Extract the argTypes from the prototype
-			$skip = strlen($name) + 1;
-			$argTypeList = substr($prototype, $skip, strlen($prototype) - $skip - 1);
-			$argTypes = explode(',', $argTypeList);
-
-			// Verify that all argTypes are legal...
-			foreach ($argTypes as $argType) {
-				$this->requireLegalType($argType);
-			}
-
-			// Get the code for the function...
-			$protoName = $this->protoMethods[$prototype]->protoName;
-			$function = $this->$protoName();
-			if (ST_TYPE_FUNCTION !== $this->getType($function)) {
-				$msg = "Method '{$protoName}' did not return a callable function";
-				throw PHPGoodies::instantiate('Oop.Exception.BadProtoMethodException', $msg);
-			}
-
-			// Try to add this prototyped function as a class member
-			$this->addClassMember(
+			$this->loadProtoMethod(
 				$name,
-				$this->protoMethods[$prototype]->returnType,
-				$this->protoMethods[$prototype]->scope,
-				$function,
-				$prototype
+				$prototype,
+				$protoMethod->protoName,
+				$protoMethod->returnType,
+				$protoMethod->scope
 			);
-
+	
 			// Remove from protoMethod since it is promoted to a full classMember now;
 			// this reduces the set that we have to comb through in future calls.
 			unset($this->protoMethods[$prototype]);
+
 		}
+	}
+
+	/**
+	 * ProtoMethod lazy loader
+	 *
+	 * @param string $name The name of the desired method; there may be many (polymorphic, duh)
+	 * @param string $prototype The function prototype for the one we want...
+	 *
+	 * @return object $this for chaining support...
+	 */
+	protected function loadProtoMethod($name, $prototype, $protoName, $returnType, $scope) {
+
+		// Extract the argTypes from the prototype
+		$skip = strlen($name) + 1;
+		$argTypeList = substr($prototype, $skip, strlen($prototype) - $skip - 1);
+		$argTypes = strlen($argTypeList) ? explode(',', $argTypeList) : array();
+
+		// Verify that all argTypes are legal...
+		foreach ($argTypes as $argType) {
+			$this->requireLegalType($argType);
+		}
+
+		// Get the code for the function...
+		$function = $this->$protoName();
+		if (ST_TYPE_FUNCTION !== $this->getType($function)) {
+			$msg = "Method '{$protoName}' did not return a callable function";
+			throw PHPGoodies::instantiate('Oop.Exception.BadProtoMethodException', $msg);
+		}
+
+		// Try to add this prototyped function as a class member
+		$this->addClassMember(
+			$name,
+			$returnType,
+			$scope,
+			$function,
+			$prototype
+		);
 
 		return $this;
 	}
@@ -284,7 +335,10 @@ trait StronglyTypedTrait {
 	 * @return string the type of the object that we will use internally
 	 */
 	protected function getType(&$obj) {
-		$type = gettype($obj);
+
+		// Get the native type; strtolower makes 'NULL' into 'null'
+		$type = strtolower(gettype($obj));
+
 		if (ST_TYPE_OBJECT == $type) {
 
 			// Nope, must be a regular object class
@@ -296,6 +350,7 @@ trait StronglyTypedTrait {
 			// Anything else is a normal class
 			return ('StdClass' == $class) ? ST_TYPE_OBJECT : "class:{$class}";
 		}
+
 		return $type;
 	}
 
@@ -388,6 +443,7 @@ trait StronglyTypedTrait {
 			case ST_TYPE_ARRAY:
 			// Made up types...
 			case ST_TYPE_FUNCTION:
+			case ST_TYPE_NULL:
 				return true;
 
 			default:

@@ -72,29 +72,27 @@ trait StronglyTypedTrait {
 		// Reflect on ourselves to see what final private ___proto___*() functions we have
 		$myself = new \ReflectionClass($this);
 		$methods = $myself->getMethods(\ReflectionMethod::IS_PUBLIC);
-		foreach ($methods as $index => $method) {
-			if (strpos($method->name, ST_PROTO_LEADER) === 0) {
-				$this->protoMethods[$method->name] =& $methods[$index];
-			}
-		}
 
-		// Now for each protoMethod that we identified...
-		foreach ($this->protoMethods as $protoName => $method) {
+		// Of all the defined methods, look for protomethods and register them
+		foreach ($methods as $index => $method) {
+
+			// If this method's name starts witht he protomethod leader string...
+			if (strpos($method->name, ST_PROTO_LEADER) === false) continue;
 
 			// Look for annotation: @proto scope returnType methodName(argType1[,argType2[,argTypeN]]])
-			$name = substr($protoName, strlen(ST_PROTO_LEADER));
+			$name = substr($method->name, strlen(ST_PROTO_LEADER));
 			if ($vpos = strpos($name, '___')) {
 				// Strip the variant id off the end...
 				$name = substr($name, 0, $vpos);
 			}
-			$docComment = $method->getDocComment();
+			$docComment = $methods[$index]->getDocComment();
 
 			// If there is no proper @proto annotation...
 			if (! preg_match("/@proto (.*? {$name}\(.*?\))/m", $docComment, $matches)) {
 
 				// If there was an attempt at one...
 				if (preg_match("/(@proto .*?\n)/m", $docComment, $matches)) {
-					$msg = "Improper @proto annotation found for method '{$protoName}'";
+					$msg = "Improper @proto annotation found for method '{$method->name}'";
 					throw PHPGoodies::instantiate('Oop.Exception.InvalidAnnotationException', $msg);
 				}
 
@@ -106,13 +104,39 @@ trait StronglyTypedTrait {
 
 			// For now we expect 3 characteristics: scope, returnType, methodName(argTypes)
 			if (3 != count($characteristics)) {
-				$msg = "Improper @proto annotation found for method '{$protoName}'";
+				$msg = "Improper @proto annotation found for method '{$method->name}'";
 				throw PHPGoodies::instantiate('Oop.Exception.InvalidAnnotationException', $msg);
 			}
-			$scope = $characteristics[0];
-			$returnType = $characteristics[1];
+			$prototype = $characteristics[2];
+
+			// Register the ProtoMethod
+			$this->protoMethods[$prototype] = new \StdClass();
+			$this->protoMethods[$prototype]->reflectedMethod =& $methods[$index];
+			$this->protoMethods[$prototype]->name = $name;
+			$this->protoMethods[$prototype]->scope = $characteristics[0];
+			$this->protoMethods[$prototype]->returnType = $characteristics[1];
+			$this->protoMethods[$prototype]->protoName = $method->name;
+		}
+	}
+
+	/**
+	 * ProtoMethod lazy loader
+	 *
+	 * @param string $name The name of the desired method; there may be many (polymorphic, duh)
+	 *
+	 * @return object $this for chaining support...
+	 */
+	protected function loadProtoMethods($name) {
+
+		// Find all protoMethods with the matching name amongst the registered ones
+		foreach ($this->protoMethods as $prototype => $protoMethod) {
+
+			// If the name does not match, keep looking, otherwise load it up!
+			if ($name != $protoMethod->name) continue;
+
+			// Extract the argTypes from the prototype
 			$skip = strlen($name) + 1;
-			$argTypeList = substr($characteristics[2], $skip, strlen($characteristics[2]) - $skip - 1);
+			$argTypeList = substr($prototype, $skip, strlen($prototype) - $skip - 1);
 			$argTypes = explode(',', $argTypeList);
 
 			// Verify that all argTypes are legal...
@@ -121,6 +145,7 @@ trait StronglyTypedTrait {
 			}
 
 			// Get the code for the function...
+			$protoName = $this->protoMethods[$prototype]->protoName;
 			$function = $this->$protoName();
 			if (ST_TYPE_FUNCTION !== $this->getType($function)) {
 				$msg = "Method '{$protoName}' did not return a callable function";
@@ -128,9 +153,20 @@ trait StronglyTypedTrait {
 			}
 
 			// Try to add this prototyped function as a class member
-			$prototype = $this->makePrototype($name, $argTypes);
-			$this->addClassMember($name, $returnType, $scope, $function, $prototype);
+			$this->addClassMember(
+				$name,
+				$this->protoMethods[$prototype]->returnType,
+				$this->protoMethods[$prototype]->scope,
+				$function,
+				$prototype
+			);
+
+			// Remove from protoMethod since it is promoted to a full classMember now;
+			// this reduces the set that we have to comb through in future calls.
+			unset($this->protoMethods[$prototype]);
 		}
+
+		return $this;
 	}
 
 	/**
@@ -693,6 +729,14 @@ trait StronglyTypedTrait {
 		foreach ($args as $arg) $argTypes[] = $this->getType($arg);
 		// TODO: any need for special accounting of object vs class:classname?
 
+		// First let's see if we already have a protoname that matches
+		$protoname = $this->findProtoname($name, $argTypes);
+		if (is_null($protoname)) {
+			// See if there are any protoMethods waiting for a lazy load
+			$this->loadProtoMethods($name);
+		}
+
+		// Still nothing?
 		$protoname = $this->findProtoname($name, $argTypes);
 		if (is_null($protoname)) {
 			$msg = "There is no class method matching: {$this->makePrototype($name, $argTypes)}";

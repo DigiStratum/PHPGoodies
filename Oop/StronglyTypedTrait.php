@@ -49,9 +49,14 @@ const ST_PROTO_LEADER	= '___proto___';
 trait StronglyTypedTrait {
 
 	/**
-	 *
+	 * The class members under our management
 	 */
 	protected $classMembers = array();
+
+	/**
+	 * ProtoMethod data for our lazy loader to reference
+	 */
+	protected $protoMethods = array();
 
 
 	/**
@@ -67,15 +72,14 @@ trait StronglyTypedTrait {
 		// Reflect on ourselves to see what final private ___proto___*() functions we have
 		$myself = new \ReflectionClass($this);
 		$methods = $myself->getMethods(\ReflectionMethod::IS_PUBLIC);
-		$protoMethods = array();
 		foreach ($methods as $index => $method) {
 			if (strpos($method->name, ST_PROTO_LEADER) === 0) {
-				$protoMethods[$method->name] =& $methods[$index];
+				$this->protoMethods[$method->name] =& $methods[$index];
 			}
 		}
 
 		// Now for each protoMethod that we identified...
-		foreach ($protoMethods as $protoName => $method) {
+		foreach ($this->protoMethods as $protoName => $method) {
 
 			// Look for annotation: @proto scope returnType methodName(argType1[,argType2[,argTypeN]]])
 			$name = substr($protoName, strlen(ST_PROTO_LEADER));

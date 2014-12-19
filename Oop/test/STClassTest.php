@@ -775,5 +775,9 @@ class STClassExtended extends STClassPopulated {
 	public function makePrototype() {
 		return call_user_func_array(array('parent', __FUNCTION__), func_get_args());
 	}
+
+	public function findProtoname() {
+		return call_user_func_array(array('parent', __FUNCTION__), func_get_args());
+	}
 }
 

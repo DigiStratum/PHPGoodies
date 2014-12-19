@@ -7,6 +7,7 @@
  * ref: http://php.net/manual/en/closure.bind.php
  * ref: http://php.net/manual/en/spl.exceptions.php
  *
+ * @todo Rename all internal methods to something more obscure, less likely to collide with subcless methog names
  * @todo Add support for strongly typed method calls by adding function prototypes to declarations
  * @todo With strongly typed method calls, it should be possible to support polymorphism...
  * @todo Add support for varargs on method calls (for strongly typed/polymorphic)
@@ -40,6 +41,8 @@ const ST_TYPE_FUNCTION	= 'function';
 const ST_TYPE_UNKNOWN	= 'unknown type';
 const ST_TYPE_VARARGS	= '...';
 
+const ST_PROTO_LEADER	= '___proto___';
+
 /**
  * A set of traits for a 'Strongly Typed' class
  */
@@ -49,6 +52,82 @@ trait StronglyTypedTrait {
 	 *
 	 */
 	protected $classMembers = array();
+
+
+	/**
+	 * Constructor function
+	 *
+	 * Let's initialize anything that we need to, the work normally done by a constructor. This
+	 * code is here instead of in an explicit constructor in order that a subclass may have a
+	 * constructor which doesn't interfere with this, and also to facilitate polymorphic
+	 * constructors...
+	 */
+	protected function ___constructor() {
+
+		// Reflect on ourselves to see what final private ___proto___*() functions we have
+		$myself = new \ReflectionClass($this);
+		$methods = $myself->getMethods(\ReflectionMethod::IS_PUBLIC);
+		$protoMethods = array();
+		foreach ($methods as $index => $method) {
+			if (strpos($method->name, ST_PROTO_LEADER) === 0) {
+				$protoMethods[$method->name] =& $methods[$index];
+			}
+		}
+
+		// Now for each protoMethod that we identified...
+		foreach ($protoMethods as $protoName => $method) {
+
+			// Look for annotation: @proto scope returnType methodName(argType1[,argType2[,argTypeN]]])
+			$name = substr($protoName, strlen(ST_PROTO_LEADER));
+			if ($vpos = strpos($name, '___')) {
+				// Strip the variant id off the end...
+				$name = substr($name, 0, $vpos);
+			}
+			$docComment = $method->getDocComment();
+
+			// If there is no proper @proto annotation...
+			if (! preg_match("/@proto (.*? {$name}\(.*?\))/m", $docComment, $matches)) {
+
+				// If there was an attempt at one...
+				if (preg_match("/(@proto .*?\n)/m", $docComment, $matches)) {
+					$msg = "Improper @proto annotation found for method '{$protoName}'";
+					throw PHPGoodies::instantiate('Oop.Exception.InvalidAnnotationException', $msg);
+				}
+
+				// TODO: should we passively skip these, log a warning or big-badda-boom?
+				continue;
+			}
+			$protoAnnotation = $matches[1];
+			$characteristics = explode(' ', $protoAnnotation);
+
+			// For now we expect 3 characteristics: scope, returnType, methodName(argTypes)
+			if (3 != count($characteristics)) {
+				$msg = "Improper @proto annotation found for method '{$protoName}'";
+				throw PHPGoodies::instantiate('Oop.Exception.InvalidAnnotationException', $msg);
+			}
+			$scope = $characteristics[0];
+			$returnType = $characteristics[1];
+			$skip = strlen($name) + 1;
+			$argTypeList = substr($characteristics[2], $skip, strlen($characteristics[2]) - $skip - 1);
+			$argTypes = explode(',', $argTypeList);
+
+			// Verify that all argTypes are legal...
+			foreach ($argTypes as $argType) {
+				$this->requireLegalType($argType);
+			}
+
+			// Get the code for the function...
+			$function = $this->$protoName();
+			if (ST_TYPE_FUNCTION !== $this->getType($function)) {
+				$msg = "Method '{$protoName}' did not return a callable function";
+				throw PHPGoodies::instantiate('Oop.Exception.BadProtoMethodException', $msg);
+			}
+
+			// Try to add this prototyped function as a class member
+			$prototype = $this->makePrototype($name, $argTypes);
+			$this->addClassMember($name, $returnType, $scope, $function, $prototype);
+		}
+	}
 
 	/**
 	 * Add a public class member
@@ -235,7 +314,7 @@ trait StronglyTypedTrait {
 	/**
 	 * Check whether the specified name is legal to use for a class member
 	 *
-	 * @param string $name The name we want to verify out
+	 * @param string $name The name we want to check out
 	 *
 	 * @return boolean true if the name is legal to use as a class member name, else false
 	 */
@@ -310,6 +389,51 @@ trait StronglyTypedTrait {
 	}
 
 	/**
+	 * Require a legal scope specifier... or Except
+	 *
+	 * @todo Add test coverage for this method...
+	 *
+	 * @param string $scope The scope name we want to check out
+	 *
+	 * @return object $this for chaining support...
+	 */
+	protected function requireLegalScope($scope) {
+		if ($this->isLegalScope($scope)) return $this;
+		$msg = 'Illegal scope specified: ' . (is_string($scope) ? "'{$scope}'" : "[ {$this->getType($scope)} ]");
+		throw new \InvalidArgumentException($msg);
+	}
+
+	/**
+	 * Require a legal type specifier... or Except
+	 *
+	 * @todo Add test coverage for this method...
+	 *
+	 * @param string $type The type name we want to check out
+	 *
+	 * @return object $this for chaining support...
+	 */
+	protected function requireLegalType($type) {
+		if ($this->isLegalType($type)) return $this;
+		$msg = 'Illegal data type specified: ' . (is_string($type) ? "'{$type}'" : "[ {$this->getType($type)} ]");
+		throw new \InvalidArgumentException($msg);
+	}
+
+	/**
+	 * Require a legal name specifier... or Except
+	 *
+	 * @todo Add test coverage for this method...
+	 *
+	 * @param string $name The name we want to check out
+	 *
+	 * @return object $this for chaining support...
+	 */
+	protected function requireLegalName($name) {
+		if ($this->isLegalName($name)) return $this;
+		$msg = 	'Illegal class member name specified: ' . (is_string($name) ? "'{$name}'" : "[ {$this->getType($name)} ]");
+		throw new \InvalidArgumentException($msg);
+	}
+
+	/**
 	 * Add a class member with the specified type and scope
 	 *
 	 * Note that if the ClassMember being added is a function, then type should be set to the
@@ -327,15 +451,7 @@ trait StronglyTypedTrait {
 	protected function addClassMember($name, $type, $scope, $value = null, $prototype = null) {
 
 		//  Check for legal name, type, and scope
-		if (! $this->isLegalName($name)) {
-			throw new \InvalidArgumentException('Illegal class member name specified: ' . (is_string($name) ? "'{$name}'" : "[ {$this->getType($name)} ]"));
-		}
-		if (! $this->isLegalType($type)) {
-			throw new \InvalidArgumentException('Illegal class member type specified: ' . (is_string($type) ? "'{$type}'" : "[ {$this->getType($type)} ]"));
-		}
-		if (! $this->isLegalScope($scope)) {
-			throw new \InvalidArgumentException('Illegal class member scope specified: ' . (is_string($scope) ? "'{$scope}'" : "[ {$this->getType($scope)} ]"));
-		}
+		$this->requireLegalName($name)->requireLegalType($type)->requireLegalScope($scope);
 
 		// Special handling for functions to get the return type
 		$returnType = null;
@@ -532,6 +648,7 @@ trait StronglyTypedTrait {
 	 * @return string Protoname of the matching class member, or null if none found
 	 */
 	protected function findProtoname($name, $argTypes = array()) {
+
 		// First see if there is an exact match for this argument prototype
 		$protoname = $this->makePrototype($name, $argTypes);
 		if (! $this->isFunction($protoname)) {

@@ -23,6 +23,8 @@ class STClassPopulated extends STClass {
 	 * Constructor
 	 */
 	public function __construct() {
+		
+		$this->___constructor();
 
 		// Add a private property
 		$this->addClassMember(
@@ -40,6 +42,24 @@ class STClassPopulated extends STClass {
 			'Lemon Drops'
 		);
 	}
+
+	/**
+	 * @proto public boolean myProtoMethod(boolean)
+	 */
+	public function ___proto___myProtoMethod___1() {
+		return function ($value) {
+			return $value;
+		};
+	}
+
+	/**
+	 * @proto public integer myProtoMethod(string)
+	 */
+	public function ___proto___myProtoMethod___2() {
+		return function ($value) {
+			return strlen($value);
+		};
+	}
 }
 
 $a = new STClassPopulated;
@@ -49,5 +69,21 @@ if (isset($a->publicProperty1)) {
 }
 if (! isset($a->privateProperty1)) {
 	print "privateProperty1 inaccessible from the outside, as expected\n";
+}
+
+if ($a->myProtoMethod(true)) {
+	print "Got a successful TRUE back from myProtoMethod\n";
+}
+if (! $a->myProtoMethod(false)) {
+	print "Got a successful FALSE back from myProtoMethod\n";
+}
+try {
+	$res = $a->myProtoMethod(1);
+}
+catch (\Exception $e) {
+	print "Got an expected exception attempting to call myProtoMethod(integer) which is undefined\n";
+}
+if (13 == $a->myProtoMethod('Hello, World!')) {
+	print "Successfully applied ad hoc polymorphism to get myProtoMethod(string)\n";
 }
 

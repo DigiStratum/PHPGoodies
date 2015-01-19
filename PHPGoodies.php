@@ -160,5 +160,24 @@ abstract class PHPGoodies {
 
 		return $reflectedClass->newInstanceArgs($args);
 	}
+
+	/**
+	 * Run an application's main function
+	 *
+	 * @param object $app A class instance that implements ApplicationIfc inerface
+	 *
+	 * @return integer The application's exit code (0 for non-error)
+	 */
+	public static function run($app) {
+
+		// If $app is legit this will already be imported, but if not...
+		static::import('Oop.ApplicationIfc');
+		if (! $app instanceof ApplicationIfc) {
+			$msg = 'Attempted to run something other than an application instance';
+			throw new \Exception($msg);
+		}
+
+		return $app->main();
+	}
 }
 

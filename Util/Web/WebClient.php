@@ -36,8 +36,14 @@ class WebClient {
 	 */
 	protected $userAgent;
 
+	/**
+	 *
+	 */
 	protected $version;
 
+	/**
+	 *
+	 */
 	protected $response;
 
 	/**
@@ -105,28 +111,30 @@ class WebClient {
 	}
 
 	/**
-	 *
+	 * Perform a GET request to the specified URL
 	 */
 	public function get($url) {
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-		//curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		//curl_setopt($ch, CURLOPT_HEADER, true);
 		curl_setopt($ch, CURLOPT_WRITEFUNCTION, array($this, 'bodyCallback'));
 		curl_setopt($ch, CURLOPT_HEADERFUNCTION, array($this, 'headerCallback'));
-		if (curl_exec($ch)) {
-			print_r($this->response);
-		}
+		return curl_exec($ch) ? $this->response : null;
 	}
 
 	/**
+	 * Callback function for each header of curl response
 	 *
+	 * @param resource $ch CURL handle
+	 * @param string $data The response header received by CURL
+	 *
+	 * @return integer length of the data
 	 */
 	public function headerCallback($ch, $data) {
 		$header = trim($data);
 		if (strlen($header)) {
+
 			$split = strpos($header, ':');
 			if ($split !== false) {
 				$name = trim(substr($header, 0, $split));
@@ -137,11 +145,27 @@ class WebClient {
 				$value = '';
 			}
 			$this->response->headers->set($name, $value);
+
+			// Look for the status code from the first one
+			if (1 == $this->response->headers->num()) {
+				$parts = explode(' ', $name);
+				if (count($parts) >=2) {
+					$this->response->code = intval($parts[1]);
+				}
+			}
 		}
-		
+
 		return strlen($data);
 	}
 
+	/**
+	 * Callback function for body of curl response
+	 *
+	 * @param resource $ch CURL handle
+	 * @param string $data The response body received by CURL
+	 *
+	 * @return integer length of the data
+	 */
 	public function bodyCallback($ch, $data) {
 		$this->response->body = $data;
 		return strlen($data);

@@ -15,5 +15,7 @@ PHPGoodies::import('Util.Web.WebClient');
 
 // 3) Make a new WebClient utility
 $wc = PHPGoodies::instantiate('Util.Web.WebClient', WebClient::CLIENT_IE, WebClient::OS_WIN_NT6);
-$wc->get('http://www.kelly-rentals.com/');
+$httpResponse = $wc->get('http://www.kelly-rentals.com/');
+
+print_r($httpResponse);
 

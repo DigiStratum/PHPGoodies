@@ -35,7 +35,7 @@ class Oauth2AccessTokenTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testThatToTokenGeneratesTokenStringsForValidData() {
 		$hash = PHPGoodies::instantiate('Lib.Data.Hash');
-		$createToken = PHPGoodies::instantiate('Lib.net.Http.Oauth2.Oauth2AccessToken', 'secret');
+		$createToken = PHPGoodies::instantiate('Lib.Net.Http.Oauth2.Oauth2AccessToken', 'secret');
 		$token = $createToken->dataToToken($hash);
 
 		$this->assertTrue(strlen($token) > 0);
@@ -52,10 +52,10 @@ class Oauth2AccessTokenTest extends \PHPUnit_Framework_TestCase {
 		$hash->set('b', 2);
 		$hash->set('c', 3);
 
-		$createToken1 = PHPGoodies::instantiate('Lib.net.Http.Oauth2.Oauth2AccessToken', 'secret1');
+		$createToken1 = PHPGoodies::instantiate('Lib.Net.Http.Oauth2.Oauth2AccessToken', 'secret1');
 		$token1 = $createToken1->dataToToken($hash);
 
-		$createToken2 = PHPGoodies::instantiate('Lib.net.Http.Oauth2.Oauth2AccessToken', 'secret2');
+		$createToken2 = PHPGoodies::instantiate('Lib.Net.Http.Oauth2.Oauth2AccessToken', 'secret2');
 		$token2 = $createToken2->dataToToken($hash);
 
 		$this->assertTrue($token1 != $token2);
@@ -72,10 +72,10 @@ class Oauth2AccessTokenTest extends \PHPUnit_Framework_TestCase {
 		$hash->set('b', 2);
 		$hash->set('c', 3);
 
-		$createToken = PHPGoodies::instantiate('Lib.net.Http.Oauth2.Oauth2AccessToken', 'secret');
+		$createToken = PHPGoodies::instantiate('Lib.Net.Http.Oauth2.Oauth2AccessToken', 'secret');
 		$token = $createToken->dataToToken($hash);
 
-		$readToken = PHPGoodies::instantiate('Lib.net.Http.Oauth2.Oauth2AccessToken', 'secret');
+		$readToken = PHPGoodies::instantiate('Lib.Net.Http.Oauth2.Oauth2AccessToken', 'secret');
 		$data = $readToken->tokenToData($token);
 
 		$this->assertTrue($data instanceof Hash);

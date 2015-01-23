@@ -15,6 +15,11 @@ namespace PHPGoodies;
 class HttpCookie {
 
 	/**
+	 * Extracted automatically when value looks like a name/value pair
+	 */
+	protected $name;
+
+	/**
 	 * Plain text value for the cookie, possibly name=value pair
 	 */
 	protected $value;
@@ -55,21 +60,47 @@ class HttpCookie {
 	 * Set default values for all our properties
 	 */
 	protected function setDefaults() {
-		$this->value = '';
-		$this->expires = null;
-		$this->domain = null;
-		$this->path = null;
-		$this->secure = false;
-		$this->httpOnly = false;
+		$this->setValue('');
+		$this->setExpires(null);
+		$this->setDomain(null);
+		$this->setPath(null);
+		$this->setSecure(false);
+		$this->setHttpOnly(false);
+	}
+
+	/**
+	 * Getter for our name property
+	 *
+	 * Note that there is no matching setter; we extract name from the value when the value is
+	 * set to ensure that it doesn't live in both properties.
+	 *
+	 * @return string name for this cookie if set, else null
+	 */
+	public function getName() {
+		return $this->name;
 	}
 
 	/**
 	 * Setter for our value property
 	 *
 	 * @param string $value The value string we want to set this cookie to
+	 *
+	 * @return object $this for chaining...
 	 */
 	public function setValue($value) {
-		$this->value = $value;
+
+		// Does it look like a name/value pair?
+		$pos = strpos($value, '=');
+		if ($pos === false) {
+			$this->value = $value;
+			$this->name = null;
+		}
+		else {
+			// Name, first '=', then value
+			$this->name = substr($value, 0, $pos);
+			$this->value = substr($value, $pos + 1);
+		}
+		return $this;
 	}
 
 	/**
@@ -83,9 +114,12 @@ class HttpCookie {
 	 * Setter for our value property
 	 *
 	 * @param integer $timestamp A regular UNIX timestamp
+	 *
+	 * @return object $this for chaining...
 	 */
 	public function setExpires($timestamp) {
 		$this->expires = $timestamp;
+		return $this;
 	}
 
 	/**
@@ -99,9 +133,12 @@ class HttpCookie {
 	 * Setter for our value property
 	 *
 	 * @param string $domain The domain resstriction for this cookie
+	 *
+	 * @return object $this for chaining...
 	 */
 	public function setDomain($domain) {
 		$this->domain = $domain;
+		return $this;
 	}
 
 	/**
@@ -115,9 +152,12 @@ class HttpCookie {
 	 * Setter for our value property
 	 *
 	 * @param string $path The path restriction for this cokie
+	 *
+	 * @return object $this for chaining...
 	 */
 	public function setPath($path) {
 		$this->path = $path;
+		return $this;
 	}
 
 	/**
@@ -131,9 +171,12 @@ class HttpCookie {
 	 * Setter for our value property
 	 *
 	 * @param boolean Set to true to require that this cookie only be sent over SSL connections
+	 *
+	 * @return object $this for chaining...
 	 */
 	public function setSecure($enable) {
 		$this->secure = $enable ? true : false;
+		return $this;
 	}
 
 	/**
@@ -147,9 +190,12 @@ class HttpCookie {
 	 * Setter for our value property
 	 *
 	 * @param boolean Set to true to prevent JavaScript/client from seeing this cookie
+	 *
+	 * @return object $this for chaining...
 	 */
 	public function setHttpOnly($enable) {
 		$this->httpOnly = $enable ? true : false;
+		return $this;
 	}
 
 	/**
@@ -205,12 +251,25 @@ class HttpCookie {
 	}
 
 	/**
-	 * Pack our properties into a string that we can send to a server as a "Cookie" header
+	 * Pack our name/value into a "cookie" header that a client can send to a server
 	 *
-	 * @return string The cookie header string (just the value portion of the header...)
+	 * @return string The "Cookie" header string (just the value portion of the header...)
 	 */
-	public function formatForHeader() {
-		$encoded = $this->encode($this->value);
+	public function formatForRequestHeader() {
+		$encoded = is_null($this->name) ? '' : $this->encode($this->name) . '=';
+		$encoded .= $this->encode($this->value);
+		return $encoded;
+	}
+
+	/**
+	 * Pack our properties into a "Set-Cookie" header that a server can send to a client
+	 *
+	 * @return string The "Set-Cookie" header string (just the value portion of the header...)
+	 */
+	public function formatForResponseHeader() {
+
+		// Response header's name/value is formatted the same as the request header is
+		$encoded = $this->formatForRequestHeader();
 
 		// Get all the other cookie properties together
 		$formatted = '';

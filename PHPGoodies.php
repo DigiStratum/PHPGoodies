@@ -40,6 +40,38 @@ abstract class PHPGoodies {
 	 */
 	public static function import($resource) {
 
+		$resourceInfo = static::resourceInfo($resource);
+
+		// If resultant path invalid, class missing
+		if (! @file_exists($resourceInfo->path)) {
+			$msg = "Could not import implementation for '{$resource}'; not found at [{$resourceInfo->path}]";
+			throw new \Exception($msg);
+		}
+
+		if (! (@include_once $resourceInfo->path)) {
+			$msg = "Could not import implementation for '{$resource}'; include failed for [{$resourceInfo->path}]";
+			throw new \Exception($msg);
+		}
+
+		// If expected name undefined after loading, class missing
+		if (! static::isImported($resourceInfo->name)) {
+			$msg = "Could not import implementation for '{$resource}'";
+			throw new \Exception($msg);
+		}
+	}
+
+	/**
+	 * Get some information about the named resource identifier
+	 *
+	 * @param string $resource The dotted notation resource specifier to import
+	 *
+	 * @return object StdClass object with name & path properties populated if possible
+	 */
+	public static function resourceInfo($resource) {
+		$resourceInfo = new \StdClass();
+		$resourceInfo->name = null;
+		$resourceInfo->path = null;
+
 		// Convert any slashes to dots then all slashes back to dots; prevents
 		// users from putting slash into import() calls as if its a raw path
 		$resourceName = str_replace(DIRECTORY_SEPARATOR, '.', $resource);
@@ -47,34 +79,18 @@ abstract class PHPGoodies {
 
 		// If no class parts, class missing
 		$numParts = count($resourceparts);
-		if ($numParts == 0) {
-			$msg = 'Resource name cannot be empty';
-			throw new \Exception($msg);
-		}
+		if ($numParts == 0) return $resourceInfo;
 
 		// If expected fully qualified name has already been imported, no-op.
-		$name = $resourceparts[$numParts - 1];
-		if (static::isImported($name)) return;
+		$resourceInfo->name = $resourceparts[$numParts - 1];
 
 		// Expected implementation will be located relative to this location
 		$path = dirname(__FILE__) . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $resourceparts) . '.php';
 
-		// If resultant path invalid, class missing
-		if (! @file_exists($path)) {
-			$msg = "Could not import implementation for '{$resource}'; not found at [{$path}]";
-			throw new \Exception($msg);
-		}
+		// If resultant path exists and is a file, capture it
+		if (@file_exists($path) && @is_file($path)) $resourceInfo->path = $path;
 
-		if (! (@include_once $path)) {
-			$msg = "Could not import implementation for '{$resource}'; include failed for [{$path}] >> [{$res}]";
-			throw new \Exception($msg);
-		}
-
-		// If expected name undefined after loading, class missing
-		if (! static::isImported($name)) {
-			$msg = "Could not import implementation for '{$resource}'";
-			throw new \Exception($msg);
-		}
+		return $resourceInfo;
 	}
 
 	/**

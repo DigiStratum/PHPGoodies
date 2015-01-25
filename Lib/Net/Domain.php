@@ -57,7 +57,7 @@ class Domain {
 	 */
 	protected function generateDomainInfo($resourceInfo) {
 
-		// Fetch the data file we will need to generate code from
+		// 1) Fetch the data file we will need to generate code from
 		$url = 'https://publicsuffix.org/list/effective_tld_names.dat';
 		$wc = PHPGoodies::instantiate('Util.Web.WebClient', WebClient::CLIENT_IE, WebClient::OS_WIN_NT6);
 		$httpResponse = $wc->get($url);
@@ -66,9 +66,77 @@ class Domain {
 			throw new \Exception('Failed to retrieve data file generating DomainInfo');
 		}
 
-		$data = explode("\n", $httpResponse->body);
+		// 2) Build a domain tree
+		$domainTree = array();
+		$line = strtok($httpResponse->body, "\n");
+		$lineNum = 0;
+		while ($line !== false) {
+			$line = trim($line);
+			if (strlen($line)) {
+				if (strpos($line, '//') === false) {
+					$lineNum++;
+					$parts = array_reverse(explode('.', $line));
+
+					// Add the parts into a tree
+					$treeBranch =& $domainTree;
+					while (count($parts)) {
+						$part = array_shift($parts);
+
+						// If this treeBranch isn't there...
+						if (! isset($treeBranch[$part])) {
+
+							// Make it!
+							$treeBranch[$part] = array();
+						}
+
+						$treeBranch =& $treeBranch[$part];
+					}
+				}
+			}
+			$line = strtok("\n");
+		}
+
+		// FIXME - maybe instead we should compare one character at a time with a pile of
+		// single-char comparators until an entire string matches with early false returns
+		// whenever there is no character match...
+
+		// 3) Generate an object class that makes it fast/easy
+		// to tell if a domain is in the domain tree
+		$code = '<?php' . "\n" . <<<END
+class DomainInfo {
+
+	public static function checkDomain(\$domain) {
+
+		\$parts = array_reverse(explode('.', \$domain));
+
+END;
+		// TODO - deal with UTF-8 (as punycode?) domains
+		$first = true;
+		$indent = "\t\t";
+		$depth = 0;
+		foreach ($domainTree as $branch => $data) {
+			$if = $first ? 'if' : 'else if';
+			$first = false;
+			
+			$code .= "{$indent}{$if} (\$parts[{$depth}] == '{$branch}') {\n";
+			$code .= "// functional code goes here\n";
+			$code .= "{$indent}}\n";
+		}
+		$code .= <<<END
+		return false;
+	}
+}
+
+END;
+
+		print $code;
+
+
+		//print_r($domainTree);
+
+		//$data = explode("\n", $httpResponse->body);
 		//print_r($data);
-		print "{$httpResponse->body}\n";
+		//print "{$httpResponse->body}\n";
 	}
 }
 

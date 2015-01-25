@@ -114,6 +114,7 @@ class WebClient {
 	 * Perform a GET request to the specified URL
 	 */
 	public function get($url) {
+		$this->response->body = '';
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
@@ -167,7 +168,7 @@ class WebClient {
 	 * @return integer length of the data
 	 */
 	public function bodyCallback($ch, $data) {
-		$this->response->body = $data;
+		$this->response->body .= $data;
 		return strlen($data);
 	}
 }

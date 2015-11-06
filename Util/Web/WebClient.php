@@ -49,7 +49,17 @@ class WebClient {
 	/**
 	 *
 	 */
-	public function __construct($client, $os, $version = null) {
+	protected $initialized = false;
+
+	/**
+	 * Constructor
+	 */
+	public function __construct() { }
+
+	/**
+	 *
+	 */
+	public function init($client, $os, $version = null) {
 
 		$this->response = PHPGoodies::instantiate('Lib.Net.Http.HttpResponse');
 
@@ -107,20 +117,41 @@ class WebClient {
 				break;
 		}
 
-		$this->userAgent = isset($userAgents["{$version}"]) ? $userAgents["{$version}"] : $userAgents[count($userAgents) - 1];
+		// The UserAgent will either be the one specified or latest
+		if ((! is_null($version)) && isset($userAgents["{$version}"])) {
+			$this->userAgent = $userAgents["{$version}"];
+		}
+		else {
+			$this->userAgent = $userAgents[count($userAgents) - 1];
+		}
+
+		$this->initialized = true;
 	}
 
 	/**
 	 * Perform a GET request to the specified URL
+	 *
+	 * @param string $url A complete URL to fetch
+	 *
+	 * @return Response from the URL or null on error
 	 */
 	public function get($url) {
-		$this->response->body = '';
+
+		if (! $this->initialized) {
+			throw new \RuntimeException('WebClient was not initialized before attempting to use it');
+		}
+
+		// Reset the response
+		$this->response->reset();
+
+		// Make a curl request to fill up our response using callbacks
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_WRITEFUNCTION, array($this, 'bodyCallback'));
 		curl_setopt($ch, CURLOPT_HEADERFUNCTION, array($this, 'headerCallback'));
+
 		return curl_exec($ch) ? $this->response : null;
 	}
 
@@ -150,7 +181,7 @@ class WebClient {
 			// Look for the status code from the first one
 			if (1 == $this->response->headers->num()) {
 				$parts = explode(' ', $name);
-				if (count($parts) >=2) {
+				if (count($parts) >= 2) {
 					$this->response->code = intval($parts[1]);
 				}
 			}

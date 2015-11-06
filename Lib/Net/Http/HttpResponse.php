@@ -101,7 +101,7 @@ class HttpResponse {
 	/**
 	 * Body for this response
 	 */
-	public $body = '';
+	public $body = null;
 
 	/**
 	 * HTTP code for this response
@@ -122,6 +122,14 @@ class HttpResponse {
 	 */
 	public function getResponseBody() {
 		return $this->body;
+	}
+
+	/**
+	 * Reset the response data for use/reuse
+	 */
+	public function reset() {
+		$this->body = null;
+		$this->headers->nil();
 	}
 }
 

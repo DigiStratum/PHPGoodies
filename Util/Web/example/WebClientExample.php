@@ -14,8 +14,9 @@ require(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
 PHPGoodies::import('Util.Web.WebClient');
 
 // 3) Make a new WebClient utility
-$wc = PHPGoodies::instantiate('Util.Web.WebClient', WebClient::CLIENT_IE, WebClient::OS_WIN_NT6);
-$httpResponse = $wc->get('http://www.kelly-rentals.com/');
+$wc = PHPGoodies::instantiate('Util.Web.WebClient');
+$wc->init(WebClient::CLIENT_IE, WebClient::OS_WIN_NT6);
+$httpResponse = $wc->get('http://www.kellydiversified.com/');
 
 print_r($httpResponse);
 

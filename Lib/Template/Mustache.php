@@ -19,6 +19,31 @@
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
+/*
+ref: https://github.com/janl/mustache.js
+{{#section1}}
+	section block
+	{{escapedVariable1}}
+	{{{unescapedVariable2}}}
+	{{&unescapedVariable3}}
+	{{=<% %>=}}
+		{{delimiter changed}}
+	<%={{ }}=%>
+	{{#stringArray}}
+		{{.}}
+	{{/stringArray}}
+	{{#objectCollection}}
+		{{filterFunction}}
+	{{/objectCollection}}
+{{/section1}}
+{{^invertedSection2}}
+	section block
+	{{! ignored comment}}
+	{{> partialReference}}
+{{/invertedSection2}}
+
+*/
+
 namespace PHPGoodies;
 
 PHPGoodies::import('Lib.Template.TemplateRendererIfc');
@@ -30,10 +55,41 @@ PHPGoodies::import('Lib.Template.TemplateRendererIfc');
 class Mustache implements TemplateRendererIfc {
 
 	/**
-	 * ref: https://mustache.github.io/mustache.5.html
+	 * Partial templates callable from the template supplied to render()
+	 */
+	protected $partials = array();
+
+	/**
+	 * Add the named partial to the set of partials for future use
+	 *
+	 * @param $name String name of the parial to add
+	 * @param $partial String partial template text
+	 */
+	public function addPartial($name, $partial) {
+		$partials[$name] = new \stdClass();
+		$partials[$name]->raw = $partial;
+		$partials[$name]->parsed = $this->parse($parial);
+	}
+
+	/**
+	 * Parse the supplied template to speed up subsequent usage
+	 */
+	protected function parse($name, &$template) {
+		// todo: parse the template into a tree and return it
+	}
+
+	/**
+	 * Render the supplied template with the supplied data
+	 *
+	 * @param $template String mustache template we want to fill up with data
+	 * @param $data object data to inject into the mustache template
+	 *
+	 * @return string template filled up with the supplied data
 	 */
 	public function render(&$template, &$data) {
-		return $this->renderSections($template, $data);
+		$parsed = $this->parse('base', $template);
+		// todo: iterate over the parsed tree and flatten it back out into text with data
+		//return $this->renderSections($template, $data);
 	}
 
 	/**

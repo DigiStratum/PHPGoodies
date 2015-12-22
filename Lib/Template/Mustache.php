@@ -21,22 +21,18 @@
 
 namespace PHPGoodies;
 
+PHPGoodies::import('Lib.Template.TemplateRendererIfc');
+
 /**
  * Mustache - Mustache templating class
  *
  */
-class Mustache {
-
-	/**
-	 *
-	 */
-	public function __construct() {
-	}
+class Mustache implements TemplateRendererIfc {
 
 	/**
 	 * ref: https://mustache.github.io/mustache.5.html
 	 */
-	public function render($template, &$data) {
+	public function render(&$template, &$data) {
 		return $this->renderSections($template, $data);
 	}
 
@@ -59,7 +55,7 @@ class Mustache {
 				$sectionStack[] = array(
 					'outer' => $scanPos + $tag->pos,
 					'name' => $tag->name,
-					'inner' => $scanPos + $tag->pos + strlen($tag->name);
+					'inner' => $scanPos + $tag->pos + strlen($tag->name)
 				);
 			}
 			// Is it a section closer?
@@ -97,7 +93,7 @@ class Mustache {
 							// FIXME: this is wrong!
 							//
 							// We should be able to iterate an array of values where each iterated chunk of template may
-							// have its own conditinoal sections; since each of those would be dependent on which element
+							// have its own conditional sections; since each of those would be dependent on which element
 							// of the array is being processed, they cannot be pre-rendered depth-first. Possible solution
 							// is to handle array iterators on open, and non-array sections on close. This means we would
 							// need to somehow pre-process the stack of tags so that we know what blocks start/end where
@@ -154,7 +150,7 @@ class Mustache {
 	 */
 	protected function renderVariables($templateFrag, &$data) {
 		// Replace all the variable tags with their respective values
-		while (($tag = $this->getNextTag($templateFrag) != null) {
+		while (($tag = $this->getNextTag($templateFrag)) != null) {
 			$preSection = substr($templateFrag, 0, $tag->pos);
 			$postSection = substr($templateFrag, $tag->pos + strlen($tag->tag));
 			$templateFrag = $preSection . getProperty($data, $tag->name) . $postSection;

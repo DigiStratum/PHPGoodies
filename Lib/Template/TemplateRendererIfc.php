@@ -2,6 +2,11 @@
 /**
  * PHPGoodies:TemplateRendererIfc - Class interface for rendering text templates
  *
+ * The idea here is that we can supply some form of text-encoded template along with a data object
+ * and that the implenting renderer class will transform the data according to the template and the
+ * custom logic of that renderer. The logic of the renderer could convert plain text, html, xml, or
+ * any other format desired.
+ *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 

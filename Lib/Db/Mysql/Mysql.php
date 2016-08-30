@@ -76,6 +76,9 @@ class Mysql {
 	 * Constructor; does nothing because we want a couple different initialization methods
 	 */
 	public function __construct() {
+		if (! function_exists('mysql_connect')) {
+			throw new \Exception('mysql functions are not available.');
+		}
 	}
 
 	/**

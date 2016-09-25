@@ -1,0 +1,16 @@
+{
+  "name": "PHPGoodies",
+  "homepage": "https://github.com/DigiStratum/PHPGoodies",
+  "authors": [
+    "Sean Michael Kelly <info@digistratum.com>"
+  ],
+  "description": "A collection of general purpose PHP Goodies that make it easier to develop sophisticated applications",
+  "license": "MIT",
+  "private": false,
+  "ignore": [],
+  "dependencies": {
+  },
+  "devDependencies": {
+  }
+}
+

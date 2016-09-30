@@ -1,0 +1,8 @@
+<phpunit>
+	<testsuites>
+		<testsuite name="phpgoodies">
+			<!-- Test the most foundaitonal classes first so we can catch low-level failures early... -->
+			<directory>test</directory>
+		</testsuite>
+	</testsuites>
+</phpunit>

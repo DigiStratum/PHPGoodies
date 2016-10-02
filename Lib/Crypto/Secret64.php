@@ -2,12 +2,12 @@
 /**
  * PHPGoodies:Secret64 - A secret-ciphered layer for Base64
  *
- * Bas64 encoding is a convenient way to glob up nearly any data you want into a string that is
+ * Baes64 encoding is a convenient way to glob up nearly any data you want into a string that is
  * neatly ASCII encoded in order to ensure data integrity when in transit across a wide variety
  * of networking and software systems such that the data has a much stronger chance of coming out
  * the other end in the same condition that it went in.
  *
- * The problem is that Bas64 does not offer any means of protecting what is encoded within; even
+ * The problem is that Base64 does not offer any means of protecting what is encoded within; even
  * though it is impossible to read at first glance, it is a simple matter to run the text through
  * a decoder and get the original content out of it without any challenge. Base64 encoded strings
  * are relatively easy to spot when they are in use and for a hacker/developer make for a pretty
@@ -16,7 +16,7 @@
  * The solution is to impose an additional layer of encoding on top of Base64. One could always, of
  * course, use strong encryption on the data going in, but this can be complex to set up, and may be
  * overkill depending on the application. For example if there is some secret personal or otherwise
- * sensitive information being transmitted, then strong encryption is called for. Put if you just
+ * sensitive information being transmitted, then strong encryption is called for. But if you just
  * want to obfuscate some information in such a way as to increase the level of difficulty of a
  * direct attack on your system then a simple cipher layer is a fast, effective means of handling
  * that.
@@ -27,7 +27,7 @@
  * base64 data and decode normally.
  *
  * Note that due to this implementation's reliance on random number generation and the differences
- * in random number generation from platform to platform, messages encoded by thie class can only be
+ * in random number generation from platform to platform, messages encoded by this class can only be
  * decoded by this same class. The code may run on two different computers, but it would not be
  * possible to, say, reimplement this code in JavaScript and have the JS encode and this PHP decode.
  * ... Not without making a cross-platform consistent pseudo random number generator algorithm, that

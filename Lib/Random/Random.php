@@ -6,7 +6,7 @@
  * very least we have PHP's native algorithm and anything else of, say for example ISAAC which is
  * cryptographically secure and reproducible cross-platform as needed to get matching results.
  *
- * @uses String
+ * @uses GString
  * @uses RandomAlgorithmNative
  * @uses RandomAlgorithmIsaac
  *
@@ -75,7 +75,7 @@ class Random {
 				$this->randomAlgorithm->seed($this->stringToNumber($seed));
 				break;
 
-			// String-seeded algorithms:
+			// GString-seeded algorithms:
 			case self::RANDOM_ALG_ISAAC:
 				$this->randomAlgorithm->seed($seed);
 				break;
@@ -115,7 +115,7 @@ class Random {
 	protected function stringToNumber($str) {
 
 		// Break secret string into 4-byte chunks (32 bits each)
-		$str = PHPGoodies::instantiate('Lib.Data.String', $str);
+		$str = PHPGoodies::instantiate('Lib.Data.GString', $str);
 		$chunks = $str->getChunked(4);
 		$num = 0x5AF00FA5; // 01011010111100000000111110100101
 		foreach ($chunks as $chunk) {

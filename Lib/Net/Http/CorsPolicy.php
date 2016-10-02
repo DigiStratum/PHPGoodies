@@ -16,7 +16,7 @@
  * ref: http://www.w3.org/TR/cors/
  *
  * @uses Collection
- * @uses String
+ * @uses GString
  * @uses HttpRequest
  * @uses HttpHeaders
  *
@@ -25,7 +25,7 @@
 
 namespace PHPGoodies;
 
-PHPGoodies::import('Lib.Data.String');
+PHPGoodies::import('Lib.Data.GString');
 PHPGoodies::import('Lib.Net.Http.HttpRequest');
 PHPGoodies::import('Lib.Net.Http.HttpHeaders');
 
@@ -105,7 +105,7 @@ class CorsPolicy {
 	 */
 	public function addOrigin($method, $origin) {
 		$this->requireSupportedMethod($method);
-		$this->methodPolicies[strtoupper($method)]->allowedOrigins->add(new String($origin));
+		$this->methodPolicies[strtoupper($method)]->allowedOrigins->add(new GString($origin));
 		return $this;
 	}
 
@@ -172,7 +172,7 @@ class CorsPolicy {
 	 */
 	public function addHeader($method, $header) {
 		$this->requireSupportedMethod($method);
-		$this->methodPolicies[strtoupper($method)]->allowedHeaders->add(new String(HttpHeaders::properName($header)));
+		$this->methodPolicies[strtoupper($method)]->allowedHeaders->add(new GString(HttpHeaders::properName($header)));
 		return $this;
 	}
 
@@ -217,7 +217,7 @@ class CorsPolicy {
 	 */
 	public function exposeHeader($method, $header) {
 		$this->requireSupportedMethod($method);
-		$this->methodPolicies[strtoupper($method)]->exposedHeaders->add(new String(HttpHeaders::properName($header)));
+		$this->methodPolicies[strtoupper($method)]->exposedHeaders->add(new GString(HttpHeaders::properName($header)));
 		return $this;
 	}
 
@@ -462,13 +462,13 @@ class CorsPolicy {
 		$methodPolicy = new \stdClass();
 
 		// The set of origins for each method for which CORS header(s) should be provided
-		$methodPolicy->allowedOrigins = PHPGoodies::instantiate('Lib.Data.Collection', 'String');
+		$methodPolicy->allowedOrigins = PHPGoodies::instantiate('Lib.Data.Collection', 'GString');
 
 		// The set of atypical headers that each method is prepared to receive (request)
-		$methodPolicy->allowedHeaders = PHPGoodies::instantiate('Lib.Data.Collection', 'String');
+		$methodPolicy->allowedHeaders = PHPGoodies::instantiate('Lib.Data.Collection', 'GString');
 
 		// The set of atypical headers that each method is prepared to send (response)
-		$methodPolicy->exposedHeaders = PHPGoodies::instantiate('Lib.Data.Collection', 'String');
+		$methodPolicy->exposedHeaders = PHPGoodies::instantiate('Lib.Data.Collection', 'GString');
 
 		// Credentialed requests may be disabled (ignored), allowed, or required
 		$methodPolicy->credentials = self::CREDENTIALS_DISABLED;

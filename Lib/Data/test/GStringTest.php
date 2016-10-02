@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:String class test cases
+ * PHPGoodies:GString class test cases
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -9,13 +9,13 @@ namespace PHPGoodies;
 
 require_once(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
 
-class StringTest extends \PHPUnit_Framework_TestCase {
+class GStringTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
-		PHPGoodies::import('Lib.Data.String');
+		PHPGoodies::import('Lib.Data.GString');
 	}
 
 	/**
@@ -33,7 +33,7 @@ class StringTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Test that string reflects initialization
 	 */
-	public function testThatStringReflectsInitialization() {
+	public function testThatGStringReflectsInitialization() {
 		$values = array(
 			'',
 			'a',
@@ -43,7 +43,7 @@ class StringTest extends \PHPUnit_Framework_TestCase {
 
 		$ok = true;
 		foreach ($values as $val) {
-			$str = PHPGoodies::instantiate('Lib.Data.String', $val);
+			$str = PHPGoodies::instantiate('Lib.Data.GString', $val);
 			if ($val !== $str->get()) {
 				$ok = false;
 				break;
@@ -55,7 +55,7 @@ class StringTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Test that the string length is what we expect it to be
 	 */
-	public function testThatStringLengthIsCorrect() {
+	public function testThatGStringLengthIsCorrect() {
 		$values = array(
 			'',
 			'a',
@@ -65,7 +65,7 @@ class StringTest extends \PHPUnit_Framework_TestCase {
 
 		$ok = true;
 		foreach ($values as $val) {
-			$str = PHPGoodies::instantiate('Lib.Data.String', $val);
+			$str = PHPGoodies::instantiate('Lib.Data.GString', $val);
 			if (strlen($val) !== $str->len()) {
 				$ok = false;
 				break;
@@ -79,8 +79,8 @@ class StringTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testThatEqualityCheckingWorks() {
 		$value = 'This is a string that should be equal to itself';
-		$str1 = PHPGoodies::instantiate('Lib.Data.String', $value);
-		$str2 = PHPGoodies::instantiate('Lib.Data.String', $value);
+		$str1 = PHPGoodies::instantiate('Lib.Data.GString', $value);
+		$str2 = PHPGoodies::instantiate('Lib.Data.GString', $value);
 
 		// It should equal the raw value
 		$this->assertTrue($str1->equals($value));
@@ -93,11 +93,11 @@ class StringTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Test that unequal strings come back as unequal...
 	 */
-	public function testThatUnequalStringsAreUnequal() {
+	public function testThatUnequalGStringsAreUnequal() {
 		$value1 = 'apples';
-		$str1 = PHPGoodies::instantiate('Lib.Data.String', $value1);
+		$str1 = PHPGoodies::instantiate('Lib.Data.GString', $value1);
 		$value2 = 'oranges';
-		$str2 = PHPGoodies::instantiate('Lib.Data.String', $value2);
+		$str2 = PHPGoodies::instantiate('Lib.Data.GString', $value2);
 
 		// It should not equal the other raw value
 		$this->assertFalse($str1->equals($value2));
@@ -109,7 +109,7 @@ class StringTest extends \PHPUnit_Framework_TestCase {
 	 * Test that bad sizes (like 0, -1) are ignored by getChunked()
 	 */
 	public function testThatGetChunkedIgnoresBadSizes() {
-		$str = PHPGoodies::instantiate('Lib.Data.String', '');
+		$str = PHPGoodies::instantiate('Lib.Data.GString', '');
 		$res = $str->getChunked(0);
 		$this->assertTrue(is_array($res));
 		$this->assertEquals(0, count($res));
@@ -133,7 +133,7 @@ class StringTest extends \PHPUnit_Framework_TestCase {
 			for ($sourceLen = 0; $sourceLen <= strlen($source); $sourceLen++) {
 				$expectedChunks = ((integer) ($sourceLen / $chunkSize)) + ((($sourceLen % $chunkSize) > 0) ? 1 : 0);
 				$val = substr($source, 0, $sourceLen);
-				$str = PHPGoodies::instantiate('Lib.Data.String', $val);
+				$str = PHPGoodies::instantiate('Lib.Data.GString', $val);
 				$res = $str->getChunked($chunkSize);
 
 				if ((! is_array($res)) || ($expectedChunks != count($res))) {

@@ -7,7 +7,7 @@
 
 namespace PHPGoodies;
 
-require_once(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
+require_once(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
 
 class RandomTest extends \PHPUnit_Framework_TestCase {
 
@@ -15,7 +15,7 @@ class RandomTest extends \PHPUnit_Framework_TestCase {
 	 * Constructor
 	 */
 	public function __construct() {
-		PHPGoodies::import('Lib.Random.Random');
+		PHPGoodies::import('Lib.Random');
 	}
 
 	/**
@@ -38,7 +38,7 @@ class RandomTest extends \PHPUnit_Framework_TestCase {
 		$limit = 10000;
 		$ok = true;
 		for ($alg = 0; $alg <= 1; $alg++) {
-			$prng = PHPGoodies::instantiate('Lib.Random.Random', $alg);
+			$prng = PHPGoodies::instantiate('Lib.Random', $alg);
 
 			// Fill up the set array with pseudorandom numbers
 			$set = array();

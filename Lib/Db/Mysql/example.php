@@ -9,10 +9,10 @@
 use PHPGoodies\PHPGoodies as PHPGoodies;
 
 // 2) Load up our goodies
-require(realpath(dirname(__FILE__) . '/../../../../PHPGoodies.php'));
+require(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
 
 // 3) Make a database connection
-$db = PHPGoodies::instantiate('Lib.Db.Mysql.Mysql');
+$db = PHPGoodies::instantiate('Lib.Db.Mysql');
 if (! $db->connect('localhost', 'root', '', 'mysql')) {
 	die("error connecting to database\n");
 }

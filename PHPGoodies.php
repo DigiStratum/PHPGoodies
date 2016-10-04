@@ -85,7 +85,13 @@ abstract class PHPGoodies {
 		$resourceInfo->name = $resourceparts[$numParts - 1];
 
 		// Expected implementation will be located relative to this location
-		$path = dirname(__FILE__) . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $resourceparts) . '.php';
+		$path = dirname(__FILE__) . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $resourceparts);
+
+		// If resultant path exists and is a directory, look for the implementation inside it
+		if (@file_exists($path) && @is_dir($path)) $path .= DIRECTORY_SEPARATOR . 'implementation';
+
+		// Expect our path to be a PHP file
+		$path .= '.php';
 
 		// If resultant path exists and is a file, capture it
 		if (@file_exists($path) && @is_file($path)) $resourceInfo->path = $path;

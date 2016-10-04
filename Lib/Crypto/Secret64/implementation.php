@@ -42,7 +42,7 @@
 
 namespace PHPGoodies;
 
-PHPGoodies::import('Lib.Random.Random');
+PHPGoodies::import('Lib.Random');
 
 /**
  * Secret64
@@ -65,7 +65,7 @@ class Secret64 {
 	 * @param string $secret Secret value to initialize randomness with to make a unique map
 	 */
 	public function __construct($secret) {
-		$this->prng = PHPGoodies::instantiate('Lib.Random.Random', Random::RANDOM_ALG_ISAAC);
+		$this->prng = PHPGoodies::instantiate('Lib.Random', Random::RANDOM_ALG_ISAAC);
 		$this->prng->seed($secret);
 		$map = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/=';
 		$max = strlen($map) - 1;

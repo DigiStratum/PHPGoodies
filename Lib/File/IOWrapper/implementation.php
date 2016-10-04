@@ -5,6 +5,10 @@
  * This is made necessary by inconsistency of calling and return data of PHP's built-in disk/file IO
  * operations as well as total absence of error handling, retry support, etc.
  *
+ * TODO: Decide whether we really want this or if we want a more OOP approach to File and Directory
+ * access such that, for a given path, a File/Dir can be checked, created, deleted, opened, read,
+ * written to, etc...
+ *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 

@@ -3,9 +3,12 @@
 		<testsuite name="phpgoodies">
 			<!-- Test the most foundaitonal classes first so we can catch low-level failures early... -->
 			<directory>test</directory>
-			<directory>Lib/Data/test</directory>
-			<directory>Lib/Crypto/test</directory>
-			<directory>Lib/Random/test</directory>
+			<file>Lib/Crypto/Secret64/test.php</file>
+			<file>Lib/Data/Collection/test.php</file>
+			<file>Lib/Data/GString/test.php</file>
+			<file>Lib/Data/Hash/test.php</file>
+			<file>Lib/File/Csv/test.php</file>
+			<file>Lib/Random/test.php</file>
 		</testsuite>
 	</testsuites>
 </phpunit>

@@ -44,7 +44,8 @@ abstract class PHPGoodies {
 
 		// If resultant path invalid, class missing
 		if (! @file_exists($resourceInfo->path)) {
-			$msg = "Could not import implementation for '{$resource}'; not found at [{$resourceInfo->path}]";
+			$msg = "Could not import implementation for '{$resource}'; not found at [{$resourceInfo->path}]; checked [";
+			$msg .= print_r($resourceInfo->checked, true) . "]";
 			throw new \Exception($msg);
 		}
 
@@ -71,6 +72,7 @@ abstract class PHPGoodies {
 		$resourceInfo = new \StdClass();
 		$resourceInfo->name = null;
 		$resourceInfo->path = null;
+		$resourceInfo->checked = Array();
 
 		// Convert any slashes to dots then all slashes back to dots; prevents
 		// users from putting slash into import() calls as if its a raw path
@@ -87,14 +89,27 @@ abstract class PHPGoodies {
 		// Expected implementation will be located relative to this location
 		$path = dirname(__FILE__) . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $resourceparts);
 
-		// If resultant path exists and is a directory, look for the implementation inside it
-		if (@file_exists($path) && @is_dir($path)) $path .= DIRECTORY_SEPARATOR . 'implementation';
-
-		// Expect our path to be a PHP file
-		$path .= '.php';
+		// If resultant path exists and is a directory, look for the
+		// implementation or interface inside there (directory load model)
+		if (@file_exists($path) && @is_dir($path)) {
+			$possibilities = Array('implementation.php', 'interface.php');
+			foreach ($possibilities as $possibility) {
+				$tpath = $path . $possibility;
+				$resourceInfo->checked[] = $tpath;
+				if (@file_exists($tpath) && @is_file($tpath)) {
+					$resourceInfo->path = $tpath;
+					break;
+				}
+			}
+		}
 
 		// If resultant path exists and is a file, capture it
-		if (@file_exists($path) && @is_file($path)) $resourceInfo->path = $path;
+		else {
+			// Everything here gets a PHP file extension!
+			$path .= '.php';
+			$resourceInfo->checked[] = $path;
+			if (@file_exists($path) && @is_file($path)) $resourceInfo->path = $path;
+		}
 
 		return $resourceInfo;
 	}

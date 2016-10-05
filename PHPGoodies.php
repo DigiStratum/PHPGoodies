@@ -89,10 +89,10 @@ abstract class PHPGoodies {
 		// Expected implementation will be located relative to this location
 		$path = dirname(__FILE__) . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $resourceparts);
 
-		// If resultant path exists and is a directory, look for the
-		// implementation or interface inside there (directory load model)
+		// If resultant path exists and is a directory, look for the implementation,
+		// interface, or trait inside there (directory load model)
 		if (@file_exists($path) && @is_dir($path)) {
-			$possibilities = Array('implementation.php', 'interface.php');
+			$possibilities = Array('implementation.php', 'interface.php', 'trait.php');
 			foreach ($possibilities as $possibility) {
 				$tpath = $path . $possibility;
 				$resourceInfo->checked[] = $tpath;

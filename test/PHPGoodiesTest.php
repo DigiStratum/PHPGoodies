@@ -44,7 +44,7 @@ class PHPGoodiesTest extends \PHPUnit_Framework_TestCase {
 		try {
 			PHPGoodies::import('PHPGoodies');
 		}
-		catch (Exception $e) {
+		catch (\Exception $e) {
 			$excepted = false;
 		}
 		$this->assertFalse($excepted);

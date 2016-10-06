@@ -84,7 +84,7 @@ abstract class PHPGoodies {
 		if ($numParts == 0) return $resourceInfo;
 
 		// If expected fully qualified name has already been imported, no-op.
-		$resourceInfo->name = $resourceparts[$numParts - 1];
+		$resourceInfo->name = static::specifierClassName($resource);
 
 		// Expected implementation will be located relative to this location
 		$path = dirname(__FILE__) . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $resourceparts);
@@ -94,7 +94,7 @@ abstract class PHPGoodies {
 		if (@file_exists($path) && @is_dir($path)) {
 			$possibilities = Array('implementation.php', 'interface.php', 'trait.php');
 			foreach ($possibilities as $possibility) {
-				$tpath = $path . $possibility;
+				$tpath = $path . DIRECTORY_SEPARATOR . $possibility;
 				$resourceInfo->checked[] = $tpath;
 				if (@file_exists($tpath) && @is_file($tpath)) {
 					$resourceInfo->path = $tpath;
@@ -152,10 +152,7 @@ abstract class PHPGoodies {
 	 * @return string Just the last segment, or null if it ends up being nothing
 	 */
 	public static function specifierClassName($resource) {
-		$resourceParts = explode('.', $resource);
-		if (count($resourceParts) == 0) return null;
-		$lastPart = trim($resourceParts[count($resourceParts) - 1]);
-		return strlen($lastPart) > 0 ? $lastPart : null;
+		return  str_replace('.', '_', $resource);
 	}
 
 	/**

@@ -7,6 +7,8 @@
  * expose the protected data properties publicly. In this way we can programmatically defined a
  * DTO that is usable on-the-fly without having to necessarily create a reusable class definition.
  *
+ * @uses Oop_Dto
+ *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 

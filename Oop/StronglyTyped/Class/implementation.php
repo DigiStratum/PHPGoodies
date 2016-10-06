@@ -2,6 +2,8 @@
 /**
  * PHPGoodies:Oop_StronglyTyped_Class - A 'Strongly Typed' class with strong type enforcement
  *
+ * @uses Oop_StronglyTyped_Class_Trait
+ *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 

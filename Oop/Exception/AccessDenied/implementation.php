@@ -5,6 +5,8 @@
  * ref: http://php.net/manual/en/language.exceptions.extending.php
  * ref: http://php.net/manual/en/spl.exceptions.php
  *
+ * @uses Oop_Exception_DataAccess
+ *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 

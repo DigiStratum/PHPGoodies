@@ -11,6 +11,8 @@
  * @todo Add support for __call()ing private methods from inside the class (privileged __call)
  * @todo Add support for typed arrays...
  *
+ * @uses Oop_StronglyTyped_Class_Member
+ *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 

@@ -33,9 +33,9 @@
  * ... Not without making a cross-platform consistent pseudo random number generator algorithm, that
  * is...
  * 
- * @uses String
- * @uses Random
- * @uses RandomAlgorithmIsaac
+ * @uses Lib_Data_String
+ * @uses Lib_Random
+ * @uses Lib_Random_Algorithm_Isaac
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -65,7 +65,7 @@ class Lib_Crypto_Secret64 {
 	 * @param string $secret Secret value to initialize randomness with to make a unique map
 	 */
 	public function __construct($secret) {
-		$this->prng = PHPGoodies::instantiate('Lib.Random', Random::RANDOM_ALG_ISAAC);
+		$this->prng = PHPGoodies::instantiate('Lib.Random', Lib_Random::RANDOM_ALG_ISAAC);
 		$this->prng->seed($secret);
 		$map = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/=';
 		$max = strlen($map) - 1;

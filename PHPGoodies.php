@@ -208,8 +208,8 @@ abstract class PHPGoodies {
 	public static function run($app) {
 
 		// If $app is legit this will already be imported, but if not...
-		static::import('Oop.ApplicationIfc');
-		if (! $app instanceof ApplicationIfc) {
+		static::import('Oop.Application');
+		if (! $app instanceof Oop_Application) {
 			$msg = 'Attempted to run something other than an application instance';
 			throw new \Exception($msg);
 		}

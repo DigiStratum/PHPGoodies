@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:GenericDto - A generic DTO implementation
+ * PHPGoodies:Oop_Dto_Dtos_Generic - A generic DTO implementation
  *
  * Publicly exposes most, but not all, of the protected Dto class methods with the same naming and
  * arguments except that the underscore prefix is dropped from the public facing names. Does NOT
@@ -17,7 +17,7 @@ PHPGoodies::import('Oop.Dto');
 /**
  * Generic DTO implementation
  */
-class GenericDto extends Dto {
+class Oop_Dto_Dtos_Generic extends Oop_Dto {
 
 	/**
 	 * Constructor mirrors that of DTO

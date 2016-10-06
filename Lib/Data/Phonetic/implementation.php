@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:Phonetic - Some interesting phonetic text handling
+ * PHPGoodies:Lib_Data_Phonetic - Some interesting phonetic text handling
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  *
@@ -59,7 +59,7 @@ namespace PHPGoodies;
 /**
  * Phonetic
  */
-class Phonetic {
+class Lib_Data_Phonetic {
 
 	/**
 	 * Constructor

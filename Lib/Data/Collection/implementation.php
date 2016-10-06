@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:Collection - Extend the capabilities of an indexed array with OOP
+ * PHPGoodies:Lib_Data_Collection - Extend the capabilities of an indexed array with OOP
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -10,7 +10,7 @@ namespace PHPGoodies;
 /**
  * Collection
  */
-class Collection {
+class Lib_Data_Collection {
 
 	/**
 	 * The name o the class that this collection will hold

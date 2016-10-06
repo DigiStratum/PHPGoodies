@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:Dto - Data Transfer Object class
+ * PHPGoodies:Oop_Dto - Data Transfer Object class
  *
  * Standardizes the way that we prepare API responses
  *
@@ -30,7 +30,7 @@ namespace PHPGoodies;
 /**
  * Data Transfer Object class
  */
-abstract class Dto {
+abstract class Oop_Dto {
 
 	/**
 	 * Associative array that will hold the name/value pairs for the response properties

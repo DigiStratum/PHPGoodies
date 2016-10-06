@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:Validator - A collection of general purpose validators
+ * PHPGoodies:Lib_Data_Validators - A collection of general purpose validators
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -8,9 +8,9 @@
 namespace PHPGoodies;
 
 /**
- * Validator - A collection of general purpose validators
+ * Validators - A collection of general purpose validators
  */
-abstract class Validators {
+abstract class Lib_Data_Validators {
 
 	// -----------------------------------------------------------------------------------------
 	// STRINGS

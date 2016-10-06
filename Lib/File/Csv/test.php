@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:Csv class test cases
+ * PHPGoodies:Lib_File_Csv class test cases
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -9,7 +9,7 @@ namespace PHPGoodies;
 
 require_once(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
 
-class CsvTest extends \PHPUnit_Framework_TestCase {
+class Lib_File_Csv_Test extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * Constructor

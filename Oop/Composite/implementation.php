@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:Composite - Merge the public properties of multiple objects into one, big object
+ * PHPGoodies:Oop_Composite - Merge the public properties of multiple objects into one, big object
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -21,7 +21,7 @@ namespace PHPGoodies;
  * Since this class has an addObject method, it will not be possible to access a method by the same
  * name on an object added to the collection.
  */
-class Composite {
+class Oop_Composite {
 
 	protected $cache;
 	protected $objects;

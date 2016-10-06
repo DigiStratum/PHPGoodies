@@ -11,13 +11,13 @@
 use PHPGoodies\STClass as STClass;
 
 // 2) Load up our goodies
-require(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
-PHPGoodies\PHPGoodies::import('Oop.STClass');
+require(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
+PHPGoodies\PHPGoodies::import('Oop.StronglyTyped.Class');
 
 /**
  * Extend and populate STClass as it would be in a normal application
  */
-class STClassPopulated extends STClass {
+class STClassPopulated extends Oop_StronglyTyped_Class {
 
 	/**
 	 * Constructor

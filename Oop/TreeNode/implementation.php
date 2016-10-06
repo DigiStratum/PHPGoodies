@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:TreeNode - An abstract Tree Node class to extend with the properties you need
+ * PHPGoodies:Oop_TreeNode - An abstract Tree Node class to extend with the properties you need
  *
  * This kind of tree allows each node to have multiple children, but only one parent. The children
  * are ordered, so that the tree can be traversed in a predictable manner.
@@ -13,7 +13,7 @@ namespace PHPGoodies;
 /**
  * TreeNode - An abstract Tree Node class to extend with the properties you need
  */
-abstract class TreeNode {
+abstract class Oop_TreeNode {
 
 	/**
 	 * The class that extends us

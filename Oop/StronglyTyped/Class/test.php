@@ -2,6 +2,9 @@
 /**
  * PHPGoodies:STClass class test cases
  *
+ * FIXME: calls to `new Oop_StronglyTyped_Class()` should probable be replaced by PHPGoodies::instantiate() calls...
+ *
+ *
  * @groups basic, types, data, magic, scope, names, functions
  *
  * @author Sean M. Kelly <smk@smkelly.com>
@@ -9,11 +12,11 @@
 
 namespace PHPGoodies;
 
-require_once(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
+require_once(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
 
-PHPGoodies::import('Oop.STClass');
+PHPGoodies::import('Oop.StronglyTyped.Class');
 
-class STClassTest extends \PHPUnit_Framework_TestCase {
+class Oop_StronglyTyped_Class_Test extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * Constructor
@@ -39,7 +42,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * @group basic
 	 */
 	public function testThatSTClassIsInstantiable() {
-		$class = PHPGoodies::instantiate('Oop.STClass');
+		$class = PHPGoodies::instantiate('Oop.StronglyTyped.Class');
 		$this->assertTrue(is_object($class));
 		$this->assertTrue($class instanceof STClass);
 	}
@@ -50,7 +53,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * @group data
 	 */
 	public function testThatPublicPropertiesAreAccessible() {
-		$class = PHPGoodies::instantiate('Oop.STClass');
+		$class = PHPGoodies::instantiate('Oop.StronglyTyped.Class');
 
 		// Add properties
 		$class->add('fortyTwo', 42);
@@ -69,7 +72,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * @group types
 	 */
 	public function testThatMismatchedDataAssignmentsAreRejected() {
-		$class = PHPGoodies::instantiate('Oop.STClass');
+		$class = PHPGoodies::instantiate('Oop.StronglyTyped.Class');
 		$class->add('fortyTwo', 42);		// Add a number
 		$class->fortyTwo = 'Forty Two!';	// Try to set it to a string!
 	}
@@ -82,7 +85,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * @group types
 	 */
 	public function testThatMismatchedTypeAdditionsAreRejected() {
-		$class = PHPGoodies::instantiate('Oop.STClass');
+		$class = PHPGoodies::instantiate('Oop.StronglyTyped.Class');
 		// A number can't be a string, you silly goose!
 		$class->add('fortyTwo', 42, ST_TYPE_STRING);
 	}
@@ -95,7 +98,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * @group data
 	 */
 	public function testThatDuplicateAddsAreRejected() {
-		$class = PHPGoodies::instantiate('Oop.STClass');
+		$class = PHPGoodies::instantiate('Oop.StronglyTyped.Class');
 		$class->add('fortyTwo', 42);
 		$class->add('fortyTwo', 42);
 	}
@@ -108,7 +111,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * @group names
 	 */
 	public function testThatInvalidPropertyNamesAddedAreRejected() {
-		$class = PHPGoodies::instantiate('Oop.STClass');
+		$class = PHPGoodies::instantiate('Oop.StronglyTyped.Class');
 		$class->add('42', 42);
 	}
 
@@ -120,7 +123,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * @group types
 	 */
 	public function testThatInvalidTypesAddedAreRejected() {
-		$class = PHPGoodies::instantiate('Oop.STClass');
+		$class = PHPGoodies::instantiate('Oop.StronglyTyped.Class');
 		$class->add('fortyTwo', 42, 'Baloney Sandwich');
 	}
 
@@ -491,7 +494,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * @group functions
 	 */
 	public function testThatAddingFunctionMemberIsCallable() {
-		$class = new STClass();
+		$class = new Oop_StronglyTyped_Class();
 
 		// Define a public function
 		$res = $class->add(
@@ -593,7 +596,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * @group functions
 	 */
 	public function testThatAddingFunctionReturnValueIsTypeEnforced() {
-		$class = new STClass();
+		$class = new Oop_StronglyTyped_Class();
 
 		// Define a public function
 		$class->add(
@@ -616,7 +619,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
 	 * @group functions
 	 */
 	public function testThatAddingFunctionNullAssignmentIsRejected() {
-		$class = new STClass();
+		$class = new Oop_StronglyTyped_Class();
 
 		// Define a public function
 		$class->add(
@@ -665,7 +668,7 @@ class STClassTest extends \PHPUnit_Framework_TestCase {
  *
  * Note: update tests in f.testThatSTClassExtendedHasExpectedClassMembers() when additions are made:
  */
-class STClassPopulated extends STClass {
+class STClassPopulated extends Oop_StronglyTyped_Class {
 
 	/**
 	 * Constructor

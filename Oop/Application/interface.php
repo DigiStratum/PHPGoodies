@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:ApplicationIfc - An application class interface to help get things running under OOP
+ * PHPGoodies:Oop_Application - An application class interface to help get things running under OOP
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -10,7 +10,7 @@ namespace PHPGoodies;
 /**
  * An application class interface to help get things running under OOP
  */
-interface  ApplicationIfc {
+interface Oop_Application {
 
 	/**
 	 * Main application entry point

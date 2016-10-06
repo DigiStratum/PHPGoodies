@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:IOWrapper - A wrapper for PHP disk/file IO operations (WORK IN PROGRESS)
+ * PHPGoodies:Lib_File_IOWrapper - A wrapper for PHP disk/file IO operations (WORK IN PROGRESS)
  *
  * This is made necessary by inconsistency of calling and return data of PHP's built-in disk/file IO
  * operations as well as total absence of error handling, retry support, etc.
@@ -17,7 +17,7 @@ namespace PHPGoodies;
 /**
  * IOWrapper - A wrapper for PHP disk/file IO operations
  */
-class IOWrapper {
+class Lib_File_IOWrapper {
 
 	/**
 	 * Constructor

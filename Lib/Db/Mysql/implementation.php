@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:Mysql - DB access for MySQL connections
+ * PHPGoodies:Lib_Db_Mysql - DB access for MySQL connections
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -15,7 +15,7 @@ namespace PHPGoodies;
  *
  * @todo Refactor to use Mysqli instead of legacy, global mysql functions
  */
-class Mysql {
+class Lib_Db_Mysql {
 
 	/**
 	 * Max number of retries to attempt for failed operations

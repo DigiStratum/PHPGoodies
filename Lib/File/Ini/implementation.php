@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:Ini - A class for working with INI files
+ * PHPGoodies:Lib_File_Ini - A class for working with INI files
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -10,7 +10,7 @@ namespace PHPGoodies;
 /**
  * Ini - A class for working with INI files
  */
-class Ini {
+class Lib_File_Ini {
 
 	/**
 	 * Path to the INI file we'll be working with

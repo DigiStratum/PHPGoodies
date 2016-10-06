@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:Secret64 - A secret-ciphered layer for Base64
+ * PHPGoodies:Lib_Crypto_Secret64 - A secret-ciphered layer for Base64
  *
  * Baes64 encoding is a convenient way to glob up nearly any data you want into a string that is
  * neatly ASCII encoded in order to ensure data integrity when in transit across a wide variety
@@ -47,7 +47,7 @@ PHPGoodies::import('Lib.Random');
 /**
  * Secret64
  */
-class Secret64 {
+class Lib_Crypto_Secret64 {
 
 	/**
 	 * Our cipher map

@@ -1,6 +1,6 @@
 <?php
 /**
-  * PHPGoodies:Hash - Extend the capabilities of an associative array with OOP
+  * PHPGoodies:Lib_Data_Hash - Extend the capabilities of an associative array with OOP
   *
   * @author Sean M. Kelly <smk@smkelly.com>
   */
@@ -10,7 +10,7 @@ namespace PHPGoodies;
 /**
  * Hash
  */
-class Hash {
+class Lib_Data_Hash {
 
 	/**
 	 * This is the actual hash data that all the methods below manipulate

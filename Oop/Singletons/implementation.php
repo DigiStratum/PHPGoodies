@@ -1,10 +1,14 @@
 <?php
 /**
- * PHPGoodies:Singletons - A class to manage a collection of singleton object instances
+ * PHPGoodies:Oop_Singletons - A class to manage a collection of singleton object instances
  *
  * With only a single instance of this class, all the instances within its collection could be
  * treated as application-wide singletons; however multiple instances would enable multiple
  * collections with one instance of each object per.
+ *
+ * Note: because this is a general purpose class loader just like PHPGoodies main class, there is no
+ * way to know in advance what the dependencies are, so you will have to collect up the dependencies
+ * yourself for the other classes which you expect to be loading with this class.
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -14,7 +18,7 @@ namespace PHPGoodies;
 /**
  * Singletons - A class to manage a collection of singleton object instances
  */
-class Singletons {
+class Oop_Singletons {
 
 	/**
 	 * The collection of instances we are working with

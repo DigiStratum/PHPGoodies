@@ -13,7 +13,7 @@ require(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
 $singletons = PHPGoodies::instantiate('Oop.Singletons');
 
 // Use our global Singletons to get a reference to an instance of Lib.Db.Mysql
-$db =& $singletons->get('Lib.Db.Mysql.Mysql');
+$db =& $singletons->get('Lib.Db.Mysql');
 if (! $db->connect('localhost', 'root', '', 'mysql')) {
 	die("error connecting to database\n");
 }
@@ -25,7 +25,7 @@ $db->close();
 function myFunction() {
 	global $singletons;
 
-	$db =& $singletons->get('Lib.Db.Mysql.Mysql');
+	$db =& $singletons->get('Lib.Db.Mysql');
 
 	$res = $db->query('SELECT NOW() AS `rightnow`;');
 	return $res[0]['rightnow'];

@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:Hash class test cases
+ * PHPGoodies:Lib_Data_Hash class test cases
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -9,7 +9,7 @@ namespace PHPGoodies;
 
 require_once(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
 
-class HashTest extends \PHPUnit_Framework_TestCase {
+class Lib_Data_Hash_Test extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * Constructor

@@ -1,18 +1,18 @@
 <?php
 /**
- * PHPGoodies:STClass - A 'Strongly Typed' class with strong type enforcement
+ * PHPGoodies:Oop_StronglyTyped_Class - A 'Strongly Typed' class with strong type enforcement
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
 namespace PHPGoodies;
 
-PHPGoodies::import('Oop.StronglyTypedTrait');
+PHPGoodies::import('Oop.StronglyTyped.Class.Trait');
 
 /**
  * A 'Strongly Typed' class with strong type enforcement
  */
-class STClass {
-	use StronglyTypedTrait;
+class Oop_StronglyTyped_Class {
+	use Oop_StronglyTyped_Class_Trait;
 }
 

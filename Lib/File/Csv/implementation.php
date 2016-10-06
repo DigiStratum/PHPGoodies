@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:Csv - A class for manipulating CSV data
+ * PHPGoodies:Lib_File_Csv - A class for manipulating CSV data
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -13,7 +13,7 @@ namespace PHPGoodies;
  * RFC-4180 Compliant implementation
  * ref: http://www.ietf.org/rfc/rfc4180.txt
  */
-abstract class Csv {
+abstract class Lib_File_Csv {
 
 	/**
 	 * Tokenize a string of CSV text/data and return the fielded data as an indexed array

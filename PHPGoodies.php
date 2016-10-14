@@ -126,7 +126,8 @@ abstract class PHPGoodies {
 	 * @return boolean true if the name is defined as a class, interface, or trace, else false
 	 */
 	public static function isImported($name, $requireClass = false) {
-		$nsName = static::namespaced($name);
+		$className = static::specifierClassName($name);
+		$nsName = static::namespaced($className);
 		return (
 			class_exists($nsName) ||
 			(! $requireClass && (interface_exists($nsName) || trait_exists($nsName)))
@@ -152,7 +153,8 @@ abstract class PHPGoodies {
 	 * @return string Just the last segment, or null if it ends up being nothing
 	 */
 	public static function specifierClassName($resource) {
-		return  str_replace('.', '_', $resource);
+		$t = trim(str_replace('.', '_', $resource));
+		return (strlen($t) > 0) ? $t : null;
 	}
 
 	/**

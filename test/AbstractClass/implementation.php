@@ -9,7 +9,7 @@
 
 namespace PHPGoodies;
 
-abstract class AbstractClass {
+abstract class test_AbstractClass {
 
 	// This should never be called
 	public function __construct() { }

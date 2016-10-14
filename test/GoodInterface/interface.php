@@ -7,7 +7,7 @@
 
 namespace PHPGoodies;
 
-interface GoodInterface {
+interface test_GoodInterface {
 	public function __construct();
 }
 

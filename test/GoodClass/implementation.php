@@ -9,7 +9,7 @@
 
 namespace PHPGoodies;
 
-class GoodClass {
+class test_GoodClass {
 	public $arg;
 
 	public function __construct($arg = null) {

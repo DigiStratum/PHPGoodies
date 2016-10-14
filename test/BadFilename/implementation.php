@@ -9,7 +9,7 @@
 
 namespace PHPGoodies;
 
-class BadClass {
+class test_BadClass {
 
 	// This should never be called
 	public function __construct() { }

@@ -82,7 +82,7 @@ class PHPGoodiesTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testThatAGoodClassIsImported() {
 		PHPGoodies::import('test.GoodClass');
-		$this->assertTrue(PHPGoodies::isImported('GoodClass'));
+		$this->assertTrue(PHPGoodies::isImported('test.GoodClass'));
 	}
 
 	/**
@@ -91,7 +91,7 @@ class PHPGoodiesTest extends \PHPUnit_Framework_TestCase {
 	public function testThatAGoodClassIsInstantiated() {
 		$instance = PHPGoodies::instantiate('test.GoodClass');
 		$this->assertTrue(is_object($instance));
-		$this->assertTrue($instance instanceof GoodClass);
+		$this->assertTrue($instance instanceof test_GoodClass);
 	}
 
 	/**
@@ -118,7 +118,7 @@ class PHPGoodiesTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testThatInterfaceImportWorks() {
 		PHPGoodies::import('test.GoodInterface');
-		$this->assertTrue(PHPGoodies::isImported('GoodInterface'));
+		$this->assertTrue(PHPGoodies::isImported('test.GoodInterface'));
 	}
 
 	/**
@@ -126,12 +126,10 @@ class PHPGoodiesTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testThatSpecifierClassNameWorks() {
 		$className = PHPGoodies::specifierClassName('1.2.3.test');
-		$this->assertEquals('test', $className);
+		$this->assertEquals('1_2_3_test', $className);
 		$className = PHPGoodies::specifierClassName('');
 		$this->assertNull($className);
 		$className = PHPGoodies::specifierClassName('   ');
-		$this->assertNull($className);
-		$className = PHPGoodies::specifierClassName('1.2.');
 		$this->assertNull($className);
 	}
 

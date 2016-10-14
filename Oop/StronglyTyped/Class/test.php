@@ -44,7 +44,7 @@ class Oop_StronglyTyped_Class_Test extends \PHPUnit_Framework_TestCase {
 	public function testThatSTClassIsInstantiable() {
 		$class = PHPGoodies::instantiate('Oop.StronglyTyped.Class');
 		$this->assertTrue(is_object($class));
-		$this->assertTrue($class instanceof STClass);
+		$this->assertTrue($class instanceof Oop_StronglyTyped_Class);
 	}
 
 	/**

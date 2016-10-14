@@ -54,7 +54,7 @@ class Lib_Net_Http_Oauth2_AccessToken {
 	 */
 	public function dataToToken($hash) {
 		PHPGoodies::import('Lib.Data.Hash');
-		if (! $hash instanceof Hash) {
+		if (! $hash instanceof Lib_Data_Hash) {
 			throw new \Exception('Something other than a Hash supplied for token data');
 		}
 		$obj = (object) $hash->all();

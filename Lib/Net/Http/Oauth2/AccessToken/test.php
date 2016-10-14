@@ -81,7 +81,7 @@ class Lib_Net_Httpd_Oauth2_AccessToken_Test extends \PHPUnit_Framework_TestCase 
 		$readToken = PHPGoodies::instantiate('Lib.Net.Http.Oauth2.AccessToken', 'secret');
 		$data = $readToken->tokenToData($token);
 
-		$this->assertTrue($data instanceof Hash);
+		$this->assertTrue($data instanceof Lib_Data_Hash);
 		$this->assertEquals(3, $data->num());
 		$this->assertTrue($data->has('a'));
 		$this->assertEquals(1, $data->get('a'));

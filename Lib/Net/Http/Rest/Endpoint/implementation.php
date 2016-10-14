@@ -41,7 +41,7 @@ abstract class Lib_Net_Http_Rest_Endpoint {
 	 * @return object $this for chaining aupport...
 	 */
 	public function setCorsPolicy($corsPolicy) {
-		if (! $corsPolicy instanceof CorsPolicy) {
+		if (! $corsPolicy instanceof Lib_Net_Http_CorsPolicy) {
 			throw new \Exception("Attempted to set something other than a CorsPolicy as the CORS Policy for a RESTful endpoint.");
 		}
 		$this->corsPolicy = $corsPolicy;
@@ -54,7 +54,7 @@ abstract class Lib_Net_Http_Rest_Endpoint {
 	 * @return boolean true if there is a CorsPolicy, else false
 	 */
 	public function hasCorsPolicy() {
-		return ($this->corsPolicy instanceof CorsPolicy);
+		return ($this->corsPolicy instanceof Lib_Net_Http_CorsPolicy);
 	}
 
 	/**

@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:TemplateRendererIfc - Class interface for rendering text templates
+ * PHPGoodies:Lib_Template_Renderer - Class interface for rendering text templates
  *
  * The idea here is that we can supply some form of text-encoded template along with a data object
  * and that the implenting renderer class will transform the data according to the template and the
@@ -13,9 +13,9 @@
 namespace PHPGoodies;
 
 /**
- * TemplateRendererIfc - Class interface for rendering text templates
+ * Lib_Template_Renderer - Class interface for rendering text templates
  */
-interface TemplateRendererIfc {
+interface Lib_Template_Renderer {
 
 	/**
 	 * Render the supplied template using the supplied data

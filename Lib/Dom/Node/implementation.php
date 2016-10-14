@@ -90,7 +90,7 @@ abstract class Node {
 	public function &appendNode($node) {
 
 		// Only other Nodes need apply...
-		if (! ($node instanceof Node)) return;
+		if (! ($node instanceof Lib_Dom_Node)) return;
 		$this->nodeList[] = $node;
 
 		return $this->nodeList[count($this->nodeList) - 1];
@@ -106,7 +106,7 @@ abstract class Node {
 	public function &prependNode($node) {
 
 		// Only other Nodes need apply...
-		if (! ($node instanceof Node)) return;
+		if (! ($node instanceof Lib_Dom_Node)) return;
 		array_unshift($this->nodeList, $node);
 
 		return $this->nodeList[0];

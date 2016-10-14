@@ -147,7 +147,7 @@ class Lib_Net_Http_Rest_Api {
 		}
 
 		// Check authentication/authorization
-		if (strlen($this->endpoints[$pattern]->authScope) && ($this->authServer instanceof Oauth2AuthServer)) {
+		if (strlen($this->endpoints[$pattern]->authScope) && ($this->authServer instanceof Lib_Net_Http_Oauth2_Auth_Server)) {
 			if (! $this->authServer->hasScopeAuthorization($this->restRequest, $this->endpoints[$pattern]->authScope)) {
 				return $this->errorResponse('Unauthorized', Lib_Net_Http_Response::HTTP_UNAUTHORIZED);
 			}

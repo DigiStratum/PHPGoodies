@@ -3,11 +3,15 @@
 		<testsuite name="phpgoodies">
 			<!-- Test the most foundaitonal classes first so we can catch low-level failures early... -->
 			<directory>test</directory>
-			<directory>Lib/Oop/test</directory>
-			<directory>Lib/Data/test</directory>
-			<directory>Lib/Crypto/test</directory>
-			<directory>Lib/File/Csv/test</directory>
-			<directory>Lib/Net/Http/Oauth2/test</directory>
+			<file>Lib/Data/Collection/test.php</file>
+			<file>Lib/Data/Hash/test.php</file>
+			<file>Lib/Data/String/test.php</file>
+			<file>Lib/Crypto/Secret64/test.php</file>
+			<file>Lib/File/Csv/test.php</file>
+			<file>Lib/Net/Http/Oauth2/Auth/User/test.php</file>
+			<file>Lib/Net/Http/Oauth2/AccessToken/test.php</file>
+			<file>Lib/Random/test.php</file>
+			<file>Lib/Template/Mustache/test.php</file>
 		</testsuite>
 	</testsuites>
 </phpunit>

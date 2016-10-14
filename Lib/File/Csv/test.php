@@ -34,7 +34,7 @@ class Lib_File_Csv_Test extends \PHPUnit_Framework_TestCase {
 	 * That no data comes out of an empty string
 	 */
 	public function testThatWeGetNoElementsWhenEmpty() {
-		$data = Csv::tokenize('');
+		$data = Lib_File_Csv::tokenize('');
 		$this->assertEquals(0, count($data));
 	}
 
@@ -46,7 +46,7 @@ class Lib_File_Csv_Test extends \PHPUnit_Framework_TestCase {
 		$counts = array(2, 3, 7);
 		foreach ($counts as $N) {
 			$csv = str_repeat(',', $N-1);
-			$data = Csv::tokenize($csv);
+			$data = Lib_File_Csv::tokenize($csv);
 			$this->assertEquals($N, count($data));
 			for ($x = 0; $x < $N; $x++) {
 				$this->assertEquals('', $data[$x]);
@@ -59,7 +59,7 @@ class Lib_File_Csv_Test extends \PHPUnit_Framework_TestCase {
 	 * in between
 	 */
 	public function testThatWeGetFirstAndLastElementsExactly() {
-		$data = Csv::tokenize('a,,,z');
+		$data = Lib_File_Csv::tokenize('a,,,z');
 		$this->assertEquals(4, count($data));
 		$this->assertEquals('a', $data[0]);
 		$this->assertEquals('', $data[1]);
@@ -74,7 +74,7 @@ class Lib_File_Csv_Test extends \PHPUnit_Framework_TestCase {
 		$csv = "a,'b',\"c\",z";
 
 		// .. with the default delimiter..
-		$data = Csv::tokenize($csv);
+		$data = Lib_File_Csv::tokenize($csv);
 		$this->assertEquals(4, count($data));
 		$this->assertEquals('a', $data[0]);
 		$this->assertEquals("'b'", $data[1]);
@@ -82,7 +82,7 @@ class Lib_File_Csv_Test extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals('z', $data[3]);
 
 		// .. with a non-default delimiter..
-		$data = Csv::tokenize($csv, "'");
+		$data = Lib_File_Csv::tokenize($csv, "'");
 		$this->assertEquals(4, count($data));
 		$this->assertEquals('a', $data[0]);
 		$this->assertEquals('b', $data[1]);
@@ -94,7 +94,7 @@ class Lib_File_Csv_Test extends \PHPUnit_Framework_TestCase {
 	 * Test that quoted fields with separators that appear inside them don't fool it
 	 */
 	public function testThatSeparatorsInQuotedFieldsDontFoolIt() {
-		$data = Csv::tokenize('"a,b","c,z"');
+		$data = Lib_File_Csv::tokenize('"a,b","c,z"');
 		$this->assertEquals(2, count($data));
 		$this->assertEquals('a,b', $data[0]);
 		$this->assertEquals('c,z', $data[1]);
@@ -104,7 +104,7 @@ class Lib_File_Csv_Test extends \PHPUnit_Framework_TestCase {
 	 * Test that quoted fields with escaped delimiters that appear inside them don't fool it
 	 */
 	public function testThatEscapedDelimitersInQuotedFieldsDontFoolIt() {
-		$data = Csv::tokenize("'shouldn\\'t fail','c,z'", "'");
+		$data = Lib_File_Csv::tokenize("'shouldn\\'t fail','c,z'", "'");
 		$this->assertEquals(2, count($data));
 		$this->assertEquals("shouldn't fail", $data[0]);
 		$this->assertEquals('c,z', $data[1]);
@@ -114,7 +114,7 @@ class Lib_File_Csv_Test extends \PHPUnit_Framework_TestCase {
 	 * Test that passing an empty array to csvize() results in an empty string
 	 */
 	public function testThatAnEmptyArrayResultsInAnEmptyString() {
-		$csv = Csv::csvize(array());
+		$csv = Lib_File_Csv::csvize(array());
 		$this->assertEquals('string', gettype($csv));
 		$this->assertEquals(0, strlen($csv));
 	}
@@ -123,7 +123,7 @@ class Lib_File_Csv_Test extends \PHPUnit_Framework_TestCase {
 	 * Test that passing a simple array to csvize() results in a properly encoded string
 	 */
 	public function testThatASimpleArrayIsEncodedProperly() {
-		$csv = Csv::csvize(array(1,'2',3,'a,b,c'));
+		$csv = Lib_File_Csv::csvize(array(1,'2',3,'a,b,c'));
 		$this->assertEquals('"1","2","3","a,b,c"', $csv);
 	}
 
@@ -132,7 +132,7 @@ class Lib_File_Csv_Test extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testThatEscapingIsHandledCorrectly() {
 		$str = "\"\\hello\\\"";
-		$csv = Csv::csvize(array($str));
+		$csv = Lib_File_Csv::csvize(array($str));
 		// Crazy slashes: one escaped slash in the origrinal become DOUBLE escaped slashes!
 		$this->assertEquals('"\"\\\\hello\\\\\""', $csv);
 	}

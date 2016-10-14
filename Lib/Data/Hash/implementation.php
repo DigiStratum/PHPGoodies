@@ -144,7 +144,7 @@ class Lib_Data_Hash {
 	 */
 	public function merge($hash, $replace = true) {
 
-		if (! $hash instanceof Hash) {
+		if (! $hash instanceof Lib_Data_Hash) {
 			throw new \Exception('Attempted to merge with something other than another Hash');
 		}
 

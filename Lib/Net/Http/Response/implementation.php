@@ -131,5 +131,30 @@ class Lib_Net_Http_Response {
 		$this->body = null;
 		$this->headers->nil();
 	}
+
+	/**
+	 * Set the HTTP status code
+	 *
+	 * @param $code integer HTTP status code value; should be one of our constants
+	 *
+	 * @return object $this for chainable support...
+	 */
+	public function setCode($code) {
+		$this->code = $code;
+		return $this;
+	}
+
+	/**
+	 * Set the response body
+	 *
+	 * @param $body string of raw response body
+	 *
+	 * @return object $this for chainable support...
+	 */
+	public function setResponseBody($body) {
+		$this->code = $body;
+		return $this;
+	}
+
 }
 

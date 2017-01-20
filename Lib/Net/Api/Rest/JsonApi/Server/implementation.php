@@ -15,44 +15,84 @@ PHPGoodies::import('Lib.Data.String');
 class Lib_Net_Api_Rest_JsonApi_Server {
 
 	/**
-	 * Cached copy of the resource factory map which is dependency-injected
+	 * Cached copy of the resource map which is dependency-injected
 	 */
-	protected $jsonApiResourceFactoryMap;
+	protected $resourceMap;
 
 	/**
 	 * Constructor
 	 *
-	 * @param $JsonApiResourceFactoryMap Hash map object instance mapping endpoint URI's to
+	 * @param $JsonApiResourceMap Hash map object instance mapping endpoint URI's to
 	 * JsonApiResource implementations
 	 */
-	public function __construct($jsonApiResourceFactoryMap) {
-		$this->jsonApiResourceFactoryMap = $jsonApiResourceFactoryMap;
+	public function __construct($resourceMap) {
+		$this->resourceMap = $resourceMap;
 	}
 
 	/**
 	 * HTTP Request Processor
 	 *
-	 * @param $httpRequest HttpRequest object instance holding the request to be processed
+	 * @param $httpRequest HttpRequest object instance reference to request to be processed
 	 *
 	 * @return HttpResponse object instance with the result of the processed request
 	 */
-	public function processRequest($httpRequest) {
+	public function processRequest(&$httpRequest) {
 		try {
 			$requestInfo = $httpRequest->getInfo();
 			$resource = $this->getResourceForURI($requestInfo->uri);
 			if (null === $resource) {
-				return $this->responseError(Lib_Net_Http_Response::HTTP_BAD_REQUEST, 'This request did not match anything in our resource map');
+				return $this->responseError(
+					Lib_Net_Http_Response::HTTP_BAD_REQUEST,
+					'No matching mapped resource for request'
+				);
+			}
+
+			switch ($requestInfo->method) {
+			case Lib_Net_Http_Request::HTTP_GET: return $this->processRequestRetrieve($requestInfo, $resource);
 			}
 
 			// TODO: Execute the appropriate handler method for the given request method against the resource that we received
+			// How shall we go about this?
+			//  * Switch on request method and call an abstract resource method?
+			//  * Call a resource method named after the request method (no switch case) ?
+			//  * Use some sort of decorator pattern solution to get a variant of the resource class with just a call method linked to the correct operations based on the request method?
+			//  * Call some resource call() method, handing it the request method?
+			//  * Call some resource process() method, handing it the entire httpRequest?
 		}
 		catch (\Exception $e) {
-			return $this->responseError(Lib_Net_Http_Response::HTTP_INTERNAL_SERVER_ERROR, 'An unexpected, internal error occurred: ' . $e->getMessage());
+			return $this->responseError(
+				Lib_Net_Http_Response::HTTP_INTERNAL_SERVER_ERROR,
+				'Unexpected internal error: ' . $e->getMessage()
+			);
 		}
 	}
 
 	/**
-	 * Get the matching resource from the factory map for the given URI
+	 * Process the request as a resource retrieval
+	 *
+	 * @param $requestInfo Object with properties describing the request being made
+	 * @param $resource Object class instance implementing JsonApi_Resource interface
+	 */
+	private function proceeRequestRetrieve($requestInfo, $resource) {
+		try {
+			// Form a successful response
+			$resource->retrieve();
+			return $this->createHttpResponse(
+				Lib_Net_Http_Response::HTTP_OK,
+				$resource->toJson()
+			);
+		}
+		catch (\Exception $e) {
+			// TODO: catch different exceptions depending on what went wrong!
+			return $this->responseError(
+				Lib_Net_Http_Response::HTTP_BAD_REQUEST,
+				'Failed retrieval: ' . $e->getMessage()
+			);
+		}
+	}
+
+	/**
+	 * Get the matching resource from the resource map for the given URI
 	 *
 	 * @param $uri string URI for the request being processed
 	 */
@@ -61,21 +101,9 @@ class Lib_Net_Api_Rest_JsonApi_Server {
 	}
 
 	/**
-	 * Factory method to produce error responses
-	 *
-	 * @param $code Integer HTTP status code
-	 * @param $message String readable message text explaining the error
+	 * Creates an HttpResponse
 	 */
-	private function responseError($code, $message) {
-
-		// Form a simple JSON:API ErrorObject
-		$errorObject = new \StdClass();
-		$errorObject->detail = $message;
-
-		// Form a simple JSON:API Response Document
-		$body = new \StdClass();
-		$body->errors = array($message);
-
+	private function createHttpResponse($code, $body) {
 		// Form a full-blown HttpResponse
 		$httpResponse = PHPGoodies::instantiate('Lib.Net.Http.Response');
 		$httpResponse->headers->set('Content-type', 'application/vnd.api+json');
@@ -83,6 +111,25 @@ class Lib_Net_Api_Rest_JsonApi_Server {
 		$httpResponse->setBody(json_encode($body));
 
 		return $httpResponse;
+	}
+
+	/**
+	 * Produce an error response
+	 *
+	 * @param $code Integer HTTP status code
+	 * @param $message String readable message text explaining the error
+	 */
+	private function responseError($code, $message) {
+
+		// Form a simple JSON:API Response Document
+		$body = new \StdClass();
+
+		// Form a simple JSON:API ErrorObject
+		$errorObject = new \StdClass();
+		$errorObject->detail = $message;
+		$body->errors = array($message);
+
+		return $this->createHttpResponse($code, $body);
 	}
 }
 

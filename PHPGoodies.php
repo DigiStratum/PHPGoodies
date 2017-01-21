@@ -62,6 +62,45 @@ abstract class PHPGoodies {
 	}
 
 	/**
+	 * Is the supplied class name currently defined?
+	 *
+	 * Why would we wrap a one-line native PHP call like this? Simple: so that we can mock it
+	 * for testing; it's sometimes impossible to mock or otherwise knock out native PHP function
+	 * calls, so this makes it easy, expecially for something that we will use quite often.
+	 *
+	 * @param string Name of a PHP class that we are interested in
+	 *
+	 * @return boolean true if the class name is defined, else false
+	 */
+	public static function classDefined($className) {
+		return class_exists($className);
+	}
+
+	/**
+	 * Is the supplied interface name currently defined?
+	 *
+	 * Why would we wrap a one-line native PHP call like this? Simple: so that we can mock it
+	 * for testing; it's sometimes impossible to mock or otherwise knock out native PHP function
+	 * calls, so this makes it easy, expecially for something that we will use quite often.
+	 *
+	 * @param string Name of a PHP interfacethat we are interested in
+	 *
+	 * @return boolean true if the interface name is defined, else false
+	 */
+	public static function interfaceDefined($interfaceName) {
+		return interface_exists($interfaceName);
+	}
+
+	/**
+	 * Does the supplied class implement the named interface?
+	 */
+	public static function classImplements($className, $interfaceName) {
+		if (! static::classDefined) return false;
+		if (! static::interfaceDefined) return false;
+		return in_array($interfaceName, class_implements($className));
+	}
+
+	/**
 	 * Get some information about the named resource identifier
 	 *
 	 * @param string $resource The dotted notation resource specifier to import

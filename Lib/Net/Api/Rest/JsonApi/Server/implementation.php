@@ -8,6 +8,7 @@
 namespace PHPGoodies;
 
 PHPGoodies::import('Lib.Data.String');
+PHPGoodies::import('Lib.Net.Http.Request');
 
 /**
  * JSON:API Server
@@ -23,9 +24,28 @@ class Lib_Net_Api_Rest_JsonApi_Server {
 	 * Constructor
 	 *
 	 * @param $JsonApiResourceMap Hash map object instance mapping endpoint URI's to
-	 * JsonApiResource implementations
+	 * Resource implementations
 	 */
 	public function __construct($resourceMap) {
+
+		// Check our parameters
+		if (is_array($resourceMap) || (count($resourceMap) === 0)) {
+			throw new \Exception('Bad Constructor Argument(s)');
+		}
+
+		// Check the Resource Map
+		foreach ($resourceMap as $pattern => $resourceClassName) {
+			if (
+				(! PHPGoodies::classDefined($resourceClassName)) ||
+				(! in_array('Lib_Net_Api_Rest_Api_JsonApi_Server_Resource', PHPGoodies::classImplements($resourceClassName)))
+			) {
+				if (is_array($resourceMap) || (count($resourceMap) === 0)) {
+					throw new \Exception("Constructor Resource Map contains bad resource for pattern '{$pattern}'");
+				}
+			}
+		}
+
+
 		$this->resourceMap = $resourceMap;
 	}
 
@@ -37,18 +57,28 @@ class Lib_Net_Api_Rest_JsonApi_Server {
 	 * @return HttpResponse object instance with the result of the processed request
 	 */
 	public function processRequest(&$httpRequest) {
+
+		// Check our parameters
+		if (! $httpRequest instanceof Lib_Net_Http_Request) {
+			return $this->responseError(
+				Lib_Net_Http_Response::HTTP_INTERNAL_SERVER_ERROR,
+				'Invalid Arguments to Process Request'
+			);
+		}
+
 		try {
 			$requestInfo = $httpRequest->getInfo();
 			$resource = $this->getResourceForURI($requestInfo->uri);
-			if (null === $resource) {
+			if ((null === $resource) || (! $resource instanceof Lib_Net_Api_Rest_JsonApi_Server_Resource)) {
 				return $this->responseError(
 					Lib_Net_Http_Response::HTTP_BAD_REQUEST,
 					'No matching mapped resource for request'
 				);
 			}
 
+			// Translate from HTTP request method to Resource operation
 			switch ($requestInfo->method) {
-			case Lib_Net_Http_Request::HTTP_GET: return $this->processRequestRetrieve($requestInfo, $resource);
+				case Lib_Net_Http_Request::HTTP_GET: return $this->processRequestRetrieve($requestInfo, $resource);
 			}
 
 			// TODO: Execute the appropriate handler method for the given request method against the resource that we received
@@ -71,9 +101,9 @@ class Lib_Net_Api_Rest_JsonApi_Server {
 	 * Process the request as a resource retrieval
 	 *
 	 * @param $requestInfo Object with properties describing the request being made
-	 * @param $resource Object class instance implementing JsonApi_Resource interface
+	 * @param $resource Object class instance implementing Resource interface
 	 */
-	private function proceeRequestRetrieve($requestInfo, $resource) {
+	private function processRequestRetrieve($requestInfo, $resource) {
 		try {
 			// Form a successful response
 			$resource->retrieve();

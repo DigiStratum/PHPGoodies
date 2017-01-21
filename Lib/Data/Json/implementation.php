@@ -35,8 +35,9 @@ class Lib_Data_Json {
 	 */
 	protected static function encode($value, $options = 0) {
 		$res = @json_encode($value, $options);
-		if ($res) return $res;
-		throw new \Exception("Lib_Data_Json::encode error: " . static::$errorStrings[json_last_error()]);
+		$err = json_last_error();
+		if (JSON_ERROR_NONE === $err) return $res;
+		throw new \Exception("Lib_Data_Json::encode error: " . static::$errorStrings[$err]);
 	}
 
 	/**
@@ -51,8 +52,9 @@ class Lib_Data_Json {
 	 */
 	protected static function decode($json, $assoc = false) {
 		$res = @json_decode($json, $assoc);
-		if ($res) return $res;
-		throw new \Exception("Lib_Data_Json::decode error: " . static::$errorStrings[json_last_error()]);
+		$err = json_last_error();
+		if (JSON_ERROR_NONE === $err) return $res;
+		throw new \Exception("Lib_Data_Json::decode error: " . static::$errorStrings[$err]);
 	}
 }
 

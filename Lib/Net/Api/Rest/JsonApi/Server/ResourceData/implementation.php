@@ -67,7 +67,17 @@ class Lib_Net_Api_Rest_JsonApi_Server_ResourceData implements \JsonSerializable 
 	}
 
 	/**
+	 * Set the value of the named attribute to the supplied value
+	 */
+	public function setAttribute($name, $value) {
+		// TODO: Implement this
+	}
+
+	/**
 	 * JsonSerializable Json Serializer
+	 *
+	 * @return Associative array of properties which will be encoded as the JSON representation
+	 * of object instances of this class
 	 */
 	public function jsonSerialize() {
 		return [

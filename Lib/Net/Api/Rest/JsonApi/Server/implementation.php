@@ -16,6 +16,11 @@ PHPGoodies::import('Lib.Net.Http.Request');
 class Lib_Net_Api_Rest_JsonApi_Server {
 
 	/**
+	 * URL which forms the server base to which all URIs are relative
+	 */
+	protected $baseUrl;
+
+	/**
 	 * Cached copy of the resource map which is dependency-injected
 	 */
 	protected $resourceMap;
@@ -23,13 +28,14 @@ class Lib_Net_Api_Rest_JsonApi_Server {
 	/**
 	 * Constructor
 	 *
+	 * @param $baseUrl String URL which forms the server base to which all URIs are relative
 	 * @param $JsonApiResourceMap Hash map object instance mapping endpoint URI's to
 	 * Resource implementations
 	 */
-	public function __construct($resourceMap) {
+	public function __construct($baseUrl, $resourceMap) {
 
 		// Check our parameters
-		if (is_array($resourceMap) || (count($resourceMap) === 0)) {
+		if (is_array($resourceMap) || (count($resourceMap) === 0) || (! is_string($baseUrl))) {
 			throw new \Exception('Bad Constructor Argument(s)');
 		}
 
@@ -45,8 +51,8 @@ class Lib_Net_Api_Rest_JsonApi_Server {
 			}
 		}
 
-
 		$this->resourceMap = $resourceMap;
+		$this->baseUrl = $baseUrl;
 	}
 
 	/**
@@ -79,6 +85,7 @@ class Lib_Net_Api_Rest_JsonApi_Server {
 			// Translate from HTTP request method to Resource operation
 			switch ($requestInfo->method) {
 				case Lib_Net_Http_Request::HTTP_GET: return $this->processRequestRetrieve($requestInfo, $resource);
+				case Lib_Net_Http_Request::HTTP_POST: return $this->processRequestCreate($requestInfo, $resource);
 			}
 
 			// TODO: Execute the appropriate handler method for the given request method against the resource that we received
@@ -98,6 +105,37 @@ class Lib_Net_Api_Rest_JsonApi_Server {
 	}
 
 	/**
+	 * Process the request as a resource creation
+	 *
+	 * @param $requestInfo Object with properties describing the request being made
+	 * @param $resource Object class instance implementing Resource interface
+	 */
+	private function processRequestCreate($requestInfo, $resource) {
+		try {
+			// Get the request POST data into the resource
+			$jsonApiDocument = json_decode($requestInfo->data);
+			// TODO: Validate the jsonApiDocument - we can't accept just any old thing...
+			$resource->fromJson(
+			);
+			$resource->create();
+			// Form a successful response
+			$httpResponse = $this->createHttpResponse(
+				Lib_Net_Http_Response::HTTP_CREATED
+			);
+			// Formulate a location redirect header to the created resource
+			$httpResponse->headers->set('Location', "{$this->baseUrl}{$resource->getUri()}");
+			return $httpResponse;
+		}
+		catch (\Exception $e) {
+			// TODO: catch different exceptions depending on what went wrong!
+			return $this->responseError(
+				Lib_Net_Http_Response::HTTP_BAD_REQUEST,
+				'Failed creation: ' . $e->getMessage()
+			);
+		}
+	}
+
+	/**
 	 * Process the request as a resource retrieval
 	 *
 	 * @param $requestInfo Object with properties describing the request being made
@@ -105,8 +143,8 @@ class Lib_Net_Api_Rest_JsonApi_Server {
 	 */
 	private function processRequestRetrieve($requestInfo, $resource) {
 		try {
-			// Form a successful response
 			$resource->retrieve();
+			// Form a successful response
 			return $this->createHttpResponse(
 				Lib_Net_Http_Response::HTTP_OK,
 				$resource->toJson()
@@ -133,13 +171,12 @@ class Lib_Net_Api_Rest_JsonApi_Server {
 	/**
 	 * Creates an HttpResponse
 	 */
-	private function createHttpResponse($code, $body) {
+	private function createHttpResponse($code, $body = null) {
 		// Form a full-blown HttpResponse
 		$httpResponse = PHPGoodies::instantiate('Lib.Net.Http.Response');
 		$httpResponse->headers->set('Content-type', 'application/vnd.api+json');
 		$httpResponse->setCode($code);
-		$httpResponse->setBody(json_encode($body));
-
+		if (! is_null($body)) $httpResponse->setBody(json_encode($body));
 		return $httpResponse;
 	}
 

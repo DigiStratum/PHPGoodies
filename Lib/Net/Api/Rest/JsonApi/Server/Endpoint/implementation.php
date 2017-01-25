@@ -1,10 +1,12 @@
 <?php
 /**
- * PHPGoodies:Lib_Api_Rest_JsonApi_Resource - Abstract class for a single resource
+ * PHPGoodies:Lib_Api_Rest_JsonApi_Endpoint - Abstract class for a single endpoint
+ *
+ * @fixme Finish off this mid-level class once we're done with the low-level stuff
  *
  * @uses Lib_Data_Hash
  * @uses Lib_Net_Api_Rest_JsonApi_Server_Attribute
- * @uses Lib_Net_Api_Rest_JsonApi_Server_ResourceData
+ * @uses Lib_Net_Api_Rest_JsonApi_Server_EndpointData
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -13,25 +15,25 @@ namespace PHPGoodies;
 
 
 /**
- * JSON:API Single resource base class
+ * JSON:API Single endpoint base class
  *
  * Each of the abstract methods is documented with certain expectations of the subclass behavior.
  */
-abstract class Lib_Net_Api_Rest_JsonApi_Resource {
+abstract class Lib_Net_Api_Rest_JsonApi_Server_Endpoint {
 
 	/**
-	 * Our resource data
+	 * Our endpoint data
 	 */
 	private $data;
 
 	/**
 	 * Constructor
 	 *
-	 * @param $type string type of resource we are working with
+	 * @param $type string type of endpoint we are working with
 	 */
 	public function __construct($type) {
 
-		// Declare each of the attributes' names in the resource data
+		// Declare each of the attributes' names in the endpoint data
 		$attributes = PHPGoodies::instantiate('Lib.Data.Hash');
 		$attributeNames = $this->getAttributeNames();
 		if ((! is_array($attributeNames)) || (count($attributeNames) === 0)) {
@@ -43,7 +45,7 @@ abstract class Lib_Net_Api_Rest_JsonApi_Resource {
 				PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.Attribute', $attributeName)
 			);
 		}
-		$this->data = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.ResourceData', $type, $attributes);
+		$this->data = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.EndpointData', $type, $attributes);
 	}
 
 	/**
@@ -62,12 +64,12 @@ abstract class Lib_Net_Api_Rest_JsonApi_Resource {
 	public function getData();
 
 	/**
-	 * Returns the URI, relative to the API base URL, which will deliver this exact resource
+	 * Returns the URI, relative to the API base URL, for this endpoint
 	 */
 	public function getUri();
 
 	/**
-	 * Accepts resource data from 
+	 * Accepts endpoint data from 
 	 */
 	public function create();
 

@@ -19,15 +19,18 @@ class Lib_Net_Api_Rest_JsonApi_Server_Attribute {
 	/**
 	 * Our attribute name
 	 */
-	private $name = null;
+	protected $name = null;
 
 	/**
 	 * Our attribute current value
 	 */
-	private $value = null;
+	protected $value = null;
 
 	/**
 	 * Constructor
+	 *
+	 * @param $name String name of the attribute
+	 * @param $value Mixed value for the attribute; optional, default is null
 	 */
 	public function __construct($name, $value = null) {
 		if (! Lib_Net_Api_Rest_JsonApi_Server_Member::isValidMemberName($name)) {
@@ -38,21 +41,30 @@ class Lib_Net_Api_Rest_JsonApi_Server_Attribute {
 	}
 
 	/**
-	 * Get the name
+	 * Get the name of the attribute
+	 *
+	 * @return string name of the attribute
 	 */
 	public function getName() {
 		return $this->name;
 	}
 
 	/**
-	 * Set the current value
+	 * Set the current value for the attribute
+	 *
+	 * @param $value mixed value for the attribute; optional, default is null
+	 *
+	 * @return $this object for chaining...
 	 */
-	public function setValue($value) {
+	public function setValue($value = null) {
 		$this->value = $value;
+		return $this;
 	}
 
 	/**
-	 * Get the current data
+	 * Get the current value for the attribute
+	 *
+	 * @return mixed value last set for the attribute
 	 */
 	public function getValue() {
 		return $this->value;

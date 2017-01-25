@@ -9,8 +9,6 @@ namespace PHPGoodies;
 
 /**
  * JSON:API Resource data class
- *
- * Leverages JsonSerializable; ref: http://jondavidjohn.com/show-non-public-members-with-json_encode/
  */
 class Lib_Net_Api_Rest_JsonApi_Server_Resource implements \JsonSerializable {
 
@@ -33,6 +31,16 @@ class Lib_Net_Api_Rest_JsonApi_Server_Resource implements \JsonSerializable {
 	 * Our collection of relationships
 	 */
 	protected $relationships = array();
+
+	/**
+	 * Links related to this resource
+	 */
+	protected $links;
+
+	/**
+	 * Non-standard metadata about the resource
+	 */
+	protected $meta;
 
 	/**
 	 * Constructor
@@ -67,10 +75,27 @@ class Lib_Net_Api_Rest_JsonApi_Server_Resource implements \JsonSerializable {
 	}
 
 	/**
-	 * Set the value of the named attribute to the supplied value
+	 * Set the collection of attributes to that provided
+	 *
+	 * @param $attributes Attributes class instance with all the needed attributes preloaded
+	 *
+	 * @return $this object for chaining...
 	 */
-	public function setAttribute($name, $value) {
-		// TODO: Implement this
+	public function setAttributes(Lib_Net_Api_Rest_JsonApi_Server_Attributes $attributes) {
+		$this->attributes = $attributes;
+		return $this;
+	}
+
+	/**
+	 * Set the links manually if needed
+	 *
+	 * @param $links Links Collection object
+	 *
+	 * @return $this object to support chaining...
+	 */
+	public function setLinks(Lib_Net_Api_Rest_JsonApi_Server_Links $links) {
+		$this->links = $links;
+		return $this;
 	}
 
 	/**

@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:Lib_Api_Rest_JsonApi_Server_ResourceData - Resource Data Class
+ * PHPGoodies:Lib_Api_Rest_JsonApi_Server_Resource - Resource Data Class
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -12,7 +12,7 @@ namespace PHPGoodies;
  *
  * Leverages JsonSerializable; ref: http://jondavidjohn.com/show-non-public-members-with-json_encode/
  */
-class Lib_Net_Api_Rest_JsonApi_Server_ResourceData implements \JsonSerializable {
+class Lib_Net_Api_Rest_JsonApi_Server_Resource implements \JsonSerializable {
 
 	/**
 	 * Our unique ID (String)

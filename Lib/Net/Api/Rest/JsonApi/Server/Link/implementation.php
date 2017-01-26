@@ -2,6 +2,8 @@
 /**
  * PHPGoodies:Lib_Api_Rest_JsonApi_Server_Link - JSON:API Link class for response documents
  *
+ * @uses Lib_Net_Api_Rest_JsonApi_Server_Member
+ *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 

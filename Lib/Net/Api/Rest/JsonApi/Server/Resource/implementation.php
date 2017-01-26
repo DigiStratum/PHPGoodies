@@ -2,10 +2,18 @@
 /**
  * PHPGoodies:Lib_Api_Rest_JsonApi_Server_Resource - Resource Data Class
  *
+ * @uses Lib_Net_Api_Rest_JsonAPi_Server_Relationships
+ * @uses Lib_Net_Api_Rest_JsonAPi_Server_Attributes
+ * @uses Lib_Net_Api_Rest_JsonAPi_Server_Links
+ *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
 namespace PHPGoodies;
+
+PHPGoodies::import('Lib.Net.Api.Rest.JsonAPi.Server.Relationships');
+PHPGoodies::import('Lib.Net.Api.Rest.JsonAPi.Server.Attributes');
+PHPGoodies::import('Lib.Net.Api.Rest.JsonAPi.Server.Links');
 
 /**
  * JSON:API Resource data class
@@ -68,8 +76,7 @@ class Lib_Net_Api_Rest_JsonApi_Server_Resource implements \JsonSerializable {
 	 *
 	 * @return $this object to support chaining...
 	 */
-	public function setRelationships($relationships) {
-		// FIXME: Validate that the parameter is what it purports to be!
+	public function setRelationships(Lib_Net_Api_Rest_JsonAPi_Server_Relationships $relationships) {
 		$this->relationships = $relationships;
 		return $this;
 	}
@@ -106,10 +113,10 @@ class Lib_Net_Api_Rest_JsonApi_Server_Resource implements \JsonSerializable {
 	 */
 	public function jsonSerialize() {
 		return [
-			'type': $this->type,
-			'id': $this->id,
-			'attributes': $this->attributes,
-			'relationships': $this->relationships
+			'type' => $this->type,
+			'id' => $this->id,
+			'attributes' => $this->attributes,
+			'relationships'=> $this->relationships
 		];
 	}
 }

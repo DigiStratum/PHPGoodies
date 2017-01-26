@@ -2,6 +2,7 @@
 /**
  * PHPGoodies:Lib_Api_Rest_JsonApi_Server_Relationship - Resource Class
  *
+ * @uses Lib_Net_Api_Rest_JsonApi_Server_Member
  * @uses Lib_Net_Api_Rest_JsonApi_Server_Links
  * @uses Lib_Net_Api_Rest_JsonApi_Server_Meta
  * @uses Lib_Net_Api_Rest_JsonApi_Server_ResourceLinkage
@@ -11,6 +12,7 @@
 
 namespace PHPGoodies;
 
+PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Member');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Links');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Meta');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.ResourceLinkage');
@@ -34,6 +36,33 @@ class Lib_Net_Api_Rest_JsonApi_Server_Relationship implements \JsonSerializable 
 	 * Meta object for non-standard metadata
 	 */
 	protected $meta = null;
+
+	/**
+	 * Used as a parent object index to reference this object
+	 */
+	protected $name;
+
+	/**
+	 * Constructor
+	 *
+	 * @param $name string unique name to use to reference this relationship
+	 */
+	public function __construct(string $name) {
+		// Let's just use our own MemberName checker
+		if (! Lib_Net_Api_Rest_JsonApi_Server_Member::isValidMemberName($name)) {
+			throw new \Exception("Invalid JSON:API relationship name: '{$name}'");
+		}
+		$this->name = $name;
+	}
+
+        /**
+	 * Getter for the name
+	 *
+	 * @return String $name for this link
+	 */
+	public function getName() {
+		return $this->name;
+	}
 
 	/**
 	 * Setter for our $links property

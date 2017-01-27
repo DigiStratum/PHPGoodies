@@ -14,7 +14,7 @@ PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Member');
 /**
  * JSON:API Resource attribute class
  */
-class Lib_Net_Api_Rest_JsonApi_Server_Attribute {
+class Lib_Net_Api_Rest_JsonApi_Server_Attribute implements Lib_Data_Collection_Keyed_Item {
 
 	/**
 	 * Our attribute name
@@ -32,7 +32,7 @@ class Lib_Net_Api_Rest_JsonApi_Server_Attribute {
 	 * @param $name String name of the attribute
 	 * @param $value Mixed value for the attribute; optional, default is null
 	 */
-	public function __construct($name, $value = null) {
+	public function __construct(string $name, $value = null) {
 		if (! Lib_Net_Api_Rest_JsonApi_Server_Member::isValidMemberName($name)) {
 			throw new \Exception("Invalid attribute name supplied: '{$name}'");
 		}
@@ -41,11 +41,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Attribute {
 	}
 
 	/**
-	 * Get the name of the attribute
-	 *
-	 * @return string name of the attribute
+	 * For Lib_Data_Collection_Keyed_Item interface...
 	 */
-	public function getName() {
+	public function getKey() {
 		return $this->name;
 	}
 
@@ -67,6 +65,15 @@ class Lib_Net_Api_Rest_JsonApi_Server_Attribute {
 	 * @return mixed value last set for the attribute
 	 */
 	public function getValue() {
+		return $this->value;
+	}
+
+	/**
+	 * JsonSerializable Json Serializer
+	 *
+	 * @return stirng value of the attribute; the name will be picked up in Collection iterator
+	 */
+	public function jsonSerialize() {
 		return $this->value;
 	}
 }

@@ -2,6 +2,7 @@
 /**
  * PHPGoodies:Lib_Api_Rest_JsonApi_Server_Link - JSON:API Link class for response documents
  *
+ * @uses Lib_Data_Collection_Keyed_Item
  * @uses Lib_Net_Api_Rest_JsonApi_Server_Member
  *
  * @author Sean M. Kelly <smk@smkelly.com>
@@ -9,12 +10,13 @@
 
 namespace PHPGoodies;
 
+PHPGoodies::import('Lib.Data.Collection.Keyed.Item');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Member');
 
 /**
  * JSON:API Link class for response documents
  */
-class Lib_Net_Api_Rest_JsonApi_Server_Link implements \JsonSerializable {
+class Lib_Net_Api_Rest_JsonApi_Server_Link implements Lib_Data_Collection_Keyed_Item, \JsonSerializable {
 
 	/**
 	 * Name for this link
@@ -56,11 +58,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Link implements \JsonSerializable {
 	}
 
 	/**
-	 * Getter for the name
-	 *
-	 * @return String $name for this link
+	 * For Lib_Data_Collection_Keyed_Item interface...
 	 */
-	public function getName() {
+	public function getKey() {
 		return $this->name;
 	}
 

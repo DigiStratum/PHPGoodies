@@ -2,6 +2,7 @@
 /**
  * PHPGoodies:Lib_Api_Rest_JsonApi_Server_Relationship - Resource Class
  *
+ * @uses Lib_Data_Collection_Keyed_Item
  * @uses Lib_Net_Api_Rest_JsonApi_Server_Member
  * @uses Lib_Net_Api_Rest_JsonApi_Server_Links
  * @uses Lib_Net_Api_Rest_JsonApi_Server_Meta
@@ -12,6 +13,7 @@
 
 namespace PHPGoodies;
 
+PHPGoodies::import('Lib.Data.Collection.Keyed.Item');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Member');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Links');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Meta');
@@ -20,7 +22,7 @@ PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.ResourceLinkage');
 /**
   * JSON:API Relationship class
   */
-class Lib_Net_Api_Rest_JsonApi_Server_Relationship implements \JsonSerializable {
+class Lib_Net_Api_Rest_JsonApi_Server_Relationship implements Lib_Data_Collection_Keyed_Item, \JsonSerializable {
 
 	/**
 	 * Links object; must have self and/or related, no others; otherwise must be null
@@ -55,15 +57,6 @@ class Lib_Net_Api_Rest_JsonApi_Server_Relationship implements \JsonSerializable 
 		$this->name = $name;
 	}
 
-        /**
-	 * Getter for the name
-	 *
-	 * @return String $name for this link
-	 */
-	public function getName() {
-		return $this->name;
-	}
-
 	/**
 	 * Setter for our $links property
 	 *
@@ -95,6 +88,13 @@ class Lib_Net_Api_Rest_JsonApi_Server_Relationship implements \JsonSerializable 
 	 */
 	public function setMeta(Lib_Net_Api_Rest_JsonApi_Server_Meta $meta) {
 		$this->meta = $meta;
+	}
+
+	/**
+	 * For Lib_Data_Collection_Keyed_Item interface
+	 */
+	public function getKey() {
+		return $this->name;
 	}
 
 	/**

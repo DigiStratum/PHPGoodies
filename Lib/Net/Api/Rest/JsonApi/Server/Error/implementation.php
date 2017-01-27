@@ -56,12 +56,6 @@ class Lib_Net_Api_Rest_JsonApi_Server_Error implements \JsonSerializable {
 	protected $meta;
 
 	/**
-	 * Constructor
-	 */
-	public function __construct() {
-	}
-
-	/**
 	 * Setter for ID
 	 *
 	 * @param $id String unique identifier for this occurrence of the problem

@@ -12,7 +12,7 @@ PHPGoodies::import('Lib.Data.Collection.Keyed.Item');
 /**
  * Collection with unique indexes
  */
-class Lib_Data_Collection_Keyed extends Lib_Data_Collection {
+class Lib_Data_Collection_Keyed extends Lib_Data_Collection implements JsonSerializable {
 
 	/**
 	 * Indexes of keyed objects in the collection
@@ -94,6 +94,22 @@ class Lib_Data_Collection_Keyed extends Lib_Data_Collection {
 		$index = $this->indexes[$key];;
 		parent::del($index);
 		return $this;
+	}
+
+	/**
+	 * JsonSerializable Json Serializer
+	 *
+	 * @return Associative array of properties which will be encoded as the JSON representation
+	 * of object instances of this class
+	 */
+	public function jsonSerialize() {
+		$objects = array();
+		$this->iterate(
+			function ($object) use (&$objects) {
+				$objects[$object->getKey()] = $object;
+			}
+		);
+		return $links;
 	}
 }
 

@@ -71,6 +71,23 @@ class Lib_Data_Collection {
 	}
 
 	/**
+	 * Set the object for the specified index to the object provided
+	 *
+	 * @param integer $index into the collection which we expect to replace
+	 * @param object $object An object; needs to be of type className...
+	 *
+	 * @return object $this for chaining...
+	 */
+	public function set($index, $object) {
+		if (! $this->has($index)) {
+			throw new \Exception("Attempted to set an object on a non-existent index [{$index}]");
+		}
+		$this->requireType($object);
+		$this->collection[$index] = $object;
+		return $this;
+	}
+
+	/**
 	 * Get the object from the collection at the specified index
 	 *
 	 * @param integer $index The index for the desired object in the collection

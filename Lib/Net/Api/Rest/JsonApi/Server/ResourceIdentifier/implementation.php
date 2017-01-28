@@ -34,9 +34,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_ResourceIdentifier implements \JsonSeriali
 	/**
 	 * Constructor
 	 *
-	 * @param $id String unique identifier for this resource (within the type)
-	 * @param $type String type of resource
-	 * @param $meta Meta class instance; optional, default is null
+	 * @param string $id unique identifier for this resource (within the type)
+	 * @param string $type type of resource
+	 * @param object $meta Meta class instance; optional, default is null
 	 */
 	public function __construct(string $id, string $type, Lib_Net_Api_Rest_JsonApi_Meta $meta = null) {
 		$this->id = $id;

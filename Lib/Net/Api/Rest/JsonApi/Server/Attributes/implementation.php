@@ -26,10 +26,10 @@ class Lib_Net_Api_Rest_JsonApi_Server_Attributes extends Lib_Data_Collection_Key
 	/**
 	 * @override Add a name/value pair as an attribute to the collection
 	 *
-	 * @param $name String name of the attribute
-	 * @param $value Mixed value of the attribute; optionsal, default is null
+	 * @param string $name name of the attribute
+	 * @param mixed $value value of the attribute; optional, default is null
 	 *
-	 * @return $this object for chaining...
+	 * @return object $this for chaining...
 	 */
 	public function add($name, $value = null) {
 		parent::add(PHPGoodies::instantiate('Lib_Net_Api_Rest_JsonApi_Server_Attribute', $name, $value));

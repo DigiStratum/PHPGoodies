@@ -18,9 +18,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Member {
 	 * Note: JSON:API spec calls for allowance of U0080+, but recommends against; we are leaving
 	 * out this support since it is specifically recommended against.
 	 *
-	 * @param $name String member name prospective that we want to check
+	 * @param string $name member name prospective that we want to check
 	 */
-	public static function isValidMemberName($name) {
+	public static function isValidMemberName(string $name) {
 		// Empty, null, and non-strings are definitely not valid...
 		if ((is_null($name) || (! is_string($name)) || (0 === strlen($name))) return false;
 		// "Global" set only if 1 char, otherwise, bookend "additional" chars between global chars

@@ -30,7 +30,7 @@ abstract class Lib_Net_Api_Rest_JsonApi_Server_ResourceLinkage extends Lib_Data_
 	/**
 	 * Constructor
 	 *
-	 * @param $limit integer limit for how many Resource Identifiers we will allow to be add()ed;
+	 * @param integer $limit limit for how many Resource Identifiers we will allow to be add()ed;
 	 * optional, default is null (unlimited)
 	 */
 	public function __construct(integer $limit = null) {
@@ -41,9 +41,9 @@ abstract class Lib_Net_Api_Rest_JsonApi_Server_ResourceLinkage extends Lib_Data_
 	/**
 	 * Add a Resource Identifier to our collection
 	 *
-	 * @param $resourceIdentifier object instance of JSON:API ResourceIdentifier class
+	 * @param object $resourceIdentifier instance of JSON:API ResourceIdentifier class
 	 *
-	 * @return $this object for chaining...
+	 * @return object $this for chaining...
 	 *
 	 * @throws Exception if this is an attempt to add too many objects to the collection
 	 */

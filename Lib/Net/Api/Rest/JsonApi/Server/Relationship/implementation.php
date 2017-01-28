@@ -47,7 +47,7 @@ class Lib_Net_Api_Rest_JsonApi_Server_Relationship implements Lib_Data_Collectio
 	/**
 	 * Constructor
 	 *
-	 * @param $name string unique name to use to reference this relationship
+	 * @param string $name unique name to use to reference this relationship
 	 */
 	public function __construct(string $name) {
 		// Let's just use our own MemberName checker
@@ -60,9 +60,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Relationship implements Lib_Data_Collectio
 	/**
 	 * Setter for our $links property
 	 *
-	 * @param $links JSON:API Server Links class instance
+	 * @param object $links JSON:API Server Links class instance
 	 *
-	 * @return $this object for chaining...
+	 * @return object $this for chaining...
 	 */
 	public function setLinks(Lib_Net_Api_Rest_JsonApi_Server_Links $links) {
 		$this->links = $links;
@@ -71,9 +71,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Relationship implements Lib_Data_Collectio
 	/**
 	 * Setter for our $data property
 	 *
-	 * @param $data JSON:API Server ResourceLinkage class instance
+	 * @param object $data JSON:API Server ResourceLinkage class instance
 	 *
-	 * @return $this object for chaining...
+	 * @return object $this for chaining...
 	 */
 	public function setData(Lib_Net_Api_Rest_JsonApi_Server_ResourceLinkage $data) {
 		$this->data = $data;
@@ -82,9 +82,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Relationship implements Lib_Data_Collectio
 	/**
 	 * Setter for our $meta property
 	 *
-	 * @param $meta JSON:API Server Meta class instance
+	 * @param object $meta JSON:API Server Meta class instance
 	 *
-	 * @return $this object for chaining...
+	 * @return object $this for chaining...
 	 */
 	public function setMeta(Lib_Net_Api_Rest_JsonApi_Server_Meta $meta) {
 		$this->meta = $meta;

@@ -2,6 +2,9 @@
 /**
  * PHPGoodies:Lib_Api_Rest_JsonApi_Server_Error - JSON:API Error class for response documents
  *
+ * @uses Lib_Net_Api_Rest_JsonApi_Server_Links
+ * @uses Lib_Net_Api_Rest_JsonApi_Server_Meta
+ *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
@@ -58,9 +61,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Error implements \JsonSerializable {
 	/**
 	 * Setter for ID
 	 *
-	 * @param $id String unique identifier for this occurrence of the problem
+	 * @param string $id unique identifier for this occurrence of the problem
 	 *
-	 * @return $this for chaining...
+	 * @return object $this for chaining...
 	 */
 	public function setId(string $id) {
 		if (0 === strlen($id)) {
@@ -73,12 +76,12 @@ class Lib_Net_Api_Rest_JsonApi_Server_Error implements \JsonSerializable {
 	/**
 	 * Setter for links 
 	 *
-	 * @param $links Links Collection instance with an 'about' link inside
+	 * @param object $links Links Collection instance with an 'about' link inside
 	 *
-	 * @return $this for chaining...
+	 * @return object $this for chaining...
 	 */
 	public function setLinks(Lib_Net_Api_Rest_JsonApi_Server_Links $links) {
-		if (! ($links->hasWith('name', 'about') && ($links->num() === 1))) {
+		if (! ($links->has('about') && ($links->num() === 1))) {
 			throw new \Exception("Links for Errors must have only one 'about' link");
 		}
 		$this->links = $links;
@@ -88,9 +91,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Error implements \JsonSerializable {
 	/**
 	 * Setter for code
 	 *
-	 * @param $code String HTTP standard error code which most closely matches this error condition
+	 * @param String $code HTTP standard error code which most closely matches this error condition
 	 *
-	 * @return $this for chaining...
+	 * @return object $this for chaining...
 	 */
 	public function setCode(string $code) {
 		if (is_null($code) || (0 === strlen($code)) || (! is_numeric($code))) {
@@ -103,9 +106,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Error implements \JsonSerializable {
 	/**
 	 * Setter for Title
 	 *
-	 * @param $title String Human readable summary of this classification of problem 
+	 * @param String $title Human readable summary of this classification of problem 
 	 *
-	 * @return $this for chaining...
+	 * @return object $this for chaining...
 	 */
 	public function setTitle(string $title) {
 		if (is_null($title) || (0 === strlen($title))) {
@@ -118,9 +121,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Error implements \JsonSerializable {
 	/**
 	 * Setter for Detail
 	 *
-	 * @param $detail String Human readable explanation of this specific occurrence of the problem
+	 * @param String $detail Human readable explanation of this specific occurrence of the problem
 	 *
-	 * @return $this for chaining...
+	 * @return object $this for chaining...
 	 */
 	public function setDetail(string $detail) {
 		if (is_null($detail) || (0 === strlen($detail))) {
@@ -133,9 +136,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Error implements \JsonSerializable {
 	/**
 	 * Setter for Source
 	 *
-	 * @param $source Server Error Srouce class instance to describe from whence the error came
+	 * @param Source $source Server Error Srouce class instance to describe from whence the error came
 	 *
-	 * @return $this for chaining...
+	 * @return object $this for chaining...
 	 */
 	public function setSource(Lib_Net_Api_Rest_JsonApi_Server_Error_Source $source) {
 		if (is_null($source)) {
@@ -148,9 +151,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Error implements \JsonSerializable {
 	/**
 	 * Setter for Meta
 	 *
-	 * @param $meta JsonApi Meta class instance to bear non-standard metadata
+	 * @param object $meta Meta class instance to bear non-standard metadata
 	 *
-	 * @return $this for chaining...
+	 * @return object $this for chaining...
 	 */
 	public function setMeta(Lib_Net_Api_Rest_JsonApi_Server_Meta $meta) {
 		if (is_null($meta)) {

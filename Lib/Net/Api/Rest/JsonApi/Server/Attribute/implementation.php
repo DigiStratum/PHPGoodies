@@ -2,6 +2,7 @@
 /**
  * PHPGoodies:Lib_Api_Rest_JsonApi_Server_Attribute - Resource Attribute class
  *
+ * @uses Lib_Data_Collection_Keyed_Item
  * @uses Lib_Net_Api_Rest_JsonApi_Server_Member
  *
  * @author Sean M. Kelly <smk@smkelly.com>
@@ -9,6 +10,7 @@
 
 namespace PHPGoodies;
 
+PHPGoodies::import('Lib.Data.Collection.Keyed.Item');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Member');
 
 /**
@@ -29,8 +31,8 @@ class Lib_Net_Api_Rest_JsonApi_Server_Attribute implements Lib_Data_Collection_K
 	/**
 	 * Constructor
 	 *
-	 * @param $name String name of the attribute
-	 * @param $value Mixed value for the attribute; optional, default is null
+	 * @param String $name name of the attribute
+	 * @param mixed $value value for the attribute; optional, default is null
 	 */
 	public function __construct(string $name, $value = null) {
 		if (! Lib_Net_Api_Rest_JsonApi_Server_Member::isValidMemberName($name)) {
@@ -50,9 +52,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Attribute implements Lib_Data_Collection_K
 	/**
 	 * Set the current value for the attribute
 	 *
-	 * @param $value mixed value for the attribute; optional, default is null
+	 * @param mixed $value value for the attribute; optional, default is null
 	 *
-	 * @return $this object for chaining...
+	 * @return object $this for chaining...
 	 */
 	public function setValue($value = null) {
 		$this->value = $value;

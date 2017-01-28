@@ -65,9 +65,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Document implements \JsonSerializable {
 	 *
 	 * @fixme Rework the resource/data classes to structure this input...
 	 *
-	 * @param $data ResourceData class instance
+	 * @param object $data ResourceData class instance
 	 *
-	 * @return $this object for chaining...
+	 * @return object $this for chaining...
 	 */
 	public function setData($data) {
 		if ((! is_null($errors)) && (! is_null($data))) {
@@ -80,9 +80,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Document implements \JsonSerializable {
 	/**
 	 * Sets the errors property of the response document
 	 *
-	 * @param $errors Errors collection instance of Error class instance(s)
+	 * @param object $errors Errors collection instance of Error class instance(s)
 	 *
-	 * @return $this object for chaining...
+	 * @return object $this for chaining...
 	 */
 	public function setErrors(Lib_Net_Api_Rest_JsonApi_Server_Errors $errors) {
 		if ((! is_null($data)) && (! is_null($errors))) {
@@ -96,9 +96,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Document implements \JsonSerializable {
 	/**
 	 * Sets the non-standard meta information of the response document
 	 *
-	 * @param $meta Some kind of meta information that we want to get out there
+	 * @param object $meta Meta class instance; Non-standard metadata for the response document
 	 *
-	 * @return $this object for chaining...
+	 * @return object $this for chaining...
 	 */
 	public function setMeta(Lib_Net_Api_Rest_JsonApi_Server_Meta $meta) {
 		$this->meta = $meta;
@@ -108,9 +108,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Document implements \JsonSerializable {
 	/**
 	 * Sets the collection of links for the response document
 	 *
-	 * @param $links Links class instance
+	 * @param object $links Links class instance
 	 *
-	 * @return $this object for chaining...
+	 * @return object $this for chaining...
 	 */
 	public function setLinks(Lib_Net_Api_Rest_JsonApi_Server_Links $links) {
 		$this->links = $links;
@@ -120,11 +120,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Document implements \JsonSerializable {
 	/**
 	 * Sets the collection of resource objects related to the primary data
 	 *
-	 * @todo Make a strict data type for Includes
+	 * @param object $included Resources Collection of Resource class instances
 	 *
-	 * @param $included Array of Resource class instances
-	 *
-	 * @return $this object for chaining...
+	 * @return object $this for chaining...
 	 */
 	public function setIncluded($included) {
 		if (is_null($data)) {

@@ -2,6 +2,8 @@
 /**
  * PHPGoodies:Lib_Api_Rest_JsonApi_Server_Errors - JSON:API Error Collection for response documents
  *
+ * @uses Lib_Data_Collection
+ *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 

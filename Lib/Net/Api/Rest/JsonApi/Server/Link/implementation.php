@@ -36,9 +36,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Link implements Lib_Data_Collection_Keyed_
 	/**
 	 * Constructor
 	 *
-	 * @param $name String name for this link (must be a valid class property name)
-	 * @param $href String HREF/URI for this link
-	 * @param $meta Mixed object/primitive (anything other than a resource) (optional)
+	 * @param string $name name for this link (must be a valid class property name)
+	 * @param string $href HREF/URI for this link
+	 * @param mixed $meta object/primitive (anything other than a resource) (optional)
 	 */
 	public function __construct(string $name, string $href, $meta = null) {
 

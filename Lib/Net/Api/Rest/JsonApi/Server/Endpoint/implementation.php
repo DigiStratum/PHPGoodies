@@ -29,9 +29,9 @@ abstract class Lib_Net_Api_Rest_JsonApi_Server_Endpoint {
 	/**
 	 * Constructor
 	 *
-	 * @param $type string type of endpoint we are working with
+	 * @param string $type type of endpoint we are working with
 	 */
-	public function __construct($type) {
+	public function __construct(string $type) {
 
 		// Declare each of the attributes' names in the endpoint data
 		$attributes = PHPGoodies::instantiate('Lib.Data.Hash');

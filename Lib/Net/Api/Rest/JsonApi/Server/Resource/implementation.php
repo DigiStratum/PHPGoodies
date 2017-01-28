@@ -53,9 +53,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Resource implements \JsonSerializable {
 	/**
 	 * Constructor
 	 *
-	 * @param $type String - we must have a resource type
-	 * @param $attributes - we must have an Attributes class instance
-	 * @param $id string - we may optionally have a unique ID (if creating a new one, we won't!)
+	 * @param string $type we must have a resource type
+	 * @param object $attributes we must have an Attributes class instance
+	 * @param string $id we may optionally have a unique ID (if creating a new one, we won't!)
 	 */
 	public function __construct(string $type, Lib_Net_Api_Rest_JsonApi_server_Attributes $attributes, string $id = null) {
 		if (
@@ -72,9 +72,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Resource implements \JsonSerializable {
 	/**
 	 * Set the relationships manually if needed
 	 *
-	 * @param $relationships Array of resource relationship objects (if any)
+	 * @param object $relationships Resource Relationships collection instance (if any)
 	 *
-	 * @return $this object to support chaining...
+	 * @return object $this to support chaining...
 	 */
 	public function setRelationships(Lib_Net_Api_Rest_JsonAPi_Server_Relationships $relationships) {
 		$this->relationships = $relationships;
@@ -84,9 +84,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Resource implements \JsonSerializable {
 	/**
 	 * Set the collection of attributes to that provided
 	 *
-	 * @param $attributes Attributes class instance with all the needed attributes preloaded
+	 * @param object $attributes Attributes class instance with all the needed attributes preloaded
 	 *
-	 * @return $this object for chaining...
+	 * @return object $this for chaining...
 	 */
 	public function setAttributes(Lib_Net_Api_Rest_JsonApi_Server_Attributes $attributes) {
 		$this->attributes = $attributes;
@@ -96,9 +96,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Resource implements \JsonSerializable {
 	/**
 	 * Set the links manually if needed
 	 *
-	 * @param $links Links Collection object
+	 * @param object $links Links Collection instance
 	 *
-	 * @return $this object to support chaining...
+	 * @return object $this for chaining...
 	 */
 	public function setLinks(Lib_Net_Api_Rest_JsonApi_Server_Links $links) {
 		$this->links = $links;

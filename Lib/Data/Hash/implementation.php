@@ -10,7 +10,7 @@ namespace PHPGoodies;
 /**
  * Hash
  */
-class Lib_Data_Hash {
+class Lib_Data_Hash implements \JsonSerializable {
 
 	/**
 	 * This is the actual hash data that all the methods below manipulate
@@ -159,6 +159,16 @@ class Lib_Data_Hash {
 		}
 
 		return $this;
+	}
+
+	/**
+	 * JsonSerializable Json Serializer
+	 *
+	 * @return Associative array of properties which will be encoded as the JSON representation
+	 * of object instances of this class
+	 */
+	public function jsonSerialize() {
+		return $this->all();
 	}
 }
 

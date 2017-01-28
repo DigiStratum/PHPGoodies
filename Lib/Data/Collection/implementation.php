@@ -10,7 +10,7 @@ namespace PHPGoodies;
 /**
  * Collection
  */
-class Lib_Data_Collection {
+class Lib_Data_Collection implements \JsonSerializable {
 
 	/**
 	 * The name o the class that this collection will hold
@@ -18,7 +18,7 @@ class Lib_Data_Collection {
 	protected $className;
 
 	/**
-	 * The collection of objects of type className that we are maintaining
+	 * The collection of items of type className that we are maintaining
 	 */
 	protected $collection = array();
 
@@ -125,9 +125,9 @@ class Lib_Data_Collection {
 	}
 
 	/**
-	 * Get the number of objects in the collection
+	 * Get the number of items in the collection
 	 *
-	 * @return integer Count of objects in the collection array
+	 * @return integer Count of items in the collection array
 	 */
 	public function num() {
 		return count($this->collection);
@@ -156,7 +156,7 @@ class Lib_Data_Collection {
 			});
 		}
 		else {
-			throw new \Exception("Attempted to pluck a non-existent property/method ('{$name}') from collection of '{$this->className}' objects");
+			throw new \Exception("Attempted to pluck a non-existent property/method ('{$name}') from collection of '{$this->className}' items");
 		}
 		return $values;
 	}
@@ -201,7 +201,7 @@ class Lib_Data_Collection {
 			});
 		}
 		else {
-			throw new \Exception("Attempted to find a a value for a non-existent property/method ('{$name}') from collection of '{$this->className}' objects");
+			throw new \Exception("Attempted to find a a value for a non-existent property/method ('{$name}') from collection of '{$this->className}' items");
 		}
 	}
 
@@ -249,6 +249,22 @@ class Lib_Data_Collection {
 		if (! is_a($object, $this->className)) {
 			throw new \Exception("Attempted to use an object of type '" . get_class($object) . "' in a collection of '{$this->className}'");
 		}
+	}
+
+	/**
+	 * JsonSerializable Json Serializer
+	 *
+	 * @return Associative array of properties which will be encoded as the JSON representation
+	 * of object instances of this class
+	 */
+	public function jsonSerialize() {
+		$items = array();
+		$this->iterate(
+			function ($item) use (&$items) {
+				$items[] = $item;
+			}
+		);
+		return $items;
 	}
 }
 

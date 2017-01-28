@@ -54,10 +54,10 @@ class Lib_Net_Api_Rest_JsonApi_Server_Resource implements \JsonSerializable {
 	 * Constructor
 	 *
 	 * @param $type String - we must have a resource type
-	 * @param $attributes - we must have a Hash object instance for attributes
+	 * @param $attributes - we must have an Attributes class instance
 	 * @param $id string - we may optionally have a unique ID (if creating a new one, we won't!)
 	 */
-	public function __construct($type, $attributes, $id = null) {
+	public function __construct(string $type, Lib_Net_Api_Rest_JsonApi_server_Attributes $attributes, string $id = null) {
 		if (
 			(! is_String($type)) || (strlen($type) === 0) ||
 			(! is_object($attributes)) || ($attributes->num() === 0)

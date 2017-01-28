@@ -14,7 +14,7 @@ PHPGoodies::import('Lib.Data.Collection.Keyed');
 /**
  * JSON:API Attribute Collection for response documents
  */
-class Lib_Net_Api_Rest_JsonApi_Server_Attributes extends Lib_Data_Collection_Keyed implements \JsonSerializable {
+class Lib_Net_Api_Rest_JsonApi_Server_Attributes extends Lib_Data_Collection_Keyed {
 
 	/**
 	 * Constructor

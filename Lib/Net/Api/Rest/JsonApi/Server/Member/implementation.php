@@ -21,8 +21,10 @@ class Lib_Net_Api_Rest_JsonApi_Server_Member {
 	 * @param string $name member name prospective that we want to check
 	 */
 	public static function isValidMemberName(string $name) {
-		// Empty, null, and non-strings are definitely not valid...
-		if ((is_null($name) || (! is_string($name)) || (0 === strlen($name))) return false;
+
+		// Empty and null strings are definitely not valid...
+		if (is_null($name) || (0 === strlen($name))) return false;
+
 		// "Global" set only if 1 char, otherwise, bookend "additional" chars between global chars
 		$pattern = (1 === strlen($name)) ? '/^[A-Za-z0-9]$/' : '/^[A-Za-z0-9]+[A-Za-z0-9_- ]*[A-Za-z0-9]+$/';
 		return preg_match($pattern, $name);

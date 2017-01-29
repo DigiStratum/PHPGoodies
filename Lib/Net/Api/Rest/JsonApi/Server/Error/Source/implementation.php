@@ -15,7 +15,7 @@ class Lib_Net_Api_Rest_JsonApi_Server_Error_Source implements \JsonSerializable 
 	/**
 	 * JSON Pointer [RFC6901] to request document entity
 	 */
-	protected $pointer;
+	protected $ptr;
 
 	/**
 	 * String identifying which URI parameter caused the error
@@ -26,22 +26,22 @@ class Lib_Net_Api_Rest_JsonApi_Server_Error_Source implements \JsonSerializable 
 	 * Constructor
 	 */
 	public function __construct() {
-		$this->pointer = null;
+		$this->ptr = null;
 		$this->parameter = null;
 	}
 
 	/**
-	 * Setter for the pointer
+	 * Setter for the ptr
 	 *
-	 * @param string $pointer RFC6901 JSON Pointer into the offending request doument entity
+	 * @param string $ptr RFC6901 JSON Pointer into the offending request doument entity
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function setPointer(string $pointer) {
-		if (is_null($pointer) || (0 === strlen($pointer))) {
-			throw new \Exception("Can't set an empty pointer for Error Source");
+	public function setPointer(string $ptr) {
+		if (is_null($ptr) || (0 === strlen($ptr))) {
+			throw new \Exception("Can't set an empty ptr for Error Source");
 		}
-		$this->pointer = $pointer;
+		$this->ptr = $ptr;
 		return $this;
 	}
 
@@ -67,11 +67,11 @@ class Lib_Net_Api_Rest_JsonApi_Server_Error_Source implements \JsonSerializable 
 	 * of object instances of this class
 	 */
 	public function jsonSerialize() {
-		if (is_null($this->pointer) && is_null($this->parameter)) {
+		if (is_null($this->ptr) && is_null($this->parameter)) {
 			throw new \Exception("Can't generate an Error Source without identifying a source");
 		}
 		return [
-			'pointer' => $this->pointer,
+			'pointer' => $this->ptr,
 			'parameter' => $this->parameter
 		];
 	}

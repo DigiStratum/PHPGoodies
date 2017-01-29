@@ -2,6 +2,7 @@
 /**
  * PHPGoodies:Lib_Api_Rest_JsonApi_Server_ResourceIdentifier - Resource Identifier Class
  *
+ * @uses Lib_Net_Api_Rest_JsonApi_Server_PrimaryData
  * @uses Lib_Net_Api_Rest_JsonApi_Meta
  *
  * @author Sean M. Kelly <smk@smkelly.com>
@@ -9,12 +10,13 @@
 
 namespace PHPGoodies;
 
+PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.PrimaryData');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Meta');
 
 /**
  * JSON:API Resource Identifier class
  */
-class Lib_Net_Api_Rest_JsonApi_Server_ResourceIdentifier implements \JsonSerializable {
+class Lib_Net_Api_Rest_JsonApi_Server_ResourceIdentifier implements \JsonSerializable, Lib_Net_Api_Rest_JsonApi_Server_PrimaryData {
 
 	/**
 	 * unique identifier for this resource (within the type)

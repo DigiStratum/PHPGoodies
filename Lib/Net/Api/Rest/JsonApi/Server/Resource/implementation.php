@@ -2,6 +2,7 @@
 /**
  * PHPGoodies:Lib_Api_Rest_JsonApi_Server_Resource - Resource Data Class
  *
+ * @uses Lib_Net_Api_Rest_JsonApi_Server_PrimaryData
  * @uses Lib_Net_Api_Rest_JsonAPi_Server_Relationships
  * @uses Lib_Net_Api_Rest_JsonAPi_Server_Attributes
  * @uses Lib_Net_Api_Rest_JsonAPi_Server_Links
@@ -11,6 +12,7 @@
 
 namespace PHPGoodies;
 
+PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.PrimaryData');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonAPi.Server.Relationships');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonAPi.Server.Attributes');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonAPi.Server.Links');
@@ -18,7 +20,7 @@ PHPGoodies::import('Lib.Net.Api.Rest.JsonAPi.Server.Links');
 /**
  * JSON:API Resource data class
  */
-class Lib_Net_Api_Rest_JsonApi_Server_Resource implements \JsonSerializable {
+class Lib_Net_Api_Rest_JsonApi_Server_Resource implements \JsonSerializable, Lib_Net_Api_Rest_JsonApi_Server_PrimaryData {
 
 	/**
 	 * Our unique ID (String)

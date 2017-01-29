@@ -2,6 +2,11 @@
 /**
  * PHPGoodies:Lib_Api_Rest_JsonApi_Server_Document - JSON:API Document class
  *
+ * @uses Lib_Net_Api_Rest_JsonApi_Server_Resources
+ * @uses Lib_Net_Api_Rest_JsonApi_Server_PrimaryData
+ * @uses Lib_Net_Api_Rest_JsonApi_Server_Errors
+ * @uses Lib_Net_Api_Rest_JsonApi_Server_Links
+ * @uses Lib_Net_Api_Rest_JsonApi_Server_Meta
  * @uses Lib_Net_Api_Rest_JsonApi_Server_JsonApi
  *
  * @author Sean M. Kelly <smk@smkelly.com>
@@ -9,6 +14,8 @@
 
 namespace PHPGoodies;
 
+PHPGoodies::import('Lib_Net_Api_Rest_JsonApi_Server_Resources');
+PHPGoodies::import('Lib_Net_Api_Rest_JsonApi_Server_PrimaryData');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Errors');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Links');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Meta');
@@ -63,13 +70,11 @@ class Lib_Net_Api_Rest_JsonApi_Server_Document implements \JsonSerializable {
 	/**
 	 * Sets the data property of the response document
 	 *
-	 * @fixme Rework the resource/data classes to structure this input...
-	 *
-	 * @param object $data ResourceData class instance
+	 * @param object $data Lib_Net_Api_Rest_JsonApi_Server_PrimaryData implementation instance
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function setData($data) {
+	public function setData(Lib_Net_Api_Rest_JsonApi_Server_PrimaryData $data) {
 		if ((! is_null($errors)) && (! is_null($data))) {
 			throw new \Exception('Cannot have data if errors are set!');
 		}
@@ -120,11 +125,15 @@ class Lib_Net_Api_Rest_JsonApi_Server_Document implements \JsonSerializable {
 	/**
 	 * Sets the collection of resource objects related to the primary data
 	 *
+	 * @todo verify that each included resource has "full linkage" by a primary data resource
+	 * identifier object. Reject the inclusion of any resource which is not; this prevents the
+	 * included resources from being abused by simply including arbitrary, unstructured data.
+	 *
 	 * @param object $included Resources Collection of Resource class instances
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function setIncluded($included) {
+	public function setIncluded(Lib_Net_Api_Rest_JsonApi_Server_Resources $included) {
 		if (is_null($data)) {
 			throw new \Exception('Cannot include resources if no primary data is set!');
 		}

@@ -2,17 +2,14 @@
 /**
  * PHPGoodies:Lib_Api_Rest_JsonApi_Endpoint - Abstract class for a single endpoint
  *
- * @fixme Finish off this mid-level class once we're done with the low-level stuff
- *
- * @uses Lib_Data_Hash
- * @uses Lib_Net_Api_Rest_JsonApi_Server_Attribute
- * @uses Lib_Net_Api_Rest_JsonApi_Server_EndpointData
+ * @uses Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
 namespace PHPGoodies;
 
+PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Uri.Pattern');
 
 /**
  * JSON:API Single endpoint base class
@@ -22,85 +19,47 @@ namespace PHPGoodies;
 abstract class Lib_Net_Api_Rest_JsonApi_Server_Endpoint {
 
 	/**
-	 * Our endpoint data
+	 * URI Pattern which we will use to decode request URIs which we are expected to handle
 	 */
-	private $data;
+	protected $uriPattern;
 
 	/**
 	 * Constructor
-	 *
-	 * @param string $type type of endpoint we are working with
 	 */
-	public function __construct(string $type) {
-
-		// Declare each of the attributes' names in the endpoint data
-		$attributes = PHPGoodies::instantiate('Lib.Data.Hash');
-		$attributeNames = $this->getAttributeNames();
-		if ((! is_array($attributeNames)) || (count($attributeNames) === 0)) {
-			throw new \Exception("No attribute names were supplied");
-		}
-		foreach ($attributeNames as $attributeName) {
-			$attributes->set(
-				$attributeName,
-				PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.Attribute', $attributeName)
-			);
-		}
-		$this->data = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.EndpointData', $type, $attributes);
+	public function __construct(Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern $uriPattern, array $supportedVerbs) {
+		$this->uriPattern = $uriPattern;
+		// Supported verbs is so that we can respond to OPTIONS requests as well as reject any unsupported verbs without thinking too hard.
 	}
 
 	/**
-	 * Gets a list of attribute names
-	 */
-	abstract public function getAttributeNames();
-
-	/**
-	 * Set the current data
-	 */
-	public function setData($data);
-
-	/**
-	 * Get the current data
-	 */
-	public function getData();
-
-	/**
-	 * Returns the URI, relative to the API base URL, for this endpoint
-	 */
-	public function getUri();
-
-	/**
-	 * Accepts endpoint data from 
-	 */
-	public function create();
-
-	/**
+	 * Get the URI Pattern for this endpoint
 	 *
+	 * This is useful so that we can have a collection of Endpoints which we can iterate over in
+	 * the server and check the pattern for each for a given httpRequest and then know which
+	 * endpoint is the appropriate one to launch.
+	 *
+	 * @todo :resolve how this helps us if we want to just have an array of patterns-to-classnames
+	 * without instantiating the relevant endpoint classname until we know it is needed to service
+	 * the request? Can we make it static so that anyone can check that out of the endpoint without
+	 * having an instance yet?
 	 */
-	public function retrieve();
+	public function getUriPattern() {
+		return $this->uriPattern;
+	}
 
 	/**
-	 *
+	 * GET the resource for this endpoint
 	 */
-	public function update();
+	public function httpGetHandler(Lib_Net_Http_Request $request) {
 
-	/**
-	 *
-	 */
-	public function delete();
+		$info = $request->getInfo();
 
-	/**
-	 *
-	 */
-	public function validate();
+		$document  = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.Document');
+		// TODO: do something here like call an abstract method which the subclass must provide to fill in the document on GET...
+		return $document;
+	}
 
-	/**
-	 *
-	 */
-	public function toJson();
 
-	/**
-	 *
-	 */
-	public function fromJson($json);
+
 }
 

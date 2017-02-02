@@ -21,6 +21,7 @@ class Lib_Net_Http_Request {
 	const HTTP_HEAD		= 'HEAD';
 	const HTTP_OPTIONS	= 'OPTIONS';
 	const HTTP_POST		= 'POST';
+	const HTTP_PATCH	= 'PATCH';
 	const HTTP_PUT		= 'PUT';
 	const HTTP_TRACE	= 'TRACE';
 
@@ -59,10 +60,10 @@ class Lib_Net_Http_Request {
 				$method = $this->setMethod($_SERVER['REQUEST_METHOD']);
 
 				// Support for method tunnelling
-				if (('POST' == $method) && isset($_SERVER['HTTP_X_HTTP_METHOD'])) {
+				if ((HTTP_POST == $method) && isset($_SERVER['HTTP_X_HTTP_METHOD'])) {
 					switch ($_SERVER['HTTP_X_HTTP_METHOD']) {
-						case 'DELETE':
-						case 'PUT':
+						case HTTP_DELETE:
+						case HTTP_PUT:
 							$this->setMethod($_SERVER['HTTP_X_HTTP_METHOD']);
 							$this->setIsTunnelled(true);
 							break;
@@ -172,6 +173,7 @@ class Lib_Net_Http_Request {
 			self::HTTP_HEAD,
 			self::HTTP_OPTIONS,
 			self::HTTP_POST,
+			self::HTTP_PATCH,
 			self::HTTP_PUT,
 			self::HTTP_TRACE
 		);

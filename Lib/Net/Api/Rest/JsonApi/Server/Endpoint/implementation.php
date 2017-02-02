@@ -3,13 +3,16 @@
  * PHPGoodies:Lib_Api_Rest_JsonApi_Endpoint - Abstract class for a single endpoint
  *
  * @uses Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern
+ * @uses Lib_Net_Api_Rest_JsonApi_Server_Document
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
 namespace PHPGoodies;
 
+PHPGoodies::import('Oop.Type');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Uri.Pattern');
+PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Document');
 
 /**
  * JSON:API Single endpoint base class
@@ -26,7 +29,9 @@ abstract class Lib_Net_Api_Rest_JsonApi_Server_Endpoint {
 	/**
 	 * Constructor
 	 */
-	public function __construct(Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern $uriPattern, array $supportedVerbs) {
+	public function __construct($uriPattern, $supportedVerbs) {
+		Oop.Type::requireType($uriPattern, 'class:Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern');
+		Oop.Type::requireType($supportedVerbs, 'array');
 		$this->uriPattern = $uriPattern;
 		// Supported verbs is so that we can respond to OPTIONS requests as well as reject any unsupported verbs without thinking too hard.
 	}
@@ -48,18 +53,21 @@ abstract class Lib_Net_Api_Rest_JsonApi_Server_Endpoint {
 	}
 
 	/**
-	 * GET the resource for this endpoint
+	 * Get the JSON:API expected response document for this endpoint based on the request
+	 *
+	 * For a given implementation, if you want this endpoint to return anything other than an
+	 * empty document, then you must override this endpoint. The subclass can call this parent
+	 * method to get the bare document to begin filling in depending on the results of the
+	 * request.
+	 *
+	 * @param Lib_Net_Http_Request $request Request object that we are responding to
+	 *
+	 * @return Lib_Net_Api_Rest_JsonApi_Server_Document response document
 	 */
-	public function httpGetHandler(Lib_Net_Http_Request $request) {
-
-		$info = $request->getInfo();
-
-		$document  = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.Document');
-		// TODO: do something here like call an abstract method which the subclass must provide to fill in the document on GET...
+	protected function getResponseDocument($request) {
+		Oop.Type::requireType($request, 'class:Lib_Net_Http_Request');
+		$document = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.Document');
 		return $document;
 	}
-
-
-
 }
 

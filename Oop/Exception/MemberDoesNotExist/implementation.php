@@ -22,7 +22,7 @@ class Oop_Exception_MemberDoesNotExist extends Oop_Exception_DataAccess {
 	/**
 	 * Constructor
 	 */
-	public function __construct($message, $code = 0, Exception $previous = null) {
+	public function __construct($message, $code = 0, $previous = null) {
 		parent::__construct($message, $code, $previous);
 	}
 

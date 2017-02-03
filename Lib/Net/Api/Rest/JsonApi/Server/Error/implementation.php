@@ -2,6 +2,7 @@
 /**
  * PHPGoodies:Lib_Api_Rest_JsonApi_Server_Error - JSON:API Error class for response documents
  *
+ * @uses Oop_Type
  * @uses Lib_Net_Api_Rest_JsonApi_Server_Links
  * @uses Lib_Net_Api_Rest_JsonApi_Server_Meta
  *
@@ -10,6 +11,7 @@
 
 namespace PHPGoodies;
 
+PHPGoodies::import('Oop.Type');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Error.Source');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Meta');
 
@@ -65,11 +67,11 @@ class Lib_Net_Api_Rest_JsonApi_Server_Error implements \JsonSerializable {
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function setId(string $id) {
+	public function setId($id) {
+		$this->id = Oop_Type::requireType($id, 'string');
 		if (0 === strlen($id)) {
 			throw new \Exception("Can't set an empty string as the unique ID for an Error");
 		}
-		$this->id = $id;
 		return $this;
 	}
 
@@ -80,7 +82,8 @@ class Lib_Net_Api_Rest_JsonApi_Server_Error implements \JsonSerializable {
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function setLinks(Lib_Net_Api_Rest_JsonApi_Server_Links $links) {
+	public function setLinks($links) {
+		Oop_Type::requireType($links, 'class:Lib_Net_Api_Rest_JsonApi_Server_Links');
 		if (! ($links->has('about') && ($links->num() === 1))) {
 			throw new \Exception("Links for Errors must have only one 'about' link");
 		}
@@ -95,8 +98,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Error implements \JsonSerializable {
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function setCode(string $code) {
-		if (is_null($code) || (0 === strlen($code)) || (! is_numeric($code))) {
+	public function setCode($code) {
+		Oop_Type::requireType($code, 'string');
+		if ((0 === strlen($code)) || (! is_numeric($code))) {
 			throw new \Exception("Code must be a string formatted numeric HTTP error code");
 		}
 		$this->code = $code;
@@ -110,8 +114,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Error implements \JsonSerializable {
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function setTitle(string $title) {
-		if (is_null($title) || (0 === strlen($title))) {
+	public function setTitle($title) {
+		Oop_Type::requireType($title, 'string');
+		if (0 === strlen($title)) {
 			throw new \Exception("Can't set an empty string as the title for an Error");
 		}
 		$this->title = $title;
@@ -125,7 +130,8 @@ class Lib_Net_Api_Rest_JsonApi_Server_Error implements \JsonSerializable {
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function setDetail(string $detail) {
+	public function setDetail($detail) {
+		Oop_Type::requireType($detail, 'string');
 		if (is_null($detail) || (0 === strlen($detail))) {
 			throw new \Exception("Can't set an empty string as the detail for an Error");
 		}
@@ -140,11 +146,8 @@ class Lib_Net_Api_Rest_JsonApi_Server_Error implements \JsonSerializable {
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function setSource(Lib_Net_Api_Rest_JsonApi_Server_Error_Source $source) {
-		if (is_null($source)) {
-			throw new \Exception("Can't set a null source for an Error");
-		}
-		$this->source = $source;
+	public function setSource($source) {
+		$this->source = Oop_Type::requireType($source, 'class:Lib_Net_Api_Rest_JsonApi_Server_Source');
 		return $this;
 	}
 
@@ -155,11 +158,8 @@ class Lib_Net_Api_Rest_JsonApi_Server_Error implements \JsonSerializable {
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function setMeta(Lib_Net_Api_Rest_JsonApi_Server_Meta $meta) {
-		if (is_null($meta)) {
-			throw new \Exception("Can't set a null meta for an Error");
-		}
-		$this->meta = $meta;
+	public function setMeta($meta) {
+		$this->meta = Oop_Type::requireType($meta, 'class:Lib_Net_Api_Rest_JsonApi_Server_Meta');
 		return $this;
 	}
 

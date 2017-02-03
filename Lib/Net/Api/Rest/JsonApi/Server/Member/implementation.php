@@ -2,10 +2,14 @@
 /**
  * PHPGoodies:Lib_Api_Rest_JsonApi_Server_Member - Helper class for JSON:API Members
  *
+ * @uses Oop_Type
+ *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
 namespace PHPGoodies;
+
+PHPGoodies::import('Oop.Type');
 
 /**
  * Helper class for JSON:API Members
@@ -20,7 +24,8 @@ class Lib_Net_Api_Rest_JsonApi_Server_Member {
 	 *
 	 * @param string $name member name prospective that we want to check
 	 */
-	public static function isValidMemberName(string $name) {
+	public static function isValidMemberName($name) {
+		Oop_Type::requireType($name, 'string');
 
 		// Empty and null strings are definitely not valid...
 		if (is_null($name) || (0 === strlen($name))) return false;

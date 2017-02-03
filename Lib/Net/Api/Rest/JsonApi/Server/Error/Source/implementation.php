@@ -2,10 +2,14 @@
 /**
  * PHPGoodies:Lib_Api_Rest_JsonApi_Server_Error_Source - JSON:API Error Source class for response documents
  *
+ * @uses Oop_Type
+ *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
 namespace PHPGoodies;
+
+PHPGoodies::import('Oop.Type');
 
 /**
  * JSON:API Error Source class for response documents
@@ -37,8 +41,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Error_Source implements \JsonSerializable 
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function setPointer(string $ptr) {
-		if (is_null($ptr) || (0 === strlen($ptr))) {
+	public function setPointer($ptr) {
+		Oop_Type::requireType($ptr, 'string');
+		if (0 === strlen($ptr)) {
 			throw new \Exception("Can't set an empty ptr for Error Source");
 		}
 		$this->ptr = $ptr;
@@ -53,7 +58,8 @@ class Lib_Net_Api_Rest_JsonApi_Server_Error_Source implements \JsonSerializable 
 	 * @return object $this for chaining...
 	 */
 	public function setParameter(string $parameter) {
-		if (is_null($parameter) || (0 === strlen($parameter))) {
+		Oop_Type::requireType($parameter, 'string');
+		if (0 === strlen($parameter)) {
 			throw new \Exception("Can't identify an empty parameter for Error Source");
 		}
 		$this->parameter = $parameter;

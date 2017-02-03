@@ -2,6 +2,7 @@
 /**
  * PHPGoodies:Lib_Api_Rest_JsonApi_Server_Relationship - Resource Class
  *
+ * @uses Oop_Type
  * @uses Lib_Data_Collection_Keyed_Item
  * @uses Lib_Net_Api_Rest_JsonApi_Server_Member
  * @uses Lib_Net_Api_Rest_JsonApi_Server_Links
@@ -13,6 +14,7 @@
 
 namespace PHPGoodies;
 
+PHPGoodies::import('Oop.Type');
 PHPGoodies::import('Lib.Data.Collection.Keyed.Item');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Member');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Links');
@@ -49,12 +51,13 @@ class Lib_Net_Api_Rest_JsonApi_Server_Relationship implements Lib_Data_Collectio
 	 *
 	 * @param string $name unique name to use to reference this relationship
 	 */
-	public function __construct(string $name) {
+	public function __construct($name) {
+		$this->name = Oop_Type::requireType($name, 'string');
+
 		// Let's just use our own MemberName checker
 		if (! Lib_Net_Api_Rest_JsonApi_Server_Member::isValidMemberName($name)) {
 			throw new \Exception("Invalid JSON:API relationship name: '{$name}'");
 		}
-		$this->name = $name;
 	}
 
 	/**
@@ -64,8 +67,8 @@ class Lib_Net_Api_Rest_JsonApi_Server_Relationship implements Lib_Data_Collectio
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function setLinks(Lib_Net_Api_Rest_JsonApi_Server_Links $links) {
-		$this->links = $links;
+	public function setLinks($links) {
+		$this->links = Oop_Type::requireType($links, 'class:Lib_Net_Api_Rest_JsonApi_Server_Links');
 	}
 
 	/**
@@ -75,8 +78,8 @@ class Lib_Net_Api_Rest_JsonApi_Server_Relationship implements Lib_Data_Collectio
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function setData(Lib_Net_Api_Rest_JsonApi_Server_ResourceLinkage $data) {
-		$this->data = $data;
+	public function setData($data) {
+		$this->data = Oop_Type::requireType($data, 'class:Lib_Net_Api_Rest_JsonApi_Server_ResourceLinkage');
 	}
 
 	/**
@@ -87,7 +90,7 @@ class Lib_Net_Api_Rest_JsonApi_Server_Relationship implements Lib_Data_Collectio
 	 * @return object $this for chaining...
 	 */
 	public function setMeta(Lib_Net_Api_Rest_JsonApi_Server_Meta $meta) {
-		$this->meta = $meta;
+		$this->meta = Oop_Type::requireType($meta, 'class:Lib_Net_Api_Rest_JsonApi_Server_Meta');
 	}
 
 	/**

@@ -2,6 +2,7 @@
 /**
  * PHPGoodies:Lib_Api_Rest_JsonApi_Server_Link - JSON:API Link class for response documents
  *
+ * @uses Oop_Type
  * @uses Lib_Data_Collection_Keyed_Item
  * @uses Lib_Net_Api_Rest_JsonApi_Server_Member
  *
@@ -10,6 +11,7 @@
 
 namespace PHPGoodies;
 
+PHPGoodies::import('Oop.Type');
 PHPGoodies::import('Lib.Data.Collection.Keyed.Item');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Member');
 
@@ -38,9 +40,12 @@ class Lib_Net_Api_Rest_JsonApi_Server_Link implements Lib_Data_Collection_Keyed_
 	 *
 	 * @param string $name name for this link (must be a valid class property name)
 	 * @param string $href HREF/URI for this link
-	 * @param mixed $meta object/primitive (anything other than a resource) (optional)
+	 * @param object $meta Non-standard metadata about this link
 	 */
-	public function __construct(string $name, string $href, $meta = null) {
+	public function __construct($name, $href, $meta = null) {
+		$this->name = Oop_Type::requireType($name, 'string');
+		$this->href = Oop_Type::requireType($href, 'string');
+		$this->meta = Oop_Type::optionalType($meta, 'class:Lib_Net_Api_Rest_JsonApi_Server_Meta');
 
 		// Let's just use our own MemberName checker
 		if (! Lib_Net_Api_Rest_JsonApi_Server_Member::isValidMemberName($name)) {
@@ -51,10 +56,6 @@ class Lib_Net_Api_Rest_JsonApi_Server_Link implements Lib_Data_Collection_Keyed_
 		if (0 === strlen($href)) {
 			throw new \Exception("Invalid JSON:API link href: '{$href}'");
 		}
-
-		$this->name = $name;
-		$this->href = $href;
-		$this->meta = $meta;
 	}
 
 	/**

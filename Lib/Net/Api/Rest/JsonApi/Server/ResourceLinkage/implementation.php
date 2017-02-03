@@ -6,6 +6,7 @@
  * allow us to make a specialized class for each variation with this super class in place to
  * hold the common code as well as provide a common ancestry point for is-a checks.
  *
+ * @uses Oop_Type
  * @uses Lib_Data_Collection
  * @uses Lib_Net_Api_Rest_JsonApi_Server_ResourceIdentifier
  *
@@ -14,6 +15,7 @@
 
 namespace PHPGoodies;
 
+PHPGoodies::import('Oop.Type');
 PHPGoodies::import('Lib.Data.Collection');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.ResourceIdentifier');
 
@@ -33,8 +35,8 @@ abstract class Lib_Net_Api_Rest_JsonApi_Server_ResourceLinkage extends Lib_Data_
 	 * @param integer $limit limit for how many Resource Identifiers we will allow to be add()ed;
 	 * optional, default is null (unlimited)
 	 */
-	public function __construct(integer $limit = null) {
-		$this->limit = $limit;
+	public function __construct($limit = null) {
+		$this->limit = Oop_Type::requireType($limit, 'integer');
 		parent::__construct('Lib_Net_Api_Rest_JsonApi_Server_ResourceIdentifier');
 	}
 
@@ -47,7 +49,8 @@ abstract class Lib_Net_Api_Rest_JsonApi_Server_ResourceLinkage extends Lib_Data_
 	 *
 	 * @throws Exception if this is an attempt to add too many objects to the collection
 	 */
-	public function add(Lib_Net_Api_Rest_JsonApi_Server_ResourceIdentifier $resourceIdentifier) {
+	public function add($resourceIdentifier) {
+		Oop_Type::requireType($resourceIdentifier, 'class:Lib_Net_Api_Rest_JsonApi_Server_ResourceIdentifier');
 		// Is there a limit in place?
 		if ((! is_null($limit)) && ($this->num() >= $limit)) {
 			throw new \Exception('Limit has been reached for number of Resource Identifiers added to this Resource Linkage');

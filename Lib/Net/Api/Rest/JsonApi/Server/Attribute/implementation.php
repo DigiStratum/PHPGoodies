@@ -2,6 +2,7 @@
 /**
  * PHPGoodies:Lib_Api_Rest_JsonApi_Server_Attribute - Resource Attribute class
  *
+ * @uses Oop_Type
  * @uses Lib_Data_Collection_Keyed_Item
  * @uses Lib_Net_Api_Rest_JsonApi_Server_Member
  *
@@ -10,6 +11,7 @@
 
 namespace PHPGoodies;
 
+PHPGoodies::import('Oop.Type');
 PHPGoodies::import('Lib.Data.Collection.Keyed.Item');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Member');
 
@@ -34,11 +36,11 @@ class Lib_Net_Api_Rest_JsonApi_Server_Attribute implements Lib_Data_Collection_K
 	 * @param String $name name of the attribute
 	 * @param mixed $value value for the attribute; optional, default is null
 	 */
-	public function __construct(string $name, $value = null) {
+	public function __construct($name, $value = null) {
+		$this->name = Oop_Type::requireType($name, 'string');
 		if (! Lib_Net_Api_Rest_JsonApi_Server_Member::isValidMemberName($name)) {
 			throw new \Exception("Invalid attribute name supplied: '{$name}'");
 		}
-		$this->name = $name;
 		$this->value = $value;
 	}
 

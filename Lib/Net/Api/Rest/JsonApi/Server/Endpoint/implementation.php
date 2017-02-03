@@ -30,10 +30,10 @@ abstract class Lib_Net_Api_Rest_JsonApi_Server_Endpoint {
 	 * Constructor
 	 */
 	public function __construct($uriPattern, $supportedVerbs) {
-		Oop.Type::requireType($uriPattern, 'class:Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern');
-		Oop.Type::requireType($supportedVerbs, 'array');
-		$this->uriPattern = $uriPattern;
+		$this->uriPattern = Oop_Type::requireType($uriPattern, 'class:Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern');
+
 		// Supported verbs is so that we can respond to OPTIONS requests as well as reject any unsupported verbs without thinking too hard.
+		$this->supportedVerbs = Oop_Type::requireType($supportedVerbs, 'array');
 	}
 
 	/**

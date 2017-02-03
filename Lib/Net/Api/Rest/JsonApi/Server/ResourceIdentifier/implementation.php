@@ -2,6 +2,7 @@
 /**
  * PHPGoodies:Lib_Api_Rest_JsonApi_Server_ResourceIdentifier - Resource Identifier Class
  *
+ * @uses Oop_Type
  * @uses Lib_Net_Api_Rest_JsonApi_Server_PrimaryData
  * @uses Lib_Net_Api_Rest_JsonApi_Meta
  *
@@ -10,6 +11,7 @@
 
 namespace PHPGoodies;
 
+PHPGoodies::improt('Oop.Type');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.PrimaryData');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Meta');
 
@@ -40,10 +42,10 @@ class Lib_Net_Api_Rest_JsonApi_Server_ResourceIdentifier implements \JsonSeriali
 	 * @param string $type type of resource
 	 * @param object $meta Meta class instance; optional, default is null
 	 */
-	public function __construct(string $id, string $type, Lib_Net_Api_Rest_JsonApi_Meta $meta = null) {
-		$this->id = $id;
-		$this->type = $type;
-		$this->meta = $meta;
+	public function __construct($id, $type, $meta = null) {
+		$this->id = Oop_Type::requireType($id, 'string');
+		$this->type = Oop_Type::requireType($type, 'string');
+		$this->meta = Oop_Type::optionalType($meta, 'class:Lib_Net_Api_Rest_JsonApi_Meta');
 	}
 
 	/**

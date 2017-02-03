@@ -2,6 +2,7 @@
 /**
  * PHPGoodies:Lib_Api_Rest_JsonApi_Server_Document - JSON:API Document class
  *
+ * @uses Oop_Type
  * @uses Lib_Net_Api_Rest_JsonApi_Server_Resources
  * @uses Lib_Net_Api_Rest_JsonApi_Server_PrimaryData
  * @uses Lib_Net_Api_Rest_JsonApi_Server_Errors
@@ -14,8 +15,9 @@
 
 namespace PHPGoodies;
 
-PHPGoodies::import('Lib_Net_Api_Rest_JsonApi_Server_Resources');
-PHPGoodies::import('Lib_Net_Api_Rest_JsonApi_Server_PrimaryData');
+PHPGoodies::import('Oop.Type');
+PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Resources');
+PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.PrimaryData');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Errors');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Links');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Meta');
@@ -74,8 +76,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Document implements \JsonSerializable {
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function setData(Lib_Net_Api_Rest_JsonApi_Server_PrimaryData $data) {
-		if ((! is_null($errors)) && (! is_null($data))) {
+	public function setData($data) {
+		Oop_Type::requireType($data, 'class:Lib_Net_Api_Rest_JsonApi_Server_PrimaryData');
+		if ((! is_null($this->errors)) && (! is_null($data))) {
 			throw new \Exception('Cannot have data if errors are set!');
 		}
 		$this->data = $data;
@@ -89,8 +92,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Document implements \JsonSerializable {
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function setErrors(Lib_Net_Api_Rest_JsonApi_Server_Errors $errors) {
-		if ((! is_null($data)) && (! is_null($errors))) {
+	public function setErrors($errors) {
+		Oop_Type::requireType($errors, 'class:Lib_Net_Api_Rest_JsonApi_Server_Errors');
+		if ((! is_null($this->data)) && (! is_null($errors))) {
 			throw new \Exception('Cannot have errors if data is set!');
 		}
 		$this->errors = $errors;
@@ -105,8 +109,8 @@ class Lib_Net_Api_Rest_JsonApi_Server_Document implements \JsonSerializable {
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function setMeta(Lib_Net_Api_Rest_JsonApi_Server_Meta $meta) {
-		$this->meta = $meta;
+	public function setMeta($meta) {
+		$this->meta = Oop_Type::requireType($meta, 'class:Lib_Net_Api_Rest_JsonApi_Server_Meta');
 		return $this;
 	}
 
@@ -117,8 +121,8 @@ class Lib_Net_Api_Rest_JsonApi_Server_Document implements \JsonSerializable {
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function setLinks(Lib_Net_Api_Rest_JsonApi_Server_Links $links) {
-		$this->links = $links;
+	public function setLinks($links) {
+		$this->links = Oop_Type::requireType($links, 'class:Lib_Net_Api_Rest_JsonApi_Server_Links');
 		return $this;
 	}
 
@@ -133,8 +137,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Document implements \JsonSerializable {
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function setIncluded(Lib_Net_Api_Rest_JsonApi_Server_Resources $included) {
-		if (is_null($data)) {
+	public function setIncluded($included) {
+		Oop_Type::requireType($included, 'class:Lib_Net_Api_Rest_JsonApi_Server_Resources');
+		if (is_null($this->data)) {
 			throw new \Exception('Cannot include resources if no primary data is set!');
 		}
 		$this->included = $included;

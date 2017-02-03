@@ -10,6 +10,5 @@ namespace PHPGoodies;
 /**
  * JSON:API Response Document, Primary Data
  */
-interface Lib_Net_Api_Rest_JsonApi_Server_PrimaryData {
-}
+interface Lib_Net_Api_Rest_JsonApi_Server_PrimaryData { }
 

@@ -2,6 +2,7 @@
 /**
  * PHPGoodies:Lib_Api_Rest_JsonApi_Server_Resource - Resource Data Class
  *
+ * @uses Oop_Type
  * @uses Lib_Net_Api_Rest_JsonApi_Server_PrimaryData
  * @uses Lib_Net_Api_Rest_JsonAPi_Server_Relationships
  * @uses Lib_Net_Api_Rest_JsonAPi_Server_Attributes
@@ -12,6 +13,7 @@
 
 namespace PHPGoodies;
 
+PHPGoodies::import('Oop.Type');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.PrimaryData');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonAPi.Server.Relationships');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonAPi.Server.Attributes');
@@ -56,19 +58,14 @@ class Lib_Net_Api_Rest_JsonApi_Server_Resource implements \JsonSerializable, Lib
 	 * Constructor
 	 *
 	 * @param string $type we must have a resource type
-	 * @param object $attributes we must have an Attributes class instance
 	 * @param string $id we may optionally have a unique ID (if creating a new one, we won't!)
 	 */
-	public function __construct(string $type, Lib_Net_Api_Rest_JsonApi_server_Attributes $attributes, string $id = null) {
-		if (
-			(! is_String($type)) || (strlen($type) === 0) ||
-			(! is_object($attributes)) || ($attributes->num() === 0)
-		) {
-			throw new \Exception("Invalid type/attributes supplied: '{$type}'");
+	public function __construct($type, $id = null) {
+		$this->type = Oop_Type::requireType($type, 'string');
+		$this->id = Oop_Type::optionalType($id, 'string');
+		if (strlen($type) === 0) {
+			throw new \Exception("Invalid type supplied: '{$type}'");
 		}
-		$this->type = $type;
-		$this->attributes = $attributes;
-		if (is_null($id) || is_string($id)) $this->id = $id;
 	}
 
 	/**
@@ -78,8 +75,8 @@ class Lib_Net_Api_Rest_JsonApi_Server_Resource implements \JsonSerializable, Lib
 	 *
 	 * @return object $this to support chaining...
 	 */
-	public function setRelationships(Lib_Net_Api_Rest_JsonAPi_Server_Relationships $relationships) {
-		$this->relationships = $relationships;
+	public function setRelationships($relationships) {
+		$this->relationships = Oop_Type::requireType($relationships, 'class:Lib_Net_Api_Rest_JsonApi_server_Relationships');
 		return $this;
 	}
 
@@ -90,8 +87,8 @@ class Lib_Net_Api_Rest_JsonApi_Server_Resource implements \JsonSerializable, Lib
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function setAttributes(Lib_Net_Api_Rest_JsonApi_Server_Attributes $attributes) {
-		$this->attributes = $attributes;
+	public function setAttributes($attributes) {
+		$this->attributes = Oop_Type::requireType($attributes, 'class:Lib_Net_Api_Rest_JsonApi_server_Attributes');
 		return $this;
 	}
 
@@ -102,8 +99,8 @@ class Lib_Net_Api_Rest_JsonApi_Server_Resource implements \JsonSerializable, Lib
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function setLinks(Lib_Net_Api_Rest_JsonApi_Server_Links $links) {
-		$this->links = $links;
+	public function setLinks($links) {
+		$this->links = Oop_Type::requireType($links, 'class:Lib_Net_Api_Rest_JsonApi_server_Links');
 		return $this;
 	}
 

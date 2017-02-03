@@ -191,4 +191,28 @@ class TypeTest extends \PHPUnit_Framework_TestCase {
 		$data = new SimpleTestClass();
 		Oop_Type::optionalType($data, 'french fries!');
 	}
+
+	/**
+	 * Test that requireType returns the data it was passed
+	 */
+	public function testThatRequireTypeReturnsData() {
+		$obj = new \StdClass();
+		$obj->prop = 'value';
+		$jsonSent = json_encode($obj);
+		$obj = Oop_Type::requireType($obj, 'object');
+		$jsonReceived = json_encode($obj);
+		$this->assertEquals($jsonSent, $jsonReceived);
+	}
+
+	/**
+	 * Test that optionalType returns the data it was passed
+	 */
+	public function testThatOptionalTypeReturnsData() {
+		$obj = new \StdClass();
+		$obj->prop = 'value';
+		$jsonSent = json_encode($obj);
+		$obj = Oop_Type::optionalType($obj, 'object');
+		$jsonReceived = json_encode($obj);
+		$this->assertEquals($jsonSent, $jsonReceived);
+	}
 }

@@ -70,10 +70,12 @@ abstract class Oop_Type {
 	 * @param string $type Descriptor of a valid type including a class name
 	 * @param boolean $ignoreNamespace Defaults to true to remove the namespace from class names
 	 *
+	 * @return mixed $data, whatever it was, if the type check passes
+	 *
 	 * @throws Oop_Exception_TypeMismatch if the type does not match
 	 */
 	public static function requireType(&$data, $type, $ignoreNamespace = true) {
-		if (static::isType($data, $type, $ignoreNamespace)) return;
+		if (static::isType($data, $type, $ignoreNamespace)) return $data;
 		throw new Oop_Exception_TypeMismatch("Expected '$type', but got '" . static::getType($data, $ignoreNamespace) . "'");
 	}
 
@@ -84,11 +86,12 @@ abstract class Oop_Type {
 	 * @param string $type Descriptor of a valid type including a class name
 	 * @param boolean $ignoreNamespace Defaults to true to remove the namespace from class names
 	 *
+	 * @return mixed $data, whatever it was, if the type check passes
+	 *
 	 * @throws Oop_Exception_TypeMismatch if the type does not match
 	 */
 	public static function optionalType(&$data, $type, $ignoreNamespace = true) {
-		if (is_null($data)) return;
-		static::requireType($data, $type, $ignoreNamespace);
+		return (is_null($data)) ? null : static::requireType($data, $type, $ignoreNamespace);
 	}
 }
 

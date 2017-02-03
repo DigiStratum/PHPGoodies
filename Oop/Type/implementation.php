@@ -76,5 +76,19 @@ abstract class Oop_Type {
 		if (static::isType($data, $type, $ignoreNamespace)) return;
 		throw new Oop_Exception_TypeMismatch("Expected '$type', but got '" . static::getType($data, $ignoreNamespace) . "'");
 	}
+
+	/**
+	 * Throws an exception if the supplied data is not null AND does not match specified type
+	 *
+	 * @param mixed $data Any PHP data we want to check the type of
+	 * @param string $type Descriptor of a valid type including a class name
+	 * @param boolean $ignoreNamespace Defaults to true to remove the namespace from class names
+	 *
+	 * @throws Oop_Exception_TypeMismatch if the type does not match
+	 */
+	public static function optionalType(&$data, $type, $ignoreNamespace = true) {
+		if (is_null($data)) return;
+		static::requireType($data, $type, $ignoreNamespace);
+	}
 }
 

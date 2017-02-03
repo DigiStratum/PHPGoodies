@@ -165,4 +165,30 @@ class TypeTest extends \PHPUnit_Framework_TestCase {
 		$data = 3;
 		Oop_Type::requireType($data, 'integer');
 	}
+
+	/**
+	 * Test that optionalType allows nulls
+	 */
+	public function testThatOptionalTypeAllowsNulls() {
+		$data = null;
+		Oop_Type::optionalType($data, 'string');
+	}
+
+	/**
+	 * Test that optionalType allows non-null values if they match type
+	 */
+	public function testThatOptionalTypeAllowsNonNullTypeMatch() {
+		$data = 3;
+		Oop_Type::optionalType($data, 'integer');
+	}
+
+	/**
+	 * Test that optionalType throws an exception on non-null mismatch
+	 *
+	 * @expectedException PHPGoodies\Oop_Exception_TypeMismatch
+	 */
+	public function testThatOptionalTypeRequiresNonNullMatch() {
+		$data = new SimpleTestClass();
+		Oop_Type::optionalType($data, 'french fries!');
+	}
 }

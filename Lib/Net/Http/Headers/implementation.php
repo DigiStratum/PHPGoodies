@@ -36,14 +36,14 @@ class Lib_Net_Http_Headers extends Lib_Data_Hash {
 		// If headers have already been sent, there's nothing we can do now
 		if ($this->headersSent) return;
 
-		// See if we have an HTTP/S header which must be sent first
+		// See if we have an HTTP header which must be sent first
 		foreach ($this->hash as $name => $value) {
 
-			// If it is the HTTP/S headers...
+			// If it is the HTTP headers...
 			if (self::isHttp($name)) {
 
 				// Send it only for now...
-				header(self::properName($name) . ": {$value}", true, $value);
+				header(self::properName($name));
 				break;
 			}
 		}
@@ -51,7 +51,7 @@ class Lib_Net_Http_Headers extends Lib_Data_Hash {
 		// All other headers; order is unimportant
 		foreach ($this->hash as $name => $value) {
 
-			// If it is the HTTP/S header, it's already been sent
+			// If it is the HTTP header, it's already been sent
 			if (self::isHttp($name)) continue;
 
 			// Send this one proper-like
@@ -133,14 +133,14 @@ class Lib_Net_Http_Headers extends Lib_Data_Hash {
 	}
 
 	/**
-	 * Is the supplied header name the special 'HTTP*' one?
+	 * Is the supplied header name the special 'HTTP/' one?
 	 *
 	 * @param string $name The header name to check
 	 *
-	 * @return boolean true if it is an HTTP header, else false
+	 * @return boolean true if it is the HTTP header, else false
 	 */
 	static public function isHttp($name) {
-		return preg_match('/^http/i', $name);
+		return preg_match('/^http\//i', $name);
 	}
 
 	/**

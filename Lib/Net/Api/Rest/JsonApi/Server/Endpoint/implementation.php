@@ -2,8 +2,16 @@
 /**
  * PHPGoodies:Lib_Api_Rest_JsonApi_Endpoint - Abstract class for a single endpoint
  *
+ * There are two modes of use: static and instantiated; the static class has a method to return the
+ * UriPattern, and the instantiated one leverages this static method as well as provides instance
+ * methods for handling requests.
+ *
+ * @uses Oop_Type
  * @uses Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern
  * @uses Lib_Net_Api_Rest_JsonApi_Server_Document
+ * @uses Lib_Net_Api_Rest_JsonApi_Server_Controller
+ * @uses Lib_Net_Http_Request
+ * @uses Lib_Net_Http_Response
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -27,13 +35,21 @@ abstract class Lib_Net_Api_Rest_JsonApi_Server_Endpoint {
 	protected $uriPattern;
 
 	/**
-	 * Constructor
+	 * The JSON:API controller which will handle requests for this endpoint
 	 */
-	public function __construct($uriPattern, $supportedVerbs) {
+	protected $controller;
+
+	/**
+	 * Constructor
+	 *
+	 * @param object $uriPattern JSON:API UriPattern for this API endpoint
+	 * @param object $controller JSON:API Controller for this API endpoint
+	 */
+	public function __construct($uriPattern, $controller) {
 		$this->uriPattern = Oop_Type::requireType($uriPattern, 'class:Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern');
 
-		// Supported verbs is so that we can respond to OPTIONS requests as well as reject any unsupported verbs without thinking too hard.
-		$this->supportedVerbs = Oop_Type::requireType($supportedVerbs, 'array');
+		// The dependency-injected JSON:API controller which will handle requests for this endpoint
+		$this->controller = Oop_Type::requireType($controller, 'class:Lib_Net_Api_Rest_JsonApi_Server_Controller');
 	}
 
 	/**
@@ -43,13 +59,22 @@ abstract class Lib_Net_Api_Rest_JsonApi_Server_Endpoint {
 	 * the server and check the pattern for each for a given httpRequest and then know which
 	 * endpoint is the appropriate one to launch.
 	 *
-	 * @todo :resolve how this helps us if we want to just have an array of patterns-to-classnames
-	 * without instantiating the relevant endpoint classname until we know it is needed to service
-	 * the request? Can we make it static so that anyone can check that out of the endpoint without
-	 * having an instance yet?
+	 * @return object JSON:API UriPattern which will match requests for this endpoint
 	 */
-	public function getUriPattern() {
-		return $this->uriPattern;
+	static abstract public function getUriPattern();
+
+	/**
+	 * Handle the supplied HTTP Request
+	 */
+	public function handleRequest($httpRequest) {
+		Oop.Type::requireType($httpRequest, 'class:Lib_Net_Http_Request');
+		$response = $this->getResponse($httpRequest);
+		$response->headers->send();
+	}
+
+	protected function getResponse($httpRequest) {
+		$response = PHPGoodies::instantiate('Lib.Net.Http.Response');
+		return $response;
 	}
 
 	/**
@@ -65,7 +90,6 @@ abstract class Lib_Net_Api_Rest_JsonApi_Server_Endpoint {
 	 * @return Lib_Net_Api_Rest_JsonApi_Server_Document response document
 	 */
 	protected function getResponseDocument($request) {
-		Oop.Type::requireType($request, 'class:Lib_Net_Http_Request');
 		$document = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.Document');
 		return $document;
 	}

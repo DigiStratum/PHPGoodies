@@ -2,12 +2,16 @@
 /**
   * PHPGoodies:Lib_Api_Rest_JsonApi_Server - Provides a JSON:API compliant HTTP REST Server
   *
+  * @uses Oop_Type
+  * @uses Lib_Data_Hash
+  * @uses Lib_Net_Http_Request
+  *
   * @author Sean M. Kelly <smk@smkelly.com>
   */
 
 namespace PHPGoodies;
 
-PHPGoodies::import('Lib.Data.String');
+PHPGoodies::import('Oop.Type');
 PHPGoodies::import('Lib.Net.Http.Request');
 
 /**
@@ -21,38 +25,30 @@ class Lib_Net_Api_Rest_JsonApi_Server {
 	protected $baseUrl;
 
 	/**
-	 * Cached copy of the resource map which is dependency-injected
+	 * Cached copy of the endpoint map
 	 */
 	protected $resourceMap;
 
 	/**
 	 * Constructor
 	 *
-	 * @param $baseUrl String URL which forms the server base to which all URIs are relative
-	 * @param $JsonApiResourceMap Hash map object instance mapping endpoint URI's to
-	 * Resource implementations
+	 * @param String $baseUrl URL which forms the server base to which all URIs are relative
 	 */
-	public function __construct($baseUrl, $resourceMap) {
+	public function __construct($baseUrl) {
+		$this->baseUrl = Oop_Type::requireType('string', $baseUrl);
+		$this->resourceMap = PHPGoodies::instantiate('Lib.Data.Hash');
+	}
 
-		// Check our parameters
-		if (is_array($resourceMap) || (count($resourceMap) === 0) || (! is_string($baseUrl))) {
-			throw new \Exception('Bad Constructor Argument(s)');
+	/**
+	 * Add an endpoint class to handle requests
+	 */
+	public function addEndpoint($endpointClassName) {
+		Oop_Type::requireType('string', $endpointClassName);
+		if (! PHPGoodies::classDefined($resourceClassName)) {
+			throw new \Exception("Tried to add endpoint with undefined class name: '{$endpointClassName}'");
 		}
 
-		// Check the Resource Map
-		foreach ($resourceMap as $pattern => $resourceClassName) {
-			if (
-				(! PHPGoodies::classDefined($resourceClassName)) ||
-				(! in_array('Lib_Net_Api_Rest_Api_JsonApi_Server_Resource', PHPGoodies::classImplements($resourceClassName)))
-			) {
-				if (is_array($resourceMap) || (count($resourceMap) === 0)) {
-					throw new \Exception("Constructor Resource Map contains bad resource for pattern '{$pattern}'");
-				}
-			}
-		}
-
-		$this->resourceMap = $resourceMap;
-		$this->baseUrl = $baseUrl;
+		return $this;
 	}
 
 	/**

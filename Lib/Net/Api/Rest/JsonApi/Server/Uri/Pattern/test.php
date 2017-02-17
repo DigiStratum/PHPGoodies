@@ -31,9 +31,18 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern_Test extends \PHPUnit_Framewor
 	/**
 	 * Test that basic numeric and string patterns generate expected regex
 	 */
-	public function testNumericStringPatternGeneratesExpectedRegex() {
+	public function testThatNumericStringPatternGeneratesExpectedRegex() {
 		$pattern = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.Uri.Pattern', '/path/{#number}/dir/{$string}');
-		$this->assertEquals('/^\/path\/(\d+)\/dir\/(\s+)$/', $pattern->toRegex());
+		$this->assertEquals('/^\/path\/(\d+)\/dir\/(\w+)$/', $pattern->toRegex());
+	}
+
+	/**
+	 * Test that a supplied URI matches our pattern
+	 */
+	public function testThatUriMatchesPattern() {
+		$pattern = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.Uri.Pattern', '/path/{#number}/dir/{$string}');
+		$regex = $pattern->toRegex();
+		$this->assertTrue($pattern->matchesUri('/path/55/dir/abc'));
 	}
 }
 

@@ -46,7 +46,7 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern {
 	}
 
 	public function matchesUri($uri) {
-		return preg_match($uri, $this->regex);
+		return (preg_match($this->regex, $uri) == 1);
 	}
 
 	/**
@@ -93,7 +93,7 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern {
 					$varNames[$varName] = $type;
 					switch ($type) {
 						case 'number': $regex .= '(\d+)'; break;
-						case 'string': $regex .= '(\s+)'; break;
+						case 'string': $regex .= '(\w+)'; break;
 					}
 					break;
 

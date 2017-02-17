@@ -29,7 +29,7 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern {
 	/**
 	 * The variable names from this Pattern which get extracted from matching Uri's
 	 */
-	protected $varNames;
+	protected $variables;
 
 	/**
 	 * Constructor
@@ -41,10 +41,29 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern {
 		$this->patternToRegex($pattern);
 	}
 
-	public function toRegex() {
-		return $this->regex;
+	/**
+	 * Get the variables from the supplied URI
+	 *
+	 * @param string $uri The URI of the request we want to match against our pattern
+	 *
+	 * @return object with the URI variables set as named properties
+	 */
+	public function getUriVariables($uri) {
+		$obj = new \StdClass();
+		if (! (preg_match($this->regex, $uri, $matches)) && count($matches)) return $obj;
+		for ($mx = 1; $mx < count($matches); $mx++) {
+			$obj->{$this->variables[$mx - 1]->name} = $matches[$mx];
+		}
+		return $obj;
 	}
 
+	/**
+	 * Check whether the supplied URI matches our pattern
+	 *
+	 * @param string $uri The URI of the request we want to match against our pattern
+	 *
+	 * @return boolean true if the URI satisfies our pattern, else false
+	 */
 	public function matchesUri($uri) {
 		return (preg_match($this->regex, $uri) == 1);
 	}
@@ -65,7 +84,7 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern {
 		$regex = '/^';
 		$var = false;
 		$varName = '';
-		$varNames = Array();
+		$variables = Array();
 		$typing = false;
 		$type = '';
 		for ($xx = 0; $xx < strlen($pattern); $xx++) {
@@ -90,7 +109,10 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern {
 						throw new \Exception("Bad pattern ['{$pattern}'], zero length variable identifier at character {$xx}");
 					}
 					$var = false;
-					$varNames[$varName] = $type;
+					$variable = new \StdClass();
+					$variable->name = $varName;
+					$variable->type = $type;
+					$variables[] = $variable;
 					switch ($type) {
 						case 'number': $regex .= '(\d+)'; break;
 						case 'string': $regex .= '(\w+)'; break;
@@ -124,9 +146,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern {
 		}
 		$regex .= '$/';
 
-		// Capture the resulting pattern regex and varNames
+		// Capture the resulting pattern regex and variables
 		$this->regex = $regex;
-		$this->varNames = $varNames;
+		$this->variables = $variables;
 	}
 }
 

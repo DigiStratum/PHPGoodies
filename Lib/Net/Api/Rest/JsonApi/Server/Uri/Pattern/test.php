@@ -29,14 +29,6 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern_Test extends \PHPUnit_Framewor
 	}
 
 	/**
-	 * Test that basic numeric and string patterns generate expected regex
-	 */
-	public function testThatNumericStringPatternGeneratesExpectedRegex() {
-		$pattern = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.Uri.Pattern', '/path/{#number}/dir/{$string}');
-		$this->assertEquals('/^\/path\/(\d+)\/dir\/(\w+)$/', $pattern->toRegex());
-	}
-
-	/**
 	 * Test that a supplied URI matches a simple, exact path
 	 */
 	public function testThatUriMatchesSimpleExactPath() {
@@ -76,5 +68,16 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern_Test extends \PHPUnit_Framewor
 		$this->assertFalse($pattern->matchesUri('/suppliedpath'));
 	}
 
+	/**
+	 * test that the URI's variables match what we expect
+	 */
+	public function testThatUriVariablesMatch() {
+		$pattern = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.Uri.Pattern', '/path/{#number}/dir/{$string}');
+		$obj = $pattern->getUriVariables('/path/55/dir/abc');
+		$this->assertTrue(property_exists($obj, 'number'));
+		$this->assertEquals($obj->number, 55);
+		$this->assertTrue(property_exists($obj, 'string'));
+		$this->assertEquals($obj->string, 'abc');
+	}
 }
 

@@ -30,7 +30,7 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern {
 	 */
 	public function __construct($pattern) {
 		$this->pattern = Oop_Type::requireType($pattern, 'string');
-		$this->regex = $this->patternToRegex($pattern);
+		$this->patternToRegex($pattern);
 	}
 
 	public function toRegex() {
@@ -78,7 +78,7 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern {
 					if (! $var) {
 						throw new \Exception("Bad pattern ['{$pattern}'], not in the middle of a variable identifier at character {$xx}");
 					}
-					if (strlen($varName) ==0) {
+					if (strlen($varName) == 0) {
 						throw new \Exception("Bad pattern ['{$pattern}'], zero length variable identifier at character {$xx}");
 					}
 					$var = false;
@@ -116,7 +116,6 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern {
 		}
 		$regex .= '$/';
 		$this->regex = $regex;
-print "REGEX: {$this->regex}\n\n";
 		// TODO: Do something with the varNames here...
 	}
 }

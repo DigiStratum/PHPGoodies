@@ -14,9 +14,7 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern_Test extends \PHPUnit_Framewor
 	/**
 	 * Constructor
 	 */
-	public function __construct() {
-	PHPGoodies::import('Lib.Data.Hash');
-	}
+	public function __construct() { }
 
 	/**
 	 * Setup to occur ahead of each test method invocation
@@ -31,9 +29,9 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern_Test extends \PHPUnit_Framewor
 	}
 
 	/**
-	 * Test that newly instantiated Hash has no data in it
+	 * Test that basic numeric and string patterns generate expected regex
 	 */
-	public function testThatNewHashIsEmpty() {
+	public function testNumericStringPatternGeneratesExpectedRegex() {
 		$pattern = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.Uri.Pattern', '/path/{#number}/dir/{$string}');
 		$this->assertEquals('/^\/path\/(\d+)\/dir\/(\s+)$/', $pattern->toRegex());
 	}

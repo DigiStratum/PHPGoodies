@@ -21,7 +21,15 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern {
 	 */
 	protected $pattern;
 
+	/**
+	 * The regex equivalent of this pattern which we'll use to match Uri's
+	 */
 	protected $regex;
+
+	/**
+	 * The variable names from this Pattern which get extracted from matching Uri's
+	 */
+	protected $varNames;
 
 	/**
 	 * Constructor
@@ -115,8 +123,10 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern {
 			throw new \Exception("Bad pattern ['{$pattern}'], unterminated variable identifier at character {$xx}");
 		}
 		$regex .= '$/';
+
+		// Capture the resulting pattern regex and varNames
 		$this->regex = $regex;
-		// TODO: Do something with the varNames here...
+		$this->varNames = $varNames;
 	}
 }
 

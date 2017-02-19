@@ -167,5 +167,33 @@ class Lib_Data_Hash_Test extends \PHPUnit_Framework_TestCase {
 		$this->assertTrue($hash1->has('key3'));
 		$this->assertEquals('value3', $hash1->get('key3'));
 	}
+
+	/**
+	 * Test that the Iterator interface behaves as expected
+	 */
+	public function testThatIteratorInterfaceWorks() {
+		$hash = PHPGoodies::instantiate('Lib.Data.Hash');
+		$hash->set('key1', 'value1');
+		$hash->set('key2', 'value2');
+		$n = 0;
+		foreach ($hash as $key => $value) {
+			switch ($n++) {
+				case 0:
+					$this->assertEquals($key, 'key1');
+					$this->assertEquals($value, 'value1');
+					break;
+
+				case 1:
+					$this->assertEquals($key, 'key2');
+					$this->assertEquals($value, 'value2');
+					break;
+
+				default:
+					// If we got here then the iterator returned
+					// something we didn't expect to exist!
+					$this->assertTur(false);
+			}
+		}
+	}
 }
 

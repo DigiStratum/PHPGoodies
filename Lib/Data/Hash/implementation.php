@@ -10,7 +10,7 @@ namespace PHPGoodies;
 /**
  * Hash
  */
-class Lib_Data_Hash implements \JsonSerializable {
+class Lib_Data_Hash implements \JsonSerializable, \Iterator {
 
 	/**
 	 * This is the actual hash data that all the methods below manipulate
@@ -161,6 +161,8 @@ class Lib_Data_Hash implements \JsonSerializable {
 		return $this;
 	}
 
+// JSONSERIALIZABLE INTERFACE
+
 	/**
 	 * JsonSerializable Json Serializer
 	 *
@@ -169,6 +171,58 @@ class Lib_Data_Hash implements \JsonSerializable {
 	 */
 	public function jsonSerialize() {
 		return $this->all();
+	}
+
+// ITERATOR INTERFACE
+
+	/**
+	 * Reset the internal pointer back to the beginning
+	 *
+	 * Note: If your element's value is false, you won't be able to tell if this was an error... 
+	 *
+	 * @return mixed value of the first element, or false if the array is empty
+	 */
+	public function rewind() {
+		return reset($this->hash);
+	}
+
+	/**
+	 * Return the current element in the array based on where the internal pointer is
+	 *
+	 * Note: If your element's value is false, you won't be able to tell if this was an error... 
+	 *
+	 * @return mixed value of the current element, or false if the pointer is past the end
+	 */
+	public function current() {
+		return current($this->hash);
+	}
+
+	/**
+	 * Return the index for the current internal pointer's position
+	 *
+	 * @return mixed array index, or null if the array is empty or the pointer is past the end
+	 */
+	public function key() {
+		return key($this->hash);
+	}
+
+	/**
+	 * Advance the internal pointer's position to the next element in the collection
+	 *
+	 * @return mixed value of the first element, or false if the array is empty
+	 */
+	public function next() {
+		return next($this->hash);
+	}
+
+	/**
+	 * Check whether the current collection element is valid (non-null and truthy)
+	 *
+	 * @return boolean true if the element key pointed to is non-null and truthy, else false
+	 */
+	public function valid() {
+		$key = key($this->hash);
+		return ((! is_null($key)) && (false != $key));
 	}
 }
 

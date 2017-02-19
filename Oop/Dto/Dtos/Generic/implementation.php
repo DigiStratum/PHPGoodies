@@ -85,7 +85,7 @@ class Oop_Dto_Dtos_Generic extends Oop_Dto {
 		return $this->_get($name);
 	}
         /**
-	 * Expose the proeprty checker
+	 * Expose the property checker
 	 *
 	 * @param string $name The name of the property to be checked
 	 *

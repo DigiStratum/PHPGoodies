@@ -74,10 +74,10 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern_Test extends \PHPUnit_Framewor
 	public function testThatUriVariablesMatch() {
 		$pattern = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.Uri.Pattern', '/path/{#number}/dir/{$string}');
 		$obj = $pattern->getUriVariables('/path/55/dir/abc');
-		$this->assertTrue(property_exists($obj, 'number'));
-		$this->assertEquals($obj->number, 55);
-		$this->assertTrue(property_exists($obj, 'string'));
-		$this->assertEquals($obj->string, 'abc');
+		$this->assertTrue($obj->chk('number'));
+		$this->assertEquals($obj->get('number'), 55);
+		$this->assertTrue($obj->chk('string'));
+		$this->assertEquals($obj->get('string'), 'abc');
 	}
 }
 

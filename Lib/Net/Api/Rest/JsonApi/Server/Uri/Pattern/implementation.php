@@ -3,6 +3,7 @@
  * PHPGoodies:Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern - JSON:API Class for comparing URIs to patterns
  *
  * @uses Oop_Type
+ * @uses Oop_Dto_Dtos_Generic
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -10,6 +11,7 @@
 namespace PHPGoodies;
 
 PHPGoodies::import('Oop.Type');
+PHPGoodies::import('Oop.Dto.Dtos.Generic');
 
 /**
  * JSON:API Class for comparing URIs to patterns
@@ -46,15 +48,23 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern {
 	 *
 	 * @param string $uri The URI of the request we want to match against our pattern
 	 *
-	 * @return object with the URI variables set as named properties
+	 * @return object Dto with the URI variables set as named properties, or null if no match
 	 */
 	public function getUriVariables($uri) {
-		$obj = new \StdClass();
-		if (! (preg_match($this->regex, $uri, $matches)) && count($matches)) return $obj;
-		for ($mx = 1; $mx < count($matches); $mx++) {
-			$obj->{$this->variables[$mx - 1]->name} = $matches[$mx];
+
+		// If there's no match on the URI, null is the result
+		$matches = $this->getREgexMatches($uri);
+		if (is_null($matches)) return null;
+
+		// If there are no variables of interest, the empty DTO is the result
+		$dto = PHPGoodies::instantiate('Oop.Dto.Dtos.Generic', array_keys($this->variables));
+		if (! count($this->variables)) return $dto;
+
+		// Fill the DTO up with the variables' values (skip the 0th element)
+		for ($v = 1; $v < count($matches); $v++) {
+			$dto->set($this->variables[$v - 1]->name, $matches[$v]);
 		}
-		return $obj;
+		return $dto;
 	}
 
 	/**
@@ -65,7 +75,23 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern {
 	 * @return boolean true if the URI satisfies our pattern, else false
 	 */
 	public function matchesUri($uri) {
-		return (preg_match($this->regex, $uri) == 1);
+		return (! is_null($this->getRegexMatches($uri)));
+	}
+
+	/**
+	 * Run the regex for this pattern against the supplied URI and get the matches
+	 *
+	 * Note: the matches will always return an array with at least one element which is the full
+	 * string match for the regex, which should be the same as the URI... if there are variable
+	 * components in the URI and pattern, then they will be added, in order, to the set of
+	 * matches following the 0th element.
+	 *
+	 * @param string $uri The URI of the request we want to match against our pattern
+	 *
+	 * @return Array of regex matches if a match occurred, or null if no match
+	 */
+	private function getRegexMatches($uri) {
+		return preg_match($this->regex, $uri, $matches) ? $matches : null;
 	}
 
 	/**

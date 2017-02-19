@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern - JSON:API Class for comparing URIs to patterns
+ * PHPGoodies:Lib_Net_Api_Rest_JsonApi_Server_UriPattern - JSON:API Class for comparing URIs to patterns
  *
  * @uses Oop_Type
  * @uses Oop_Dto_Dtos_Generic
@@ -16,7 +16,7 @@ PHPGoodies::import('Oop.Dto.Dtos.Generic');
 /**
  * JSON:API Class for comparing URIs to patterns
  */
-class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern {
+class Lib_Net_Api_Rest_JsonApi_Server_UriPattern {
 
 	/**
 	 * The pattern string we will use
@@ -53,7 +53,7 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern {
 	public function getUriVariables($uri) {
 
 		// If there's no match on the URI, null is the result
-		$matches = $this->getREgexMatches($uri);
+		$matches = $this->getRegexMatches($uri);
 		if (is_null($matches)) return null;
 
 		// If there are no variables of interest, the empty DTO is the result
@@ -91,7 +91,8 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern {
 	 * @return Array of regex matches if a match occurred, or null if no match
 	 */
 	private function getRegexMatches($uri) {
-		return preg_match($this->regex, $uri, $matches) ? $matches : null;
+		$turi = Oop_Type::requireType($uri, 'string');
+		return preg_match($this->regex, $turi, $matches) ? $matches : null;
 	}
 
 	/**

@@ -7,7 +7,7 @@
 
 namespace PHPGoodies;
 
-require_once(realpath(dirname(__FILE__) . '/../../../../../../../../PHPGoodies.php'));
+require_once(realpath(dirname(__FILE__) . '/../../../../../../../PHPGoodies.php'));
 
 class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern_Test extends \PHPUnit_Framework_TestCase {
 
@@ -32,7 +32,7 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern_Test extends \PHPUnit_Framewor
 	 * Test that a supplied URI matches a simple, exact path
 	 */
 	public function testThatUriMatchesSimpleExactPath() {
-		$pattern = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.Uri.Pattern', 'exactpath');
+		$pattern = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.UriPattern', 'exactpath');
 		$this->assertTrue($pattern->matchesUri('exactpath'));
 	}
 
@@ -40,7 +40,7 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern_Test extends \PHPUnit_Framewor
 	 * Test that a supplied URI does not patch extra path
 	 */
 	public function testThatUriFailsExtraPath() {
-		$pattern = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.Uri.Pattern', 'exactpath');
+		$pattern = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.UriPattern', 'exactpath');
 		$this->assertFalse($pattern->matchesUri('exactpath/andthensome'));
 	}
 
@@ -48,7 +48,7 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern_Test extends \PHPUnit_Framewor
 	 * Test that a supplied URI matches our pattern
 	 */
 	public function testThatUriMatchesPattern() {
-		$pattern = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.Uri.Pattern', '/path/{#number}/dir/{$string}');
+		$pattern = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.UriPattern', '/path/{#number}/dir/{$string}');
 		$this->assertTrue($pattern->matchesUri('/path/55/dir/abc'));
 	}
 
@@ -56,7 +56,7 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern_Test extends \PHPUnit_Framewor
 	 * Test that a supplied URI does NOT match words for numbers
 	 */
 	public function testThatUriWordFailsAsNumber() {
-		$pattern = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.Uri.Pattern', '/path/{#number}');
+		$pattern = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.UriPattern', '/path/{#number}');
 		$this->assertFalse($pattern->matchesUri('/path/abc'));
 	}
 
@@ -64,7 +64,7 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern_Test extends \PHPUnit_Framewor
 	 * Test that a supplied URI does NOT match total mismatch
 	 */
 	public function testThatUriFailsMismatchPath() {
-		$pattern = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.Uri.Pattern', '/requiredpath');
+		$pattern = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.UriPattern', '/requiredpath');
 		$this->assertFalse($pattern->matchesUri('/suppliedpath'));
 	}
 
@@ -72,7 +72,7 @@ class Lib_Net_Api_Rest_JsonApi_Server_Uri_Pattern_Test extends \PHPUnit_Framewor
 	 * test that the URI's variables match what we expect
 	 */
 	public function testThatUriVariablesMatch() {
-		$pattern = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.Uri.Pattern', '/path/{#number}/dir/{$string}');
+		$pattern = PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.UriPattern', '/path/{#number}/dir/{$string}');
 		$obj = $pattern->getUriVariables('/path/55/dir/abc');
 		$this->assertTrue($obj->chk('number'));
 		$this->assertEquals($obj->get('number'), 55);

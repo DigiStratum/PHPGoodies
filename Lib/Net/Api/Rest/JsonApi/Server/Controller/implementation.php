@@ -126,7 +126,7 @@ abstract class Lib_Net_Api_Rest_JsonApi_Controller {
 	}
 
 	/**
-	 * Make dispath any of the above handlers' service calls
+	 * Dispatch any of the above handlers' service calls
 	 *
 	 * @param string $methodName Name of the service method we want to invoke
 	 * @param string $uri The URI of the request we want to match against our UriPattern
@@ -149,8 +149,12 @@ abstract class Lib_Net_Api_Rest_JsonApi_Controller {
 
 		// Map JsonApi.Server.Exceptions to HTTP RESPONSES
 		catch (Lib_Net_Api_Rest_JsonApi_Server_Exception_NoAuthentication $e) {
+			$e = PHPGoodies::instantiate(Lib_Net_Http_Response_MappedException_Unauthorized);
+			throw $e;
 		}
 		catch (Lib_Net_Api_Rest_JsonApi_Server_Exception, \Exception $e) {
+			//$e = PHPGoodies::instantiate(Lib_Net_Http_Response_MappedException_ServerError);
+			throw $e;
 		}
 
 		return $this->service->{$methodName}($vars);

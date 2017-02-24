@@ -16,7 +16,7 @@ PHPGoodies::import('Lib.Net.Http.Response.MappedException');
 /**
  * MappedException: 402 PAYMENT REQUIRED
  */
-abstract class Lib_Net_Http_Response_MappedException_PaymentRequired extends Lib_Net_Http_Response_MappedException {
+class Lib_Net_Http_Response_MappedException_PaymentRequired extends Lib_Net_Http_Response_MappedException {
 
 	/**
 	 * Constructor - code is "fixed" for these mapped exceptions, so we don't allow code to be supplied
@@ -25,7 +25,7 @@ abstract class Lib_Net_Http_Response_MappedException_PaymentRequired extends Lib
 		$msg = (strlen($message)) ? " - {$message}" : '';
 		$code = Lib_Net_Http_Response::HTTP_PAYMENT_REQUIRED;
 		$desc = Lib_Net_Http_Response::getDescription($code);
-		parent::__construct("{$desc}{$m}", $code, $previous);
+		parent::__construct("{$desc}{$msg}", $code, $previous);
 	}
 }
 

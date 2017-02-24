@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:Lib_Net_Http_Response_MappedException - Extension of SPL's RuntimeException
+ * PHPGoodies:Lib_Net_Http_Response_MappedException_PaymentRequired - Extension of SPL's RuntimeException
  *
  * @uses Lib_Net_Http_Response
  * @uses Lib_Net_Http_Response_MappedException

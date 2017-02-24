@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPGoodies:Lib_Net_Http_Response_MappedException_PreconditionRequired - Extension of SPL's RuntimeException
+ * PHPGoodies:Lib_Net_Http_Response_MappedException_RequestedRangeNotSatisfiable - Extension of SPL's RuntimeException
  *
  * @uses Lib_Net_Http_Response
  * @uses Lib_Net_Http_Response_MappedException
@@ -14,16 +14,16 @@ PHPGoodies::import('Lib.Net.Http.Response');
 PHPGoodies::import('Lib.Net.Http.Response.MappedException');
 
 /**
- * MappedException: 428 PRECONDITION REQUIRED
+ * MappedException: 416 REQUESTED RANGE NOT SATISFIABLE
  */
-abstract class Lib_Net_Http_Response_MappedException_PreconditionRequired extends Lib_Net_Http_Response_MappedException {
+abstract class Lib_Net_Http_Response_MappedException_RequestedRangeNotSatisfiable extends Lib_Net_Http_Response_MappedException {
 
 	/**
 	 * Constructor - code is "fixed" for these mapped exceptions, so we don't allow code to be supplied
 	 */
 	public function __construct($message = '', $previous = null) {
 		$msg = (strlen($message)) ? " - {$message}" : '';
-		$code = Lib_Net_Http_Response::HTTP_PRECONDITION_REQUIRED;
+		$code = Lib_Net_Http_Response::HTTP_REQUESTED_RANGE_NOT_SATISFIABLE;
 		$desc = Lib_Net_Http_Response::getDescription($code);
 		parent::__construct("{$desc}{$m}", $code, $previous);
 	}

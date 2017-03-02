@@ -63,90 +63,94 @@ abstract class Lib_Net_Api_Rest_JsonApi_Controller {
 	/**
 	 * Translate an HTTP POST request into a service call
 	 *
-	 * @param string $uri The URI of the request we want to match against our UriPattern
+	 * @param object $httpRequest instance of Http.Request
 	 *
 	 * @return object HTTPResponse instance
 	 */
-	public function doPost($uri) {
-		$this->serviceCall('create', $uri);
+	public function doPost($httpRequest) {
+		return $this->serviceCall('create', $httpRequest);
 	}
 
 	/**
 	 * Translate an HTTP GET request into a service call
 	 *
-	 * @param string $uri The URI of the request we want to match against our UriPattern
+	 * @param object $httpRequest instance of Http.Request
 	 *
 	 * @return object HTTPResponse instance
 	 */
-	public function doGet($uri) {
-		$this->serviceCall('retrieve', $uri);
+	public function doGet($httpRequest) {
+		return $this->serviceCall('retrieve', $httpRequest);
 	}
 
 	/**
 	 * Translate an HTTP PATCH request into a service call
 	 *
-	 * @param string $uri The URI of the request we want to match against our UriPattern
+	 * @param object $httpRequest instance of Http.Request
 	 *
 	 * @return object HTTPResponse instance
 	 */
-	public function doPatch($uri) {
-		$this->serviceCall('update', $uri);
+	public function doPatch($httpRequest) {
+		return $this->serviceCall('update', $httpRequest);
 	}
 
 	/**
 	 * Translate an HTTP DELETE request into a service call
 	 *
-	 * @param string $uri The URI of the request we want to match against our UriPattern
+	 * @param object $httpRequest instance of Http.Request
 	 *
 	 * @return object HTTPResponse instance
 	 */
-	public function doDelete($uri) {
-		$this->serviceCall('delete', $uri);
+	public function doDelete($httpRequest) {
+		return $this->serviceCall('delete', $httpRequest);
 	}
 
 	/**
 	 * Translate an HTTP PUT request into a service call
 	 *
-	 * @param string $uri The URI of the request we want to match against our UriPattern
+	 * @param object $httpRequest instance of Http.Request
 	 *
 	 * @return object HTTPResponse instance
 	 */
-	public function doPut($uri) {
-		$this->serviceCall('replace', $uri);
+	public function doPut($httpRequest) {
+		return $this->serviceCall('replace', $httpRequest);
 	}
 
 	/**
 	 * Translate an HTTP HEAD request into a service call
 	 *
-	 * @param string $uri The URI of the request we want to match against our UriPattern
+	 * @param object $httpRequest instance of Http.Request
 	 *
 	 * @return object HTTPResponse instance
 	 */
-	public function doHead($uri) {
-		$this->serviceCall('getMetadata', $uri);
+	public function doHead($httpRequest) {
+		return $this->serviceCall('getMetadata', $httpRequest);
 	}
 
 	/**
 	 * Translate an HTTP OPTIONS request into a service call
 	 *
-	 * @param string $uri The URI of the request we want to match against our UriPattern
+	 * @param object $httpRequest instance of Http.Request
 	 *
 	 * @return object HTTPResponse instance
 	 */
-	public function doOptions($uri) {
+	public function doOptions($httpRequest) {
+		$httpResponse = $this->serviceCall('retrieve', $httpRequest);
+		$httpResponse->setResponseBody(null);
+		return $httpResponse;
 	}
 
 	/**
 	 * Dispatch any of the above handlers' service calls
 	 *
 	 * @param string $methodName Name of the service method we want to invoke
-	 * @param string $uri The URI of the request we want to match against our UriPattern
 	 *
 	 * @return object HTTPResponse instance
 	 *
 	 * @throws InvalidRequest
 	 */
-	protected function serviceCall($methodName, $uri) {
+	protected function serviceCall($methodName, $httpRequest) {
+
+		$uri = $httpRequest->getPath();
 
 		// Formulate an HTTP response, for better or worse!
 		$response = PHPGoodies::instantiate('Lib.Net.Http.Response');

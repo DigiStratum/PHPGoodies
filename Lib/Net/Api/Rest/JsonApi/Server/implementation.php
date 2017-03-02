@@ -3,6 +3,7 @@
   * PHPGoodies:Lib_Api_Rest_JsonApi_Server - Provides a JSON:API compliant HTTP REST Server
   *
   * @uses Oop_Type
+  * @uses Oop_Exception_TypeMismatch
   * @uses Lib_Data_Hash
   * @uses Lib_Net_Http_Request
   *
@@ -12,6 +13,7 @@
 namespace PHPGoodies;
 
 PHPGoodies::import('Oop.Type');
+PHPGoodies::import('Oop.Exception.TypeMismatch');
 PHPGoodies::import('Lib.Net.Http.Request');
 
 /**
@@ -61,7 +63,10 @@ class Lib_Net_Api_Rest_JsonApi_Server {
 	public function processRequest(&$httpRequest) {
 
 		// Check our parameters
-		if (! $httpRequest instanceof Lib_Net_Http_Request) {
+		try {
+			Oop_Type::requireType($httpRequest, 'class:Lib_Net_Http_Request');
+		}
+		catch (Oop_Exception_TypeMismatch $e) {
 			return $this->responseError(
 				Lib_Net_Http_Response::HTTP_INTERNAL_SERVER_ERROR,
 				'Invalid Arguments to Process Request'
@@ -70,11 +75,11 @@ class Lib_Net_Api_Rest_JsonApi_Server {
 
 		try {
 			$requestInfo = $httpRequest->getInfo();
-			$resource = $this->getResourceForURI($requestInfo->uri);
-			if ((null === $resource) || (! $resource instanceof Lib_Net_Api_Rest_JsonApi_Server_Resource)) {
+			$controller = $this->getControllerForUri($requestInfo->uri);
+			if (is_null($controller) || (! $controller instanceof Lib_Net_Api_Rest_JsonApi_Server_Controller)) {
 				return $this->responseError(
-					Lib_Net_Http_Response::HTTP_BAD_REQUEST,
-					'No matching mapped resource for request'
+					Lib_Net_Http_Response::HTTP_NOT_FOUND,
+					'No mapped controller for request URI'
 				);
 			}
 

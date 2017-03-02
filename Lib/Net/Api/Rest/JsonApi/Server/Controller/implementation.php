@@ -5,6 +5,14 @@
  * @uses Oop_Type
  * @uses Lib_Net_Api_Rest_JsonApi_Server_UriPattern
  * @uses Lib_Net_Api_Rest_JsonApi_Server_Service
+ * @uses Lib_Net_Api_Rest_JsonApi_Server_Service_Exception
+ * @uses Lib_Net_Api_Rest_JsonApi_Server_Service_Exception_NoAuthentication
+ * @uses Lib_Net_Api_Rest_JsonApi_Server_Service_Exception_NoAuthorization
+ * @uses Lib_Net_Http_Response
+ * @uses Lib_Net_Http_Response_MappedException_BadRequest
+ * @uses Lib_Net_Http_Response_MappedException_Unauthorized
+ * @uses Lib_Net_Http_Response_MappedException_ServerError
+ * @uses Lib_Net_Http_Response_MappedException_Forbidden
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
@@ -12,6 +20,9 @@
 namespace PHPGoodies;
 
 PHPGoodies::import('Oop.Type');
+PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Service.Exception');
+PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Service.Exception.NoAuthentication');
+PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Service.Exception.NoAuthorization');
 
 /**
  * JSON:API Endpoint Controller
@@ -41,16 +52,6 @@ abstract class Lib_Net_Api_Rest_JsonApi_Controller {
 	}
 
 	/**
-	 * Handle an HTTP OPTIONS request
-	 *
-	 * @param string $uri The URI of the request we want to match against our UriPattern
-	 *
-	 * @return object HTTPResponse instance
-	 */
-	public function doOptions($uri) {
-	}
-
-	/**
 	 * Checks whether the UriPattern which attaches us matches the supplied URI
 	 *
 	 * @param string $uri Portion of a URL that we want to know whether is a match for us
@@ -60,7 +61,7 @@ abstract class Lib_Net_Api_Rest_JsonApi_Controller {
 	abstract static public function matchesUri($uri);
 
 	/**
-	 * Handle an HTTP POST request
+	 * Translate an HTTP POST request into a service call
 	 *
 	 * @param string $uri The URI of the request we want to match against our UriPattern
 	 *
@@ -71,7 +72,7 @@ abstract class Lib_Net_Api_Rest_JsonApi_Controller {
 	}
 
 	/**
-	 * Handle an HTTP GET request
+	 * Translate an HTTP GET request into a service call
 	 *
 	 * @param string $uri The URI of the request we want to match against our UriPattern
 	 *
@@ -82,7 +83,7 @@ abstract class Lib_Net_Api_Rest_JsonApi_Controller {
 	}
 
 	/**
-	 * Handle an HTTP PATCH request
+	 * Translate an HTTP PATCH request into a service call
 	 *
 	 * @param string $uri The URI of the request we want to match against our UriPattern
 	 *
@@ -93,7 +94,7 @@ abstract class Lib_Net_Api_Rest_JsonApi_Controller {
 	}
 
 	/**
-	 * Handle an HTTP DELETE request
+	 * Translate an HTTP DELETE request into a service call
 	 *
 	 * @param string $uri The URI of the request we want to match against our UriPattern
 	 *
@@ -104,7 +105,7 @@ abstract class Lib_Net_Api_Rest_JsonApi_Controller {
 	}
 
 	/**
-	 * Handle an HTTP PUT request
+	 * Translate an HTTP PUT request into a service call
 	 *
 	 * @param string $uri The URI of the request we want to match against our UriPattern
 	 *
@@ -115,7 +116,7 @@ abstract class Lib_Net_Api_Rest_JsonApi_Controller {
 	}
 
 	/**
-	 * Handle an HTTP HEAD request
+	 * Translate an HTTP HEAD request into a service call
 	 *
 	 * @param string $uri The URI of the request we want to match against our UriPattern
 	 *
@@ -123,6 +124,16 @@ abstract class Lib_Net_Api_Rest_JsonApi_Controller {
 	 */
 	public function doHead($uri) {
 		$this->serviceCall('getMetadata', $uri);
+	}
+
+	/**
+	 * Translate an HTTP OPTIONS request into a service call
+	 *
+	 * @param string $uri The URI of the request we want to match against our UriPattern
+	 *
+	 * @return object HTTPResponse instance
+	 */
+	public function doOptions($uri) {
 	}
 
 	/**
@@ -143,21 +154,26 @@ abstract class Lib_Net_Api_Rest_JsonApi_Controller {
 		try {
 			$vars = $this->uriPattern->getUriVariables($uri);
 			if (is_null($args)) {
-				throw new \Exception('400 BAD REQUEST');
+				$e = PHPGoodies::instantiate('Lib.Net.Http.Response.MappedException.BadRequest');
+				throw $e;
 			}
+
+			return $this->service->{$methodName}($vars);
 		}
 
-		// Map JsonApi.Server.Exceptions to HTTP RESPONSES
-		catch (Lib_Net_Api_Rest_JsonApi_Server_Exception_NoAuthentication $e) {
-			$e = PHPGoodies::instantiate(Lib_Net_Http_Response_MappedException_Unauthorized);
+		// Convert JsonApi.Server.Service.Exception to Http.Response MappedException
+		catch (Lib_Net_Api_Rest_JsonApi_Server_Service_Exception_NoAuthentication $e) {
+			$e = PHPGoodies::instantiate('Lib.Net.Http.Response.MappedException.Unauthorized');
 			throw $e;
 		}
-		catch (Lib_Net_Api_Rest_JsonApi_Server_Exception, \Exception $e) {
-			//$e = PHPGoodies::instantiate(Lib_Net_Http_Response_MappedException_ServerError);
+		catch (Lib_Net_Api_Rest_JsonApi_Server_Service_Exception_NoAuthorization $e) {
+			$e = PHPGoodies::instantiate('Lib.Net.Http.Response.MappedException.Forbidden');
 			throw $e;
 		}
-
-		return $this->service->{$methodName}($vars);
+		catch (\Exception $e) {
+			$e = PHPGoodies::instantiate('Lib.Net.Http.Response.MappedException.ServerError');
+			throw $e;
+		}
 	}
 }
 

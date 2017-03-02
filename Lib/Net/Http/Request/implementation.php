@@ -15,7 +15,9 @@ namespace PHPGoodies;
  */
 class Lib_Net_Http_Request {
 
-	// HTTP Request methods
+	/**
+	 * HTTP Request methods
+	 */
 	const HTTP_DELETE	= 'DELETE';
 	const HTTP_GET		= 'GET';
 	const HTTP_HEAD		= 'HEAD';
@@ -25,18 +27,30 @@ class Lib_Net_Http_Request {
 	const HTTP_PUT		= 'PUT';
 	const HTTP_TRACE	= 'TRACE';
 
-	/**
-	 * A set of the above HTTP_* request methods for easy checking
-	 */
-	protected $requestMethods;
+	protected $readonly = false;
 
 	/**
-	 * The request information data structure
+	 * Request Properties
+	 *
+	 * preFragment=false -> scheme://host[:port]/path[?queryString][#fragment]
+	 * preFragment=true  -> scheme://host[:port]/path[#fragment][?queryString]
 	 */
-	protected $requestInfo;
+	protected $scheme;	// HTTP/S
+	protected $host;	// www.yoursite.com
+	protected $port;	// service port (80|443)
+	protected $path;
+	protected $queryString;
+	protected $fragment;
+	
+	protected $method;	// One of the defined HTTP_* request methods
+	protected $isTunnelled;	// true|false to tunnel methods other than GET|POST
+	protected $preFragment;	// true|false to preFragment a request being formed
+	protected $payload;	// All the name=value pair data for GET|POST, etc.
+	protected $rawPayload;	// Raw POST/PUT/PATCH data if it is not form-encoded
+	protected $headers;	// HttpHeaders instance with the complete set
 
 	/**
-	 * Constructor - does nothing but set up the empty data structure
+	 * Constructor
 	 *
 	 * Note: pass false for the initCurrentRequest initializer if you want to make your own new
 	 * HttpRequest.
@@ -45,8 +59,6 @@ class Lib_Net_Http_Request {
 	 * client request being handled (optional, default=true)
 	 */
 	public function __construct($initCurrentRequest = true) {
-
-		$this->requestMethods = self::getRequestMethods();
 
 		$this->reset();
 
@@ -74,7 +86,7 @@ class Lib_Net_Http_Request {
 				else $this->setIsTunnelled(false);
 			}
 
-			// Protocol
+			// Scheme
 			$isSecure = false;
 			// ref : http://stackoverflow.com/questions/1175096/how-to-find-out-if-you-are-using-https-without-serverhttps
 			if (
@@ -89,49 +101,44 @@ class Lib_Net_Http_Request {
 				(isset($_SERVER['SERVER_PORT']) && (443 == $_SERVER['SERVER_PORT']))) {
 				$isSecure = true;
 			}
-			$this->setProtocol($_SERVER['REQUEST_SCHEME'] . ($isSecure ? 'S' : ''));
+			$this->setScheme($_SERVER['REQUEST_SCHEME'] . ($isSecure ? 'S' : ''));
 
-			// Hostname
-			$this->setHostname($_SERVER['HTTP_HOST']);
+			// Host
+			$this->setHost($_SERVER['HTTP_HOST']);
 
 			// Port
 			$this->setPort($_SERVER['SERVER_PORT']);
 
-			// URI
-			$uri = '';
+			// URI Path
+			$path = '';
 			if (isset($_SERVER['REQUEST_URI'])) {
 				$parts = explode('?', $_SERVER['REQUEST_URI']);
-				$uri = $parts[0];
+				$path = $parts[0];
 			}
 			else if (isset($_SERVER['PHP_SELF'])) {
-				$uri = $_SERVER['PHP_SELF'];
+				$path = $_SERVER['PHP_SELF'];
 			}
 			else if (isset($_SERVER['SCRIPT_NAME']) && isset($_SERVER['PATH_INFO'])) {
-				$uri = $_SERVER['SCRIPT_NAME'] . $_SERVER['PATH_INFO'];
+				$path = $_SERVER['SCRIPT_NAME'] . $_SERVER['PATH_INFO'];
 			}
-			$this->setUri($uri);
-
-			// Script
-			if (isset($_SERVER['SCRIPT_NAME'])) {
-
-				if ($uri != $_SERVER['SCRIPT_NAME']) {
-					// It's not something useful to set separately
-					// when preparing a URL so we'll do it directly
-					$this->requestInfo->script = $_SERVER['SCRIPT_NAME'];
-				}
-			}
+			$this->setPath($path);
 
 			// Request data
-			$this->requestInfo->data = PHPGoodies::instantiate('Lib.Data.Hash');
 			if (is_array($_REQUEST) && count($_REQUEST)) {
 				foreach ($_REQUEST as $name => $value) {
-					$this->requestInfo->add($name, $value);
+					$this->setPayloadData($name, $value);
 				}
+			}
+			else if (($this->getMethod() == 'POST') || ($this->getMethod() == 'PUT') || ($this->getMethod() == 'PATCH')) {
+				// Capture the raw HTTP POST/PUT/PATCH data if there's no structured REQUEST data
+				$this->setRawPayload($HTTP_RAW_POST_DATA);
 			}
 
 			// Headers
-			$this->requestInfo->headers = PHPGoodies::instantiate('Lib.Net.Http.Headers');
-			$this->requestInfo->headers->receive();
+			$this->headers = PHPGoodies::instantiate('Lib.Net.Http.Headers');
+			$this->headers->receive();
+
+			$this->readonly = true;
 		}
 	}
 
@@ -142,83 +149,128 @@ class Lib_Net_Http_Request {
 	 */
 	public function reset() {
 
-		// preFragment=false -> protocol://hostname[:port]/uri[?queryString][#fragment]
-		// preFragment=true  -> protocol://hostname[:port]/uri[#fragment][?queryString]
-		$this->requestInfo = new \stdClass();
-		$this->requestInfo->method = null;	// One of the defined HTTP_* request methods
-		$this->requestInfo->isTunnelled = null;	// true|false to tunnel methods other than GET|POST
-		$this->requestInfo->protocol = null;	// HTTP/S
-		$this->requestInfo->hostname = null;	// www.yoursite.com
-		$this->requestInfo->port = null;	// service port (80|443)
-		$this->requestInfo->uri = null;		// entire uri up to the '?' for mapping
-		$this->requestInfo->script = null;	// leading portion of uri, possibly all of it
-		$this->requestInfo->queryString = null;	// everything after the '?' up to a fragment or EOL
-		$this->requestInfo->data = null;	// All the name=value pair data for GET|POST, etc.
-		$this->requestInfo->fragment = null;	// everything after the '#'
-		$this->requestInfo->preFragment = null;	// true|false to preFragment a request being forumed
-		$this->requestInfo->headers = null;	// HttpHeaders instance with the complete set
+		// We'll only do the reset if we're not readonly
+		if ($this->readonly) throw new \Exception("Attempt to modify a read-only, preinitialized request");
+
+		$this->scheme = null;
+		$this->host = null;
+		$this->port = null;
+		$this->path = null;
+		$this->queryString = null;
+		$this->fragment = null;
+
+		$this->method = null;
+		$this->isTunnelled = null;
+		$this->payload = null;
+		$this->rawPayload = null;
+		$this->preFragment = null;
+		$this->headers = null;
 
 		return $this;
 	}
 
 	/**
-	 * Get a complete set of supported request methods
-	 *
-	 * @return array filled with the string name of each supported request method
-	 */
-	static public function getRequestMethods() {
-		return  array(
-			self::HTTP_DELETE,
-			self::HTTP_GET,
-			self::HTTP_HEAD,
-			self::HTTP_OPTIONS,
-			self::HTTP_POST,
-			self::HTTP_PATCH,
-			self::HTTP_PUT,
-			self::HTTP_TRACE
-		);
-	}
-
-	/**
-	 * Gets the request info as it stands
-	 *
-	 * @return object with request info properties and respective data
-	 */
-	public function getInfo() {
-		return $this->requestInfo;
-	}
-
-	/**
-	 * Gets the current data set as a formatted query string
+	 * Gets the current payload as a formatted query string if possible
 	 *
 	 * @return string URL-encoded query string with the data (may be 0-length if no data)
 	 */
 	public function getDataAsQueryString() {
 		PHPGoodies::import('Lib.Net.Http.QueryString');
-		return QueryString::getDataAsQueryString($this->requestInfo->data);
+		return QueryString::getDataAsQueryString($this->payload);
+	}
+
+
+
+	/**
+	 * Getter for the request scheme
+	 *
+	 * @return string scheme identifier (HTTP/S)
+	 */
+	public function getScheme() {
+		return $this->scheme;
 	}
 
 	/**
-	 * Setter for request protocol
+	 * Getter for the request host
 	 *
-	 * @param string $protocol Something like HTTP/S normally, but could be another
+	 * @return string hostname (www.yoursite.com)
+	 */
+	public function getHost() {
+		return $this->host;
+	}
+
+	/**
+	 * Getter for the request port
+	 *
+	 * @return integer port, if any
+	 */
+	public function getPort() {
+		return $this->port;
+	}
+
+	/**
+	 * Getter for the request URI path
+	 *
+	 * @return string URI path for the request, if any
+	 */
+	public function getPath() {
+		return $this->path;
+	}
+
+	/**
+	 * Getter for the request URL query string
+	 *
+	 * @return string URL query string for the request, if any
+	 */
+	public function getQueryString() {
+		return $this->queryString;
+	}
+
+	/**
+	 * Getter for the request URL fragment
+	 *
+	 * @return string URL fragment for the request, if any
+	 */
+	public function getFragment() {
+		return $this->fragment;
+	}
+
+
+
+
+
+
+
+
+
+
+	/**
+	 * Setter for request scheme
+	 *
+	 * @param string $scheme Something like HTTP/S normally, but could be another
 	 *
 	 * @return object $this for chainable support...
 	 */
-	public function setProtocol($protocol) {
-		$this->requestInfo->protocol = strtoupper($protocol);
+	public function setScheme($scheme) {
+		// We'll only modify properties if we're not readonly
+		if ($this->readonly) throw new \Exception("Attempt to modify a read-only, preinitialized request");
+		Oop_Type::requireType($scheme, 'string');
+		$this->scheme = strtoupper($scheme);
 		return $this;
 	}
 
 	/**
-	 * Setter for request hostname
+	 * Setter for request host
 	 *
-	 * @param string $hostname www.yoursite.com
+	 * @param string $host www.yoursite.com
 	 *
 	 * @return object $this for chainable support...
 	 */
-	public function setHostname($hostname) {
-		$this->requestInfo->hostname = $hostname;
+	public function setHost($host) {
+		// We'll only modify properties if we're not readonly
+		if ($this->readonly) throw new \Exception("Attempt to modify a read-only, preinitialized request");
+		Oop_Type::requireType($scheme, 'string');
+		$this->host = $host;
 		return $this;
 	}
 
@@ -230,94 +282,25 @@ class Lib_Net_Http_Request {
 	 * @return object $this for chainable support...
 	 */
 	public function setPort($port) {
-		$this->requestInfo->port = $port;
+		// We'll only modify properties if we're not readonly
+		if ($this->readonly) throw new \Exception("Attempt to modify a read-only, preinitialized request");
+		Oop_Type::requireType($scheme, 'number');
+		$this->port = $port;
 		return $this;
 	}
 
 	/**
-	 * Setter for request URI
+	 * Setter for request URI Path
 	 *
-	 * @param string $uri The URI for this request
-	 *
-	 * @return object $this for chainable support...
-	 */
-	public function setUri($uri) {
-		$this->requestInfo->uri = $uri;
-		return $this;
-	}
-
-	/**
-	 * Setter for request method
-	 *
-	 * @param string $method One of the supported http methods (GET/POST/OPTIONS, etc)
+	 * @param string $path The URI for this request
 	 *
 	 * @return object $this for chainable support...
 	 */
-	public function setMethod($method) {
-		if (! $this->isValidMethod($method)) {
-			throw new \Exception("Attempt to set an invalid request method ({$method})");
-		}
-		$this->requestInfo->method = strtoupper($method);
-		return $this;
-	}
-
-	/**
-	 * Make sure the specified protocol is a valid one
-	 */
-	public function isValidMethod($method) {
-		return in_array(strtoupper($method), $this->requestMethods);
-	}
-
-	/**
-	 * Setter for request method tunnelled state
-	 *
-	 * @param boolean $isTunnelled true to tunnel real method through POST as HTTP_X_HTTP_METHOD
-	 *
-	 * @return object $this for chainable support...
-	 */
-	public function setIsTunnelled($isTunnelled) {
-		$this->requestInfo->isTunnelled = $isTunnelled ? true : false;
-		return $this;
-	}
-
-	/**
-	 * Setter for request data element(s)
-	 *
-	 * Note that value should really be a simple string or integer to make things easy to follow
-	 * but it would technically be possibly to set an array of simple string/integer values as
-	 * well. Supplying objects or any other data types here will not be rejected, but probably
-	 * won't get you what you were hoping for...
-	 *
-	 * @param string $name Name of the data element to set
-	 * @param mixed $value The value to set for this data element
-	 *
-	 * @return object $this for chainable support...
-	 */
-	public function setData($name, $value = null) {
-
-		// If this is the first data element, initialize the array to hold data
-		if (! is_array($this->requestInfo->data)) $this->requestInfo->data = array();
-
-		// If this data element is not already in place, then we'll use a single value
-		if (! isset($this->requestInfo->data[$name])) {
-			$this->requestInfo->data[$name] = $value;
-		}
-		else {
-			// Something is already in this data element - is it an array?
-			if (is_array($this->requestInfo->data[$name])) {
-				// Sweet - just add this value to the array
-				$this->requestInfo->data[$name][] = $value;
-			}
-			else {
-				// Convert it to an array and make the current
-				// value and the new one the first two elements
-				$this->requestInfo->data[$name] = array(
-					$this->requestInfo->data[$name],
-					$value
-				);
-			}
-		}
-
+	public function setPath($path) {
+		// We'll only modify properties if we're not readonly
+		if ($this->readonly) throw new \Exception("Attempt to modify a read-only, preinitialized request");
+		Oop_Type::requireType($scheme, 'string');
+		$this->path = $path;
 		return $this;
 	}
 
@@ -329,7 +312,10 @@ class Lib_Net_Http_Request {
 	 * @return object $this for chainable support...
 	 */
 	public function setQueryString($queryString) {
-		$this->requestInfo->queryString = $queryString;
+		// We'll only modify properties if we're not readonly
+		if ($this->readonly) throw new \Exception("Attempt to modify a read-only, preinitialized request");
+		Oop_Type::requireType($scheme, 'string');
+		$this->queryString = $queryString;
 		return $this;
 	}
 
@@ -341,7 +327,107 @@ class Lib_Net_Http_Request {
 	 * @return object $this for chainable support...
 	 */
 	public function setFragment($fragment) {
-		$this->requestInfo->fragment = $fragment;
+		// We'll only modify properties if we're not readonly
+		if ($this->readonly) throw new \Exception("Attempt to modify a read-only, preinitialized request");
+		Oop_Type::requireType($scheme, 'string');
+		$this->fragment = $fragment;
+		return $this;
+	}
+
+	/**
+	 * Setter for request method
+	 *
+	 * @param string $method One of the supported http methods (GET/POST/OPTIONS, etc)
+	 *
+	 * @return object $this for chainable support...
+	 */
+	public function setMethod($method) {
+		// We'll only modify properties if we're not readonly
+		if ($this->readonly) throw new \Exception("Attempt to modify a read-only, preinitialized request");
+		if (! $this->isValidMethod($method)) {
+			throw new \Exception("Attempt to set an invalid request method ({$method})");
+		}
+		$this->method = strtoupper($method);
+		return $this;
+	}
+
+	/**
+	 * Setter for request method tunnelled state
+	 *
+	 * @param boolean $isTunnelled true to tunnel real method through POST as HTTP_X_HTTP_METHOD
+	 *
+	 * @return object $this for chainable support...
+	 */
+	public function setIsTunnelled($isTunnelled) {
+		// We'll only modify properties if we're not readonly
+		if ($this->readonly) throw new \Exception("Attempt to modify a read-only, preinitialized request");
+		Oop_Type::requireType($scheme, 'boolean');
+		$this->isTunnelled = $isTunnelled ? true : false;
+		return $this;
+	}
+
+	/**
+	 * Setter for raw payload data
+	 *
+	 * Note: it only makes sense to use this OR setPayloadData - not both!
+	 *
+	 * @param string Raw POST/PUT/PATCH payload data
+	 *
+	 * @return object $this for chainable support...
+	 */
+	public function setRawPayload(&$payload) {
+		// We'll only modify properties if we're not readonly
+		if ($this->readonly) throw new \Exception("Attempt to modify a read-only, preinitialized request");
+		Oop_Type::requireType($scheme, 'string');
+		$this->rawPayload = $payload;
+		return $this;
+	}
+
+	/**
+	 * Setter for request data element(s)
+	 *
+	 * Note: it only makes sense to use this OR setRawPayload - not both!
+	 *
+	 * Note that value should really be a simple string or integer to make things easy to follow
+	 * but it would technically be possibly to set an array of simple string/integer values as
+	 * well. Supplying objects or any other data types here will not be rejected, but probably
+	 * won't get you what you were hoping for...
+	 *
+	 * @param string $name Name of the data element to set
+	 * @param mixed $value The value to set for this data element
+	 *
+	 * @return object $this for chainable support...
+	 */
+	public function setPayloadData($name, $value = null) {
+
+		// We'll only modify properties if we're not readonly
+		if ($this->readonly) throw new \Exception("Attempt to modify a read-only, preinitialized request");
+
+		// If this is the first data element, initialize the array to hold data
+		if (! is_array($this->payload)) $this->payload = PHPGoodies::instantiate('Lib.Data.Hash');
+
+		// If this data element is not already in place, then we'll use a single value
+		if (! isset($this->payload[$name])) {
+			$this->payload->add($name, $value);
+		}
+		else {
+			// Something is already in this data element - is it an array?
+			$val = $this->payload->get($name);
+			if (is_array($val)) {
+				// Sweet - just add this value to the array
+				$val[] = $value;
+			}
+			else {
+				// Convert it to an array and make the current
+				// value and the new one the first two elements
+				$val = array(
+					$this->payload->get($name),
+					$value
+				);
+			}
+			$this->payload->set($name, $val);
+		}
+
 		return $this;
 	}
 
@@ -351,7 +437,7 @@ class Lib_Net_Http_Request {
 	 * So "prefragment" is a made-up term here, but it refers to formulating an irregular URL
 	 * by placing the fragment in front of the query string such as:
 	 *
-	 * protocol://hostname:port/uri/#fragment/?querystring
+	 * scheme://host:port/path/#fragment/?querystring
 	 *
 	 * This is useful for applications that perform client-side routing such as with AngularJS.
 	 *
@@ -360,8 +446,35 @@ class Lib_Net_Http_Request {
 	 * @return object $this for chainable support...
 	 */
 	public function setPreFragment($preFragment) {
-		$this->requestInfo->preFragment = $preFragment ? true : false;
+		// We'll only modify properties if we're not readonly
+		if ($this->readonly) throw new \Exception("Attempt to modify a read-only, preinitialized request");
+		$this->preFragment = $preFragment ? true : false;
 		return $this;
+	}
+
+
+
+
+
+
+
+	/**
+	 * Make sure the specified method is a valid one
+	 */
+	protected function isValidMethod($method) {
+		Oop_Type::requireType($method, 'string');
+		switch (strtoupper($method)) {
+			case HTTP_DELETE:
+			case HTTP_GET:
+			case HTTP_HEAD:
+			case HTTP_OPTIONS:
+			case HTTP_POST:
+			case HTTP_PATCH:
+			case HTTP_PUT:
+			case HTTP_TRACE:
+				return true;
+		}
+		return false;
 	}
 }
 

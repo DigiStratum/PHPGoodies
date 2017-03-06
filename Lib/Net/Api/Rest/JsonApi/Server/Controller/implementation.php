@@ -27,7 +27,7 @@ PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Service.Exception.NoAuthoriz
 /**
  * JSON:API Endpoint Controller
  */
-abstract class Lib_Net_Api_Rest_JsonApi_Controller {
+abstract class Lib_Net_Api_Rest_JsonApi_Server_Controller {
 
 	/**
 	 * The URI_Pattern which attaches us
@@ -41,12 +41,12 @@ abstract class Lib_Net_Api_Rest_JsonApi_Controller {
 	protected $service;
 
 	/**
-	 * Default controller
+	 * Default constructor
 	 *
 	 * @param object $uriPattern Uri_Pattern class instance which attaches us
 	 * @param object $service Service implementation which we can count on
 	 */
-	public function __controller($uriPattern, $service) {
+	public function __construct($uriPattern, $service) {
 		$this->uriPattern = Oop_Type::requireType($uriPattern, 'class:Lib_Net_Api_Rest_JsonApi_Server_UriPattern');
 		$this->service = Oop_Type::requireType($service, 'class:Lib_Net_Api_Rest_JsonApi_Server_Service');
 	}

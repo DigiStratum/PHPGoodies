@@ -2,11 +2,14 @@
 /**
  * PHPGoodies:Oop_Type - An assortment of utility methods to help us with data types
  *
+ * @uses Oop_Exception_TypeMismatch
+ *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
 namespace PHPGoodies;
 
+PHPGoodies::import('Oop.Exception.TypeMismatch');
 
 
 /**
@@ -53,6 +56,8 @@ abstract class Oop_Type {
 	/**
 	 * Is the supplied data of the specified type?
 	 *
+	 * Note, classnames must be specified as "class:{classname}" for the data type.
+	 *
 	 * @param mixed $data Any PHP data we want to check the type of
 	 * @param string $type Descriptor of a valid type including a class name
 	 * @param boolean $ignoreNamespace Defaults to true to remove the namespace from class names
@@ -60,11 +65,27 @@ abstract class Oop_Type {
 	 * @return boolean true if the data's type matches the specified type, else false
 	 */
 	public static function isType(&$data, $type, $ignoreNamespace = true) {
-		return (static::getType($data, $ignoreNamespace) == $type);
+
+		// If the data is the exact type, then we're good...
+		$res = (static::getType($data, $ignoreNamespace) == $type);
+		if ($res) return true;
+
+		// But we might also have an "is a" situation via inheritance, so...
+		if (strpos($type, ':') === false) return false;
+		$classinfo = explode(':', $type);
+		$class = $classinfo[1];
+		$res = $data instanceof $class;
+		if ($res) return true;
+
+		// Ok, last chance: maybe it's in our namespace instead of the global one...
+		$class = "PHPGoodies\\{$class}";
+		return $data instanceof $class;
 	}
 
 	/**
 	 * Throws an exception if the supplied data does NOT match the specified type
+	 *
+	 * Note, classnames must be specified as "class:{classname}" for the data type.
 	 *
 	 * @param mixed $data Any PHP data we want to check the type of
 	 * @param string $type Descriptor of a valid type including a class name

@@ -14,6 +14,7 @@ use PHPGoodies\Lib_Net_Api_Rest_JsonApi_Server_Service as Lib_Net_Api_Rest_JsonA
 require(realpath(dirname(__FILE__) . '/../../../../../../../PHPGoodies.php'));
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Controller');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Service');
+PHPGoodies::import('Lib.Net.Http.Request');
 
 // 3) Provide an implementation for a Service
 class MyService implements Lib_Net_Api_Rest_JsonApi_Server_Service {
@@ -28,13 +29,14 @@ class MyService implements Lib_Net_Api_Rest_JsonApi_Server_Service {
 // 4) Provide an implementation for a Controller
 class MyController extends Lib_Net_Api_Rest_JsonApi_Server_Controller {
 
+	static protected $pattern = '/path/{#number}/dir/{$string}';
+
 	public function __construct($service) {
-		print "fired up!\n\n";
 		parent::__construct(self::getUriPattern(), $service);
 	}
 
-	static private function getUriPattern() {
-		return PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.UriPattern', '/path/{#number}/dir/{$string}');
+	static protected function getUriPattern() {
+		return PHPGoodies::instantiate('Lib.Net.Api.Rest.JsonApi.Server.UriPattern', self::$pattern);
 	}
 
 	static public function matchesUri($uri) {
@@ -53,6 +55,18 @@ foreach ($uris as $uri) {
 	if (MyController::matchesUri($uri)) {
 		$myService = new MyService();
 		$myController = new MyController($myService);
+
+		// mock an HttpRequest
+		$httpRequest = PHPGoodies::instantiate('Lib.Net.Http.Request', false);
+		$httpRequest->setMethod('GET')->setScheme('https')->setHost('localhost')->setPath($uri);
+
+		try {
+			$httpResponse = $myController->getResponseForRequest($httpRequest);
+			print "RESPONSE: \n" . print_r($httpResponse, true) . "\n\n";
+		}
+		catch (Exception $e) {
+			print "Exception: [{$e->getMessage()}]\n\n";
+		}
 	}
 }
 

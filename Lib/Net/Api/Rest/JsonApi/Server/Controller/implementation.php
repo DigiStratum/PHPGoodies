@@ -8,6 +8,7 @@
  * @uses Lib_Net_Api_Rest_JsonApi_Server_Service_Exception
  * @uses Lib_Net_Api_Rest_JsonApi_Server_Service_Exception_NoAuthentication
  * @uses Lib_Net_Api_Rest_JsonApi_Server_Service_Exception_NoAuthorization
+ * @uses Lib_Net_Http_Request
  * @uses Lib_Net_Http_Response
  * @uses Lib_Net_Http_Response_MappedException_BadRequest
  * @uses Lib_Net_Http_Response_MappedException_Unauthorized
@@ -20,6 +21,7 @@
 namespace PHPGoodies;
 
 PHPGoodies::import('Oop.Type');
+PHPGoodies::import('Lib.Net.Http.Request');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Service.Exception');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Service.Exception.NoAuthentication');
 PHPGoodies::import('Lib.Net.Api.Rest.JsonApi.Server.Service.Exception.NoAuthorization');
@@ -61,81 +63,40 @@ abstract class Lib_Net_Api_Rest_JsonApi_Server_Controller {
 	abstract static public function matchesUri($uri);
 
 	/**
-	 * Translate an HTTP POST request into a service call
+	 * Translate an HTTP request into an appropriate service call
 	 *
 	 * @param object $httpRequest instance of Http.Request
 	 *
 	 * @return object HTTPResponse instance
 	 */
-	public function doPost($httpRequest) {
-		return $this->serviceCall('create', $httpRequest);
-	}
+	public function getResponseForRequest($httpRequest) {
+		Oop_Type::requireType($httpRequest, 'class:Lib_Net_Http_Request');
 
-	/**
-	 * Translate an HTTP GET request into a service call
-	 *
-	 * @param object $httpRequest instance of Http.Request
-	 *
-	 * @return object HTTPResponse instance
-	 */
-	public function doGet($httpRequest) {
-		return $this->serviceCall('retrieve', $httpRequest);
-	}
+		// Prepare to make a call to the service layer depending on which request method...
+		switch ($httpRequest->getMethod()) {
+			case Lib_Net_Http_Request::HTTP_POST: $serviceMethod = 'create'; break;
+			case Lib_Net_Http_Request::HTTP_GET: $serviceMethod = 'retrieve'; break; 
+			case Lib_Net_Http_Request::HTTP_PATCH: $serviceMethod = 'update'; break; 
+			case Lib_Net_Http_Request::HTTP_DELETE: $serviceMethod = 'delete'; break;
+			case Lib_Net_Http_Request::HTTP_PUT: $serviceMethod = 'replace'; break;
+			case Lib_Net_Http_Request::HTTP_HEAD: $serviceMethod = 'retrieve'; break;
+			case Lib_Net_Http_Request::HTTP_OPTIONS: $serviceMethod ='getMetaData'; break;
+			case Lib_Net_Http_Request::HTTP_TRACE: 
+				$e = PHPGoodies::instantiate('Lib.Net.Http.Response.MappedException.MethodNodAllowed');
+				throw $e;
 
-	/**
-	 * Translate an HTTP PATCH request into a service call
-	 *
-	 * @param object $httpRequest instance of Http.Request
-	 *
-	 * @return object HTTPResponse instance
-	 */
-	public function doPatch($httpRequest) {
-		return $this->serviceCall('update', $httpRequest);
-	}
+			default:
+				$e = PHPGoodies::instantiate('Lib.Net.Http.Response.MappedException.BadRequest');
+				throw $e;
+		}
 
-	/**
-	 * Translate an HTTP DELETE request into a service call
-	 *
-	 * @param object $httpRequest instance of Http.Request
-	 *
-	 * @return object HTTPResponse instance
-	 */
-	public function doDelete($httpRequest) {
-		return $this->serviceCall('delete', $httpRequest);
-	}
+		$httpResponse = $this->serviceCall($serviceMethod, $httpRequest);
 
-	/**
-	 * Translate an HTTP PUT request into a service call
-	 *
-	 * @param object $httpRequest instance of Http.Request
-	 *
-	 * @return object HTTPResponse instance
-	 */
-	public function doPut($httpRequest) {
-		return $this->serviceCall('replace', $httpRequest);
-	}
+		// Strip the response body for HEAD requests
+		if ($httpRequest->getMethod() === Lib_Net_Http_Request::HTTP_HEAD) {
+			$httpResponse->setResponseBody(null);
+		}
 
-	/**
-	 * Translate an HTTP HEAD request into a service call
-	 *
-	 * @param object $httpRequest instance of Http.Request
-	 *
-	 * @return object HTTPResponse instance
-	 */
-	public function doHead($httpRequest) {
-		return $this->serviceCall('getMetadata', $httpRequest);
-	}
-
-	/**
-	 * Translate an HTTP OPTIONS request into a service call
-	 *
-	 * @param object $httpRequest instance of Http.Request
-	 *
-	 * @return object HTTPResponse instance
-	 */
-	public function doOptions($httpRequest) {
-		$httpResponse = $this->serviceCall('retrieve', $httpRequest);
-		$httpResponse->setResponseBody(null);
 		return $httpResponse;
 	}
 
@@ -156,13 +117,20 @@ abstract class Lib_Net_Api_Rest_JsonApi_Server_Controller {
 		$response = PHPGoodies::instantiate('Lib.Net.Http.Response');
 
 		try {
+			// Since the service layer caters to the needs of this specific endpoint,
+			// the only variability, then, comes from URI variables. (todo: also add
+			// support for passing query string values as arguments, duh!)
 			$vars = $this->uriPattern->getUriVariables($uri);
-			if (is_null($args)) {
+			if (is_null($vars)) {
 				$e = PHPGoodies::instantiate('Lib.Net.Http.Response.MappedException.BadRequest');
 				throw $e;
 			}
 
-			return $this->service->{$methodName}($vars);
+			$result = $this->service->{$methodName}($vars);
+
+			// todo: convert result data into a JSON:API HttpResponse structure...
+
+			return $response;
 		}
 
 		// Convert JsonApi.Server.Service.Exception to Http.Response MappedException

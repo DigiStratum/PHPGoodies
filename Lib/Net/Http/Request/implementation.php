@@ -72,10 +72,10 @@ class Lib_Net_Http_Request {
 				$method = $this->setMethod($_SERVER['REQUEST_METHOD']);
 
 				// Support for method tunnelling
-				if ((HTTP_POST == $method) && isset($_SERVER['HTTP_X_HTTP_METHOD'])) {
+				if ((self::HTTP_POST == $method) && isset($_SERVER['HTTP_X_HTTP_METHOD'])) {
 					switch ($_SERVER['HTTP_X_HTTP_METHOD']) {
-						case HTTP_DELETE:
-						case HTTP_PUT:
+						case self::HTTP_DELETE:
+						case self::HTTP_PUT:
 							$this->setMethod($_SERVER['HTTP_X_HTTP_METHOD']);
 							$this->setIsTunnelled(true);
 							break;
@@ -129,7 +129,7 @@ class Lib_Net_Http_Request {
 					$this->setPayloadData($name, $value);
 				}
 			}
-			else if (($this->getMethod() == 'POST') || ($this->getMethod() == 'PUT') || ($this->getMethod() == 'PATCH')) {
+			else if (($this->getMethod() == self::HTTP_POST) || ($this->getMethod() == self::HTTP_PUT) || ($this->getMethod() == self::HTTP_PATCH)) {
 				// Capture the raw HTTP POST/PUT/PATCH data if there's no structured REQUEST data
 				$this->setRawPayload($HTTP_RAW_POST_DATA);
 			}
@@ -179,7 +179,14 @@ class Lib_Net_Http_Request {
 		return QueryString::getDataAsQueryString($this->payload);
 	}
 
-
+	/**
+	 * Getter for the request method
+	 *
+	 * @return string method identifier (GET/POST/etc..
+	 */
+	public function getMethod() {
+		return $this->method;
+	}
 
 	/**
 	 * Getter for the request scheme
@@ -464,14 +471,14 @@ class Lib_Net_Http_Request {
 	protected function isValidMethod($method) {
 		Oop_Type::requireType($method, 'string');
 		switch (strtoupper($method)) {
-			case HTTP_DELETE:
-			case HTTP_GET:
-			case HTTP_HEAD:
-			case HTTP_OPTIONS:
-			case HTTP_POST:
-			case HTTP_PATCH:
-			case HTTP_PUT:
-			case HTTP_TRACE:
+			case self::HTTP_DELETE:
+			case self::HTTP_GET:
+			case self::HTTP_HEAD:
+			case self::HTTP_OPTIONS:
+			case self::HTTP_POST:
+			case self::HTTP_PATCH:
+			case self::HTTP_PUT:
+			case self::HTTP_TRACE:
 				return true;
 		}
 		return false;

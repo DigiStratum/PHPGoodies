@@ -2,12 +2,15 @@
 /**
  * PHPGoodies:Lib_Net_Http_Response - An HTTP response container
  *
+ * @uses Oop_Type
  * @uses Lib_Net_Http_Headers
  *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
 namespace PHPGoodies;
+
+PHPGoodies::import('Oop.Type');
 
 /**
  * HTTP response container
@@ -120,7 +123,7 @@ class Lib_Net_Http_Response {
 	 *
 	 * @return string The body text for the response
 	 */
-	public function getResponseBody() {
+	public function getBody() {
 		return $this->body;
 	}
 
@@ -140,6 +143,7 @@ class Lib_Net_Http_Response {
 	 * @return object $this for chainable support...
 	 */
 	public function setCode($code) {
+		Oop_Type::requireType($code, 'number');
 		$this->code = $code;
 		$desc = self::getDescription($code);
 		$this->headers->set("HTTP/1.1 {$code} {$desc}");
@@ -153,8 +157,9 @@ class Lib_Net_Http_Response {
 	 *
 	 * @return object $this for chainable support...
 	 */
-	public function setResponseBody($body) {
-		$this->code = $body;
+	public function setBody(&$body) {
+		Oop_Type::requireType($body, 'string');
+		$this->body = $body;
 		return $this;
 	}
 

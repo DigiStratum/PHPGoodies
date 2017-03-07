@@ -276,7 +276,7 @@ class Lib_Net_Http_Request {
 	public function setHost($host) {
 		// We'll only modify properties if we're not readonly
 		if ($this->readonly) throw new \Exception("Attempt to modify a read-only, preinitialized request");
-		Oop_Type::requireType($scheme, 'string');
+		Oop_Type::requireType($host, 'string');
 		$this->host = $host;
 		return $this;
 	}
@@ -291,7 +291,7 @@ class Lib_Net_Http_Request {
 	public function setPort($port) {
 		// We'll only modify properties if we're not readonly
 		if ($this->readonly) throw new \Exception("Attempt to modify a read-only, preinitialized request");
-		Oop_Type::requireType($scheme, 'number');
+		Oop_Type::requireType($port, 'number');
 		$this->port = $port;
 		return $this;
 	}
@@ -306,7 +306,7 @@ class Lib_Net_Http_Request {
 	public function setPath($path) {
 		// We'll only modify properties if we're not readonly
 		if ($this->readonly) throw new \Exception("Attempt to modify a read-only, preinitialized request");
-		Oop_Type::requireType($scheme, 'string');
+		Oop_Type::requireType($path, 'string');
 		$this->path = $path;
 		return $this;
 	}
@@ -321,7 +321,7 @@ class Lib_Net_Http_Request {
 	public function setQueryString($queryString) {
 		// We'll only modify properties if we're not readonly
 		if ($this->readonly) throw new \Exception("Attempt to modify a read-only, preinitialized request");
-		Oop_Type::requireType($scheme, 'string');
+		Oop_Type::requireType($queryString, 'string');
 		$this->queryString = $queryString;
 		return $this;
 	}
@@ -336,7 +336,7 @@ class Lib_Net_Http_Request {
 	public function setFragment($fragment) {
 		// We'll only modify properties if we're not readonly
 		if ($this->readonly) throw new \Exception("Attempt to modify a read-only, preinitialized request");
-		Oop_Type::requireType($scheme, 'string');
+		Oop_Type::requireType($fragment, 'string');
 		$this->fragment = $fragment;
 		return $this;
 	}
@@ -368,7 +368,7 @@ class Lib_Net_Http_Request {
 	public function setIsTunnelled($isTunnelled) {
 		// We'll only modify properties if we're not readonly
 		if ($this->readonly) throw new \Exception("Attempt to modify a read-only, preinitialized request");
-		Oop_Type::requireType($scheme, 'boolean');
+		Oop_Type::requireType($isTunnelled, 'boolean');
 		$this->isTunnelled = $isTunnelled ? true : false;
 		return $this;
 	}
@@ -385,7 +385,7 @@ class Lib_Net_Http_Request {
 	public function setRawPayload(&$payload) {
 		// We'll only modify properties if we're not readonly
 		if ($this->readonly) throw new \Exception("Attempt to modify a read-only, preinitialized request");
-		Oop_Type::requireType($scheme, 'string');
+		Oop_Type::requireType($payload, 'string');
 		$this->rawPayload = $payload;
 		return $this;
 	}
@@ -458,12 +458,6 @@ class Lib_Net_Http_Request {
 		$this->preFragment = $preFragment ? true : false;
 		return $this;
 	}
-
-
-
-
-
-
 
 	/**
 	 * Make sure the specified method is a valid one

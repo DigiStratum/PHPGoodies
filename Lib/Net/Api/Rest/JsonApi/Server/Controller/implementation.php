@@ -129,6 +129,7 @@ abstract class Lib_Net_Api_Rest_JsonApi_Server_Controller {
 			$result = $this->service->{$methodName}($vars);
 
 			// todo: convert result data into a JSON:API HttpResponse structure...
+			$response->setBody($result);
 
 			return $response;
 		}

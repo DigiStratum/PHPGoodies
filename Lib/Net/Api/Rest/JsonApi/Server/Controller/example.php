@@ -19,7 +19,7 @@ PHPGoodies::import('Lib.Net.Http.Request');
 // 3) Provide an implementation for a Service
 class MyService implements Lib_Net_Api_Rest_JsonApi_Server_Service {
 	public function create($variables) {return true;}
-        public function retrieve($variables) {return true;}
+        public function retrieve($variables) {return "some example data";}
         public function update($variables) {return true;}
         public function delete($variables) {return true;}
         public function replace($variables) {return true;}
@@ -52,7 +52,9 @@ $uris = Array(
 );
 
 foreach ($uris as $uri) {
+	print "Mock Request: {$uri}\n";
 	if (MyController::matchesUri($uri)) {
+		print "MATCH!\n";
 		$myService = new MyService();
 		$myController = new MyController($myService);
 
@@ -68,5 +70,6 @@ foreach ($uris as $uri) {
 			print "Exception: [{$e->getMessage()}]\n\n";
 		}
 	}
+	else print "no match...\n";
 }
 

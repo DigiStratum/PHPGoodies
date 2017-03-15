@@ -25,6 +25,11 @@ class Lib_Net_Email {
 	protected $headers;
 
 	/**
+	 * The collection of body parts for this email; note there can be multiples for multi-part
+	 */
+	protected $bodyParts;
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
@@ -61,10 +66,11 @@ class Lib_Net_Email {
 		}
 
 		$this->headers = PHPGoodies::instantiate('Lib.Data.Hash');
+		$this->bodyParts = PHPGoodies::instantiate('Lib.Data.Hash');
 	}
 
 	/**
-	 * Add the named header with the supplied value, if possible
+	 * Set the named header to the supplied value, if possible
 	 *
 	 * @todo Scrub the value for acceptable character set
 	 *
@@ -73,12 +79,58 @@ class Lib_Net_Email {
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function addHeader($name, $value) {
+	public function setHeader($name, $value) {
 		$headerName = $this->getProperHeaderName($name);
 		if (is_null($headerName)) {
 			throw new \Exception("{$name} is not a supported header");
 		}
 
+		$this->headers->set($name, $value);
+
+		return $this;
+	}
+
+	/**
+	 * Set the email body
+	 *
+	 * Note that our default is text/plain mainly because for simple applications, the easiest
+	 * thing for them to do is pass along a plain text body whose formatting will be preserved.
+	 * A more advanced application capable of forming an HTML or even multi-part body will have
+	 * to override the type or use one of the other convenience setters.
+	 *
+	 * @param string $body The body content for the email
+	 * @param string $type The content type for the body (optional, defaults to text/plain)
+	 *
+	 * @return object $this for chaining...
+	 */
+	public function setBody(&$body, $type='text/plain') {
+		// TODO: Vary key more smarter based on multiple body parts of the same type (need?)
+		$key = $type;
+		$this->bodyParts->set($key, $body);
+		return $this;
+	}
+
+	/**
+	 * Set the email body for plain text explicitly
+	 *
+	 * @param string $body The body content for the email
+	 *
+	 * @return object $this for chaining...
+	 */
+	public function setTextBody(&$text) {
+		$this->setBody($text);
+		return $this;
+	}
+
+	/**
+	 * Set the email body for html explicitly
+	 *
+	 * @param string $body The body content for the email
+	 *
+	 * @return object $this for chaining...
+	 */
+	public function setHtmlBody(&$html) {
+		$this->setBody($body, 'text/html');
 		return $this;
 	}
 

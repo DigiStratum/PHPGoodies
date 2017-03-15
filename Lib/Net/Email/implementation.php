@@ -2,6 +2,8 @@
 /**
  * PHPGoodies:Lib_Net_Url - A class for working with emails
  *
+ * @uses Lib_Data_Hash
+ *
  * @author Sean M. Kelly <smk@smkelly.com>
  */
 
@@ -12,8 +14,14 @@ namespace PHPGoodies;
  */
 class Lib_Net_Email {
 
+	/**
+	 * Lookup table for valid headers
+	 */
 	protected $validHeaders;
 
+	/**
+	 * The collection of defined headers for THIS email
+	 */
 	protected $headers;
 
 	/**
@@ -51,7 +59,41 @@ class Lib_Net_Email {
 		foreach ($headers as $header) {
 			$this->validHeaders[strtolower($header)] = $header;
 		}
+
+		$this->headers = PHPGoodies::instantiate('Lib.Data.Hash');
 	}
 
+	/**
+	 * Add the named header with the supplied value, if possible
+	 *
+	 * @todo Scrub the value for acceptable character set
+	 *
+	 * @param string $name The name of the header we want to add
+	 * @param string $value The value to set the named header to
+	 *
+	 * @return object $this for chaining...
+	 */
+	public function addHeader($name, $value) {
+		$headerName = $this->getProperHeaderName($name);
+		if (is_null($headerName)) {
+			throw new \Exception("{$name} is not a supported header");
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Get the properly cased header name for that supplied
+	 *
+	 * @todo Add support for X-** custom headers which will not be in our array
+	 *
+	 * @param string $headerName Client requested header which may have improper casing
+	 *
+	 * @return string properly cased equivalent header name, or null if the header is not valid
+	 */
+	protected function getProperHeaderName($headerName) {
+		$key = strtolower($headerName);
+		return (isset($this->validHeaders[$key])) ? $this->validHeaders[$key] : null;
+	}
 }
 

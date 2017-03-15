@@ -113,9 +113,9 @@ class Lib_Net_Email {
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function setBody(&$body, $type='text/plain', $charset='us-ascii') {
+	public function setBody($body, $type='text/plain', $charset='us-ascii') {
 		$supportedBodyTypes = Array('text/plain', 'text/html');
-		if (! in_array($supportedBodyTypes, $type)) {
+		if (! in_array($type, $supportedBodyTypes)) {
 			throw new \Exception("Unsupported body type: {$type}");
 		}
 		$key = "{$type}; charset={$charset}";
@@ -131,7 +131,7 @@ class Lib_Net_Email {
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function setTextBody(&$text, $charset='us-ascii') {
+	public function setTextBody($text, $charset='us-ascii') {
 		$this->setBody($text, 'text/plain', $charset);
 		return $this;
 	}
@@ -144,8 +144,8 @@ class Lib_Net_Email {
 	 *
 	 * @return object $this for chaining...
 	 */
-	public function setHtmlBody(&$html, $charset='us-ascii') {
-		$this->setBody($body, 'text/html', $charset);
+	public function setHtmlBody($html, $charset='us-ascii') {
+		$this->setBody($html, 'text/html', $charset);
 		return $this;
 	}
 
@@ -188,7 +188,7 @@ class Lib_Net_Email {
 			$body = $boundary = '';
 		}
 		$contentType = '';
-		$this->bodyParts->iterate(function ($type, $content) use ($body, $boundary, $multipart, $contentType) {
+		$this->bodyParts->iterate(function ($type, $content) use (&$body, $boundary, $multipart, &$contentType) {
 
 			// For multipart message
 			if ($multipart) {
@@ -269,7 +269,14 @@ class Lib_Net_Email {
 		$res = $this->composeBody();
 		$this->setHeader('Content-Type', $res->type);
 
-		mail($data['To'], $data['Subject'], $res->body, $headers);
+		// Form the rest of the headers
+		$headers = '';
+		$this->headers->iterate(function ($name, $value) use (&$headers) {
+			$headers .= "{$name}: {$value}\r\n";
+		});
+		$headers .= "\r\n";
+
+		return mail($data['To'], $data['Subject'], $res->body, $headers);
 	}
 
 	/**

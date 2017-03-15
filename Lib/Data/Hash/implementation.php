@@ -160,5 +160,27 @@ class Lib_Data_Hash {
 
 		return $this;
 	}
+
+	/**
+	 * Iterate over the collection passing each entry to the callback function
+	 *
+	 * If the callback function returns false, then iteration will stop there and return the
+	 * number of entries we iterated before the stopping point.
+	 *
+	 * @param function $callback Callback function with two arguments to receive the key & value
+	 *
+	 * @return integer count of how many entries we iterated before we stopped, or null if entire collection iterated
+	 */
+	public function iterate($callback) {
+		if (! is_callable($callback)) {
+			throw new \Exception("Attempted to iterate with a non-callable callback; it must be a function!");
+		}
+		$num = 0;
+		foreach ($this->hash as $name => $value) {
+			$res = call_user_func($callback, $name, $value);
+			if ($res === false) return $num;
+			$num++;
+		}
+	}
 }
 

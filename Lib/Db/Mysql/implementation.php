@@ -268,7 +268,7 @@ class Lib_Db_Mysql {
 				@mysql_free_result($result);
 
 				// The return result from callbacks is either true or false only
-				return$sqlrows;
+				return $sqlrows;
 
 			// Queries that return no row data come here (INSERT, UPDATE, DELETE, DROP, etc.)
 			case 'boolean':

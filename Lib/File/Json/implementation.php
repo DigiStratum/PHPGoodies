@@ -9,6 +9,8 @@ namespace PHPGoodies;
 
 /**
  * Json - A class for manipulating Json data
+ *
+ * TODO: Add support for image embedding like: <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAIAAAB=" />
  */
 class Lib_File_Json {
 

@@ -9,7 +9,7 @@ namespace PHPGoodies;
 
 require_once(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
 
-class Secret64Test extends \PHPUnit_Framework_TestCase {
+class Secret64Test extends \PHPUnit\Framework\TestCase {
 
 	/**
 	 * Constructor

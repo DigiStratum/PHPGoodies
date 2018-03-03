@@ -16,7 +16,7 @@ require_once(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
 
 PHPGoodies::import('Oop.StronglyTyped.Class');
 
-class Oop_StronglyTyped_Class_Test extends \PHPUnit_Framework_TestCase {
+class Oop_StronglyTyped_Class_Test extends \PHPUnit\Framework\TestCase {
 
 	/**
 	 * Constructor

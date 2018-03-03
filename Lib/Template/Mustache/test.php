@@ -9,7 +9,7 @@ namespace PHPGoodies;
 
 require_once(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
 
-class MustacheTest extends \PHPUnit_Framework_TestCase {
+class MustacheTest extends \PHPUnit\Framework\TestCase {
 
 	/**
 	 * Our class under test

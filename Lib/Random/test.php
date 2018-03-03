@@ -9,7 +9,7 @@ namespace PHPGoodies;
 
 require_once(realpath(dirname(__FILE__) . '/../../PHPGoodies.php'));
 
-class RandomTest extends \PHPUnit_Framework_TestCase {
+class RandomTest extends \PHPUnit\Framework\TestCase {
 
 	/**
 	 * Constructor

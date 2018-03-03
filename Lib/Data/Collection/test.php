@@ -9,7 +9,7 @@ namespace PHPGoodies;
 
 require_once(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
 
-class Lib_Data_Collection_Test extends \PHPUnit_Framework_TestCase {
+class Lib_Data_Collection_Test extends \PHPUnit\Framework\TestCase {
 
 	/**
 	 * Constructor

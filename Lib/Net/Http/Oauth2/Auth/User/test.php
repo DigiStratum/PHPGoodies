@@ -11,7 +11,7 @@ require_once(realpath(dirname(__FILE__) . '/../../../../../../PHPGoodies.php'));
 
 PHPGoodies::import('Lib.Net.Http.Oauth2.Auth.User');
 
-class Oauth2AuthUserTest extends \PHPUnit_Framework_TestCase {
+class Oauth2AuthUserTest extends \PHPUnit\Framework\TestCase {
 
 	/**
 	 * Constructor

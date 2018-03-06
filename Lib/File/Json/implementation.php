@@ -80,8 +80,7 @@ class Lib_File_Json {
 	 * @return mixed data structure of the composed JSON
 	 */
 	public function composeJson($json) {
-		if (is_null($json)) return null;
-//		return $this->composeJsonData(json_decode($json));
+		return $this->composeJsonData(json_decode($json));
 	}
 
 	/**

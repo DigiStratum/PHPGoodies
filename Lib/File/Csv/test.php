@@ -14,7 +14,7 @@ class Lib_File_Csv_Test extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Constructor
 	 */
-	public function __construct() {
+	public static function setupBeforeClass() {
 		PHPGoodies::import('Lib.File.Csv');
 	}
 

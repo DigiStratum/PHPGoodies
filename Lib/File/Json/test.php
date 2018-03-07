@@ -8,8 +8,9 @@
 namespace PHPGoodies;
 
 require_once(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
+PHPGoodies::import('test.TestFramework.TestCase');
 
-class Lib_File_Json_Test extends \PHPUnit\Framework\TestCase {
+class Lib_File_Json_Test extends test_TestFramework_TestCase {
 
 	protected $sut;
 

@@ -12,12 +12,14 @@ namespace PHPGoodies;
 
 require_once(realpath(dirname(__FILE__) . '/../../../../../PHPGoodies.php'));
 
-class Lib_Net_Httpd_Oauth2_AccessToken_Test extends \PHPUnit\Framework\TestCase {
+PHPGoodies::import('test.TestFramework.TestCase');
+
+class Lib_Net_Httpd_Oauth2_AccessToken_Test extends test_TestFramework_TestCase {
 
 	/**
 	 * Constructor
 	 */
-	public function __construct() {
+	public static function setupBeforeClass() {
 		PHPGoodies::import('Lib.Net.Http.Oauth2.AccessToken');
 	}
 

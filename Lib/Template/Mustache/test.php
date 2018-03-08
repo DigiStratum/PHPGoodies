@@ -8,8 +8,9 @@
 namespace PHPGoodies;
 
 require_once(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
+PHPGoodies::import('test.TestFramework.TestCase');
 
-class MustacheTest extends \PHPUnit\Framework\TestCase {
+class MustacheTest extends test_TestFramework_TestCase {
 
 	/**
 	 * Our class under test
@@ -17,9 +18,9 @@ class MustacheTest extends \PHPUnit\Framework\TestCase {
 	private $class;
 
 	/**
-	 * Constructor
+	 * Pre-Constructor
 	 */
-	public function __construct() {
+	public static function setupBeforeClass() {
 		PHPGoodies::import('Lib.Template.Mustache');
 	}
 

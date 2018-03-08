@@ -8,13 +8,14 @@
 namespace PHPGoodies;
 
 require_once(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
+PHPGoodies::import('test.TestFramework.TestCase');
 
-class Secret64Test extends \PHPUnit\Framework\TestCase {
+class Secret64Test extends test_TestFramework_TestCase {
 
 	/**
-	 * Constructor
+	 * Pre-Constructor
 	 */
-	public function __construct() {
+	public static function setupBeforeClass() {
 		PHPGoodies::import('Lib.Crypto.Secret64');
 	}
 

@@ -4,7 +4,6 @@
  *
  * FIXME: calls to `new Oop_StronglyTyped_Class()` should probable be replaced by PHPGoodies::instantiate() calls...
  *
- *
  * @groups basic, types, data, magic, scope, names, functions
  *
  * @author Sean M. Kelly <smk@smkelly.com>
@@ -15,14 +14,9 @@ namespace PHPGoodies;
 require_once(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
 
 PHPGoodies::import('Oop.StronglyTyped.Class');
+PHPGoodies::import('test.TestFramework.TestCase');
 
-class Oop_StronglyTyped_Class_Test extends \PHPUnit\Framework\TestCase {
-
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-	}
+class Oop_StronglyTyped_Class_Test extends test_TestFramework_TestCase {
 
 	/**
 	 * Setup to occur ahead of each test method invocation

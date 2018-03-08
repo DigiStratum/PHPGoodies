@@ -8,14 +8,9 @@
 namespace PHPGoodies;
 
 require_once(realpath(dirname(__FILE__) . '/../PHPGoodies.php'));
+PHPGoodies::import('test.TestFramework.TestCase');
 
-class PHPGoodiesTest extends \PHPUnit\Framework\TestCase {
-
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-	}
+class PHPGoodiesTest extends test_TestFramework_TestCase {
 
 	/**
 	 * Setup to occur ahead of each test method invocation

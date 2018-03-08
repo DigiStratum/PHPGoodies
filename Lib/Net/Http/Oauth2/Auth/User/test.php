@@ -10,14 +10,9 @@ namespace PHPGoodies;
 require_once(realpath(dirname(__FILE__) . '/../../../../../../PHPGoodies.php'));
 
 PHPGoodies::import('Lib.Net.Http.Oauth2.Auth.User');
+PHPGoodies::import('test.TestFramework.TestCase');
 
-class Oauth2AuthUserTest extends \PHPUnit\Framework\TestCase {
-
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-	}
+class Oauth2AuthUserTest extends test_TestFramework_TestCase {
 
 	/**
 	 * Setup to occur ahead of each test method invocation

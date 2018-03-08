@@ -8,6 +8,7 @@
 			<file>Lib/Data/String/test.php</file>
 			<file>Lib/Crypto/Secret64/test.php</file>
 			<file>Lib/File/Csv/test.php</file>
+			<file>Lib/File/Json/test.php</file>
 			<file>Lib/Net/Http/Oauth2/Auth/User/test.php</file>
 			<file>Lib/Net/Http/Oauth2/AccessToken/test.php</file>
 			<file>Lib/Random/test.php</file>

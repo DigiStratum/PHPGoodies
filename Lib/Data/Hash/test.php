@@ -8,13 +8,14 @@
 namespace PHPGoodies;
 
 require_once(realpath(dirname(__FILE__) . '/../../../PHPGoodies.php'));
+PHPGoodies::import('test.TestFramework.TestCase');
 
-class Lib_Data_Hash_Test extends \PHPUnit\Framework\TestCase {
+class Lib_Data_Hash_Test extends test_TestFramework_TestCase {
 
 	/**
-	 * Constructor
+	 * Pre-Constructor
 	 */
-	public function __construct() {
+	public static function setupBeforeClass() {
 		PHPGoodies::import('Lib.Data.Hash');
 	}
 
